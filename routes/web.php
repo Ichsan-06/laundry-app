@@ -19,3 +19,6 @@ Route::post('/kasir/member', [KasirController::class, 'storeMember'])->name('kas
 Route::resource('members', MemberController::class);
 Route::resource('transactions', TransactionController::class);
 Route::resource('machines', MachineController::class);
+Route::resource('users', \App\Http\Controllers\UserController::class);
+Route::resource('addons', \App\Http\Controllers\AddonController::class);
+Route::resource('services', \App\Http\Controllers\ServiceController::class);

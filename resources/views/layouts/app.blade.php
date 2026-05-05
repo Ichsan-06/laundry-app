@@ -81,6 +81,31 @@
                     </svg>
                     Members
                 </a>
+                <a href="{{ route('users.index') }}" class="flex items-center gap-4 rounded-lg {{ Request::routeIs('users.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::routeIs('users.*') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    User Management
+                </a>
+                <a href="{{ route('addons.index') }}" class="flex items-center gap-4 rounded-lg {{ Request::routeIs('addons.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::routeIs('addons.*') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    Add Ons
+                </a>
+                <a href="{{ route('services.index') }}" class="flex items-center gap-4 rounded-lg {{ Request::routeIs('services.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::routeIs('services.*') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"></path>
+                        <path d="M7 21h10"></path>
+                        <path d="M12 21v-3"></path>
+                        <path d="M7 3h10"></path>
+                        <path d="M12 3v3"></path>
+                    </svg>
+                    Service
+                </a>
                 <a href="#" class="flex items-center gap-4 rounded-lg px-5 py-4 text-[15px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-primary-600">
                     <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
