@@ -32,6 +32,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="min-h-screen bg-[#f7f8fc] font-sans text-slate-800 antialiased">
     <div class="min-h-screen bg-white shadow-soft">
@@ -51,48 +52,48 @@
             </div>
 
             <nav class="mt-12 space-y-3">
-                <a href="#" class="flex items-center gap-4 rounded-lg bg-primary-600 px-5 py-4 text-[15px] font-bold text-white shadow-lg shadow-primary-500/25">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <a href="/kasir" class="flex items-center gap-4 rounded-lg {{ Request::is('kasir') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::is('kasir') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 10h16v10H4z"></path>
                         <path d="M7 10V7a5 5 0 0 1 10 0v3"></path>
                     </svg>
-                    Kasir
+                    Cashier
                 </a>
-                <a href="#" class="flex items-center gap-4 rounded-lg px-5 py-4 text-[15px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-primary-600">
-                    <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="5" y="4" width="14" height="16" rx="2"></rect>
-                        <path d="M8 8h8M8 12h8M8 16h4"></path>
-                    </svg>
-                    Transaksi
-                </a>
-                <a href="#" class="flex items-center gap-4 rounded-lg px-5 py-4 text-[15px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-primary-600">
-                    <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <a href="{{ route('machines.index') }}" class="flex items-center gap-4 rounded-lg {{ Request::routeIs('machines.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::routeIs('machines.*') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="6" y="3" width="12" height="18" rx="2"></rect>
                         <circle cx="12" cy="14" r="3"></circle>
                     </svg>
-                    Mesin
+                    Machines
                 </a>
-                <a href="#" class="flex items-center gap-4 rounded-lg px-5 py-4 text-[15px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-primary-600">
-                    <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <a href="{{ route('transactions.index') }}" class="flex items-center gap-4 rounded-lg {{ Request::routeIs('transactions.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::routeIs('transactions.*') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="4" width="14" height="16" rx="2"></rect>
+                        <path d="M8 8h8M8 12h8M8 16h4"></path>
+                    </svg>
+                    Transactions
+                </a>
+                <a href="{{ route('members.index') }}" class="flex items-center gap-4 rounded-lg {{ Request::routeIs('members.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-slate-500 hover:bg-slate-50 hover:text-primary-600' }} px-5 py-4 text-[15px] font-bold transition">
+                    <svg class="h-5 w-5 {{ Request::routeIs('members.*') ? 'text-white' : 'text-slate-400' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-8 0v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                         <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Member
+                    Members
                 </a>
                 <a href="#" class="flex items-center gap-4 rounded-lg px-5 py-4 text-[15px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-primary-600">
                     <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <path d="M14 2v6h6M8 13h8M8 17h6"></path>
                     </svg>
-                    Laporan
+                    Reports
                 </a>
                 <a href="#" class="flex items-center gap-4 rounded-lg px-5 py-4 text-[15px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-primary-600">
                     <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82 2 2 0 0 1-3.34 0A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33 2 2 0 0 1 0-3.34A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82 2 2 0 0 1 3.34 0A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.23.36.58.64 1 .8a1.65 1.65 0 0 0 1.82-.33 2 2 0 0 1 0 3.34A1.65 1.65 0 0 0 19.4 15z"></path>
                     </svg>
-                    Pengaturan
+                    Settings
                 </a>
             </nav>
 
@@ -131,6 +132,7 @@
         </nav>
 
         <main class="flex min-h-screen min-w-0 flex-1 flex-col pb-20 lg:pb-0 lg:pl-[270px]">
+            @sectionMissing('header')
             <header class="sticky top-0 z-20 flex min-h-[84px] shrink-0 items-center justify-between gap-4 border-b border-slate-100 bg-white/95 px-4 py-4 backdrop-blur md:min-h-[108px] md:px-10">
                 <div class="min-w-0">
                     <div class="mb-1 flex items-center gap-3 lg:hidden">
@@ -171,6 +173,9 @@
                     </div>
                 </div>
             </header>
+            @else
+                @yield('header')
+            @endif
 
             <section class="flex-1 overflow-y-auto bg-[#fbfcff] p-5 md:p-8">
                 @yield('content')

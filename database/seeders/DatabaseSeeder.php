@@ -3,23 +3,38 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Outlet;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create a default outlet
+        $outlet = Outlet::create([
+            'nama_outlet' => 'Laundry Express Utama',
+            'alamat' => 'Jl. Merdeka No. 123',
+            'telepon' => '021-1234567',
+            'kota' => 'Jakarta',
+            'aktif' => true,
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create a super admin user
+        User::create([
+            'outlet_id' => $outlet->id,
+            'nama' => 'Super Admin',
+            'email' => 'admin@laundry.com',
+            'password_hash' => Hash::make('password'),
+            'role' => 'SUPER_ADMIN',
+            'aktif' => true,
+        ]);
+
+        // Run other seeders
+        $this->call([
+            MemberSeeder::class,
+            TransactionSeeder::class,
+            MachineSeeder::class,
         ]);
     }
 }
