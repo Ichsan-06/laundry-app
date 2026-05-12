@@ -6,6 +6,7 @@ use App\Http\Controllers\MachineController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\WijayaPayCallbackController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\KasirController;
@@ -30,6 +31,8 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
         Route::get('/kasir/receipt/{id}', [KasirController::class, 'printReceipt'])->name('kasir.receipt');
         Route::post('/kasir/transaction', [KasirController::class, 'store'])->name('kasir.store');
+        Route::post('/kasir/qris', [KasirController::class, 'createQrisPayment'])->name('kasir.qris.create');
+        Route::get('/kasir/qris/{transaction}/status', [KasirController::class, 'checkQrisStatus'])->name('kasir.qris.status');
         Route::post('/kasir/member', [KasirController::class, 'storeMember'])->name('kasir.member.store');
     });
 
@@ -70,3 +73,5 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         ->middleware('rbac:permission,view reports')
         ->name('reports.index');
 });
+
+Route::post('/callback/wijayapay', WijayaPayCallbackController::class)->name('callback.wijayapay');

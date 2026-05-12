@@ -39,7 +39,7 @@
     <div>
         <p>No: {{ $transaction->transaction_number }}<br>
            Tgl: {{ $transaction->created_at->format('d/m/Y H:i') }}<br>
-           Kasir: {{ $transaction->cashier->name }}<br>
+           Kasir: {{ $transaction->cashier->nama ?? '-' }}<br>
            Plgn: {{ $transaction->member ? $transaction->member->nama : 'Non Member' }}</p>
     </div>
 

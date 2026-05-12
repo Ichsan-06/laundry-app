@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'wijayapay' => [
+        'merchant_code' => env('WIJAYAPAY_MERCHANT_CODE'),
+        'api_key' => env('WIJAYAPAY_API_KEY'),
+        'create_url' => env('WIJAYAPAY_CREATE_URL', 'https://wijayapay.com/api/transaction/create'),
+        'status_url' => env('WIJAYAPAY_STATUS_URL', 'https://wijayapay.com/api/get-status'),
+        'callback_url' => env('WIJAYAPAY_CALLBACK_URL'),
+    ],
+
 ];

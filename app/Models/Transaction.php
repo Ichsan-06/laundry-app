@@ -28,6 +28,12 @@ class Transaction extends Model
         'member_discount',
         'total_amount',
         'payment_method',
+        'payment_status',
+        'trx_reference',
+        'ref_id',
+        'payment_fee',
+        'payment_expires_at',
+        'paid_at',
         'amount_received',
         'change_amount',
         'notes',
@@ -37,9 +43,12 @@ class Transaction extends Model
         'subtotal' => 'decimal:2',
         'member_discount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'payment_fee' => 'decimal:2',
         'amount_received' => 'decimal:2',
         'change_amount' => 'decimal:2',
         'estimated_finish' => 'datetime',
+        'payment_expires_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     public function outlet()

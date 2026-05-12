@@ -16,6 +16,32 @@
     discountPercent: 0,
     taxPercent: 0,
     showNewMemberModal: false,
+    isSubmitting: false,
+    toast: { show: false, type: 'success', message: '', timeout: null },
+    alertModal: { show: false, type: 'error', title: '', message: '' },
+    showPaymentSuccessModal: false,
+    lastPaidTransaction: null,
+    qrisModal: {
+        show: false,
+        transactionId: null,
+        transactionNumber: '',
+        refId: '',
+        trxReference: '',
+        paymentName: 'QRIS',
+        qrImage: '',
+        totalBayar: 0,
+        totalFee: 0,
+        expired: null,
+        remainingSeconds: 0,
+        status: 'pending',
+        tutorialPembayaran: '',
+    },
+    pollingTimer: null,
+    countdownTimer: null,
+    csrfToken: @js(csrf_token()),
+    qrisCreateUrl: @js(route('kasir.qris.create')),
+    qrisStatusTemplate: @js(route('kasir.qris.status', ['transaction' => '__TRANSACTION__'])),
+    receiptTemplate: @js(url('/kasir/receipt/__TRANSACTION__')),
     newMember: { nama: '', no_hp: '', email: '' },
 
     // Data from Backend
@@ -28,9 +54,225 @@
     dropOff: {
         details: [{ package_id: '', weight: 1, note: '' }],
         selectedAddons: [],
-        items: [{ nama: '', qty: 1, note: '' }],
+        items: [{ nama: '', qty: 1, note: '', available_stock: null }],
         catatan: '',
         estimasiSelesai: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] + ' 10:00',
+    },
+
+    init() {
+        @if(session('success'))
+            this.showToast('success', @js(session('success')));
+        @endif
+
+        @if($errors->any())
+            this.showAlert('error', 'Transaksi gagal', @js($errors->first()));
+        @endif
+    },
+
+    qrisStatusUrl(transactionId) {
+        return this.qrisStatusTemplate.replace('__TRANSACTION__', transactionId);
+    },
+
+    receiptUrl(transactionId) {
+        return this.receiptTemplate.replace('__TRANSACTION__', transactionId);
+    },
+
+    formatCurrency(value) {
+        return 'Rp ' + Math.max(0, Number(value || 0)).toLocaleString('id-ID');
+    },
+
+    showToast(type, message) {
+        if (this.toast.timeout) {
+            clearTimeout(this.toast.timeout);
+        }
+
+        this.toast = { show: true, type, message, timeout: null };
+        this.toast.timeout = setTimeout(() => {
+            this.toast.show = false;
+        }, 3500);
+    },
+
+    showAlert(type, title, message) {
+        this.alertModal = { show: true, type, title, message };
+    },
+
+    closeAlert() {
+        this.alertModal.show = false;
+    },
+
+    resetQrisTimers() {
+        if (this.pollingTimer) {
+            clearInterval(this.pollingTimer);
+            this.pollingTimer = null;
+        }
+
+        if (this.countdownTimer) {
+            clearInterval(this.countdownTimer);
+            this.countdownTimer = null;
+        }
+    },
+
+    closeQrisModal() {
+        this.resetQrisTimers();
+        this.qrisModal.show = false;
+    },
+
+    openQrisModal(payload) {
+        this.resetQrisTimers();
+        const expiredAt = payload.expired ? new Date(payload.expired) : null;
+        this.qrisModal = {
+            show: true,
+            transactionId: payload.transaction_id,
+            transactionNumber: payload.transaction_number,
+            refId: payload.ref_id,
+            trxReference: payload.trx_reference,
+            paymentName: payload.payment_name || 'QRIS',
+            qrImage: payload.qr_image,
+            totalBayar: Number(payload.total_bayar || 0),
+            totalFee: Number(payload.total_fee || 0),
+            expired: expiredAt,
+            remainingSeconds: expiredAt ? Math.max(0, Math.floor((expiredAt.getTime() - Date.now()) / 1000)) : 0,
+            status: payload.payment_status || 'pending',
+            tutorialPembayaran: payload.tutorial_pembayaran || '',
+        };
+        this.startQrisCountdown();
+        this.startQrisPolling();
+    },
+
+    startQrisCountdown() {
+        this.countdownTimer = setInterval(() => {
+            if (!this.qrisModal.expired) {
+                return;
+            }
+
+            const remaining = Math.max(0, Math.floor((this.qrisModal.expired.getTime() - Date.now()) / 1000));
+            this.qrisModal.remainingSeconds = remaining;
+
+            if (remaining <= 0) {
+                this.qrisModal.status = 'expired';
+                this.resetQrisTimers();
+                this.showToast('error', 'QRIS sudah expired. Silakan generate ulang.');
+            }
+        }, 1000);
+    },
+
+    formatCountdown(seconds) {
+        const total = Math.max(0, Number(seconds || 0));
+        const minutes = String(Math.floor(total / 60)).padStart(2, '0');
+        const secs = String(total % 60).padStart(2, '0');
+        return minutes + ':' + secs;
+    },
+
+    async startQrisPolling() {
+        if (!this.qrisModal.transactionId) {
+            return;
+        }
+
+        this.pollingTimer = setInterval(() => {
+            this.checkQrisStatus(false);
+        }, 5000);
+    },
+
+    async checkQrisStatus(showFeedback = true) {
+        if (!this.qrisModal.transactionId || this.qrisModal.status === 'paid' || this.qrisModal.status === 'expired') {
+            return;
+        }
+
+        try {
+            const response = await fetch(this.qrisStatusUrl(this.qrisModal.transactionId), {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Status pembayaran gagal diperiksa.');
+            }
+
+            this.qrisModal.status = result.payment_status;
+            this.qrisModal.trxReference = result.trx_reference || this.qrisModal.trxReference;
+            this.qrisModal.paymentName = result.payment_name || this.qrisModal.paymentName;
+            this.qrisModal.tutorialPembayaran = result.tutorial_pembayaran || this.qrisModal.tutorialPembayaran;
+
+            if (result.expired) {
+                this.qrisModal.expired = new Date(result.expired);
+            }
+
+            if (result.payment_status === 'paid') {
+                this.resetQrisTimers();
+                this.qrisModal.show = false;
+                this.lastPaidTransaction = {
+                    id: this.qrisModal.transactionId,
+                    number: this.qrisModal.transactionNumber,
+                    total: this.qrisModal.totalBayar,
+                    change: 0,
+                    paidAt: result.paid_at,
+                };
+                this.showPaymentSuccessModal = true;
+                this.showToast('success', 'Pembayaran QRIS berhasil diterima.');
+                this.isSubmitting = false;
+                return;
+            }
+
+            if (result.payment_status === 'expired') {
+                this.resetQrisTimers();
+                this.qrisModal.status = 'expired';
+                this.showToast('error', 'QRIS sudah expired. Silakan generate ulang.');
+            } else if (showFeedback) {
+                const providerStatus = (result.third_party_status || 'pending').toUpperCase();
+                const paymentName = result.payment_name || 'QRIS';
+                this.showToast('success', 'Response ' + paymentName + ' dari third party: ' + providerStatus + '. Pembayaran masih menunggu.');
+            }
+        } catch (error) {
+            if (showFeedback) {
+                this.showAlert('error', 'Gagal cek status', error.message || 'Status pembayaran tidak bisa diperiksa saat ini.');
+            }
+        }
+    },
+
+    async createQrisPayment(form, transactionId = null) {
+        const formData = new FormData(form);
+
+        if (transactionId) {
+            formData.set('transaction_id', transactionId);
+        }
+
+        const response = await fetch(this.qrisCreateUrl, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': this.csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Gagal membuat QRIS.');
+        }
+
+        this.openQrisModal(result);
+        this.showToast('success', 'QRIS berhasil dibuat. Silakan scan untuk melanjutkan pembayaran.');
+    },
+
+    async regenerateQris(form) {
+        if (!this.qrisModal.transactionId) {
+            return;
+        }
+
+        try {
+            this.isSubmitting = true;
+            await this.createQrisPayment(form, this.qrisModal.transactionId);
+        } catch (error) {
+            this.showAlert('error', 'Generate ulang gagal', error.message || 'QRIS baru tidak berhasil dibuat.');
+        } finally {
+            this.isSubmitting = false;
+        }
     },
 
     addServiceDetail() {
@@ -58,7 +300,10 @@
     },
 
     toggleMachine(machine) {
-        if (machine.status !== 'AVAILABLE') return;
+        if (machine.status !== 'AVAILABLE') {
+            this.showToast('error', 'Stok tidak mencukupi. Mesin ' + machine.machine_code + ' sedang tidak tersedia.');
+            return;
+        }
         
         const index = this.selectedMachines.findIndex(m => m.id === machine.id);
         if (index > -1) {
@@ -71,10 +316,10 @@
                     if (!hasSameType) {
                         this.selectedMachines.push(machine);
                     } else {
-                        alert('You already selected a ' + machine.machine_type);
+                        this.showToast('error', 'Anda sudah memilih mesin bertipe ' + machine.machine_type + '.');
                     }
                 } else {
-                    alert('You can only select up to 2 machines (1 Washer & 1 Dryer) in ALL mode');
+                    this.showToast('error', 'Maksimal 2 mesin di mode Semua: 1 washer dan 1 dryer.');
                 }
             } else {
                 this.selectedMachines = [machine];
@@ -94,7 +339,7 @@
     },
 
     addItem() {
-        this.dropOff.items.push({ nama: '', qty: 1, note: '' });
+        this.dropOff.items.push({ nama: '', qty: 1, note: '', available_stock: null });
     },
 
     removeItem(index) {
@@ -143,6 +388,97 @@
         return Math.max(0, change);
     },
 
+    get shortageAmount() {
+        if (this.paymentMethod !== 'CASH') return 0;
+        const shortage = this.totalAmount - (parseFloat(this.amountReceived) || 0);
+        return Math.max(0, shortage);
+    },
+
+    get hasEmptyCashInput() {
+        return this.paymentMethod === 'CASH' && (this.amountReceived === '' || this.amountReceived === null);
+    },
+
+    get validDropOffItems() {
+        return this.dropOff.items.filter(item => String(item.nama || '').trim() !== '');
+    },
+
+    validateCheckout() {
+        if (this.service === 'self_service' && this.selectedMachines.length === 0) {
+            this.showAlert('error', 'Keranjang kosong', 'Pilih minimal satu mesin sebelum checkout.');
+            return false;
+        }
+
+        if (this.service === 'self_service') {
+            const unavailableMachine = this.selectedMachines.find(machine => machine.status !== 'AVAILABLE');
+            if (unavailableMachine) {
+                this.showAlert('error', 'Stok tidak mencukupi', 'Mesin ' + unavailableMachine.machine_code + ' sudah tidak tersedia.');
+                return false;
+            }
+        }
+
+        if (this.service === 'drop_off') {
+            const hasServiceDetail = this.dropOff.details.some(detail => detail.package_id);
+            if (!hasServiceDetail || this.validDropOffItems.length === 0) {
+                this.showAlert('error', 'Keranjang kosong', 'Tambahkan detail layanan dan minimal satu item cucian sebelum checkout.');
+                return false;
+            }
+
+            const invalidWeight = this.dropOff.details.find(detail => detail.package_id && (parseFloat(detail.weight) || 0) <= 0);
+            if (invalidWeight) {
+                this.showAlert('error', 'Berat tidak valid', 'Berat cucian harus lebih dari 0 kg.');
+                return false;
+            }
+
+            const invalidQtyItem = this.validDropOffItems.find(item => (parseInt(item.qty, 10) || 0) <= 0);
+            if (invalidQtyItem) {
+                this.showAlert('error', 'Jumlah item tidak valid', 'Jumlah item untuk ' + invalidQtyItem.nama + ' harus lebih dari 0.');
+                return false;
+            }
+
+            const insufficientStockItem = this.validDropOffItems.find(item => item.available_stock !== null && item.available_stock !== '' && (parseInt(item.qty, 10) || 0) > parseInt(item.available_stock, 10));
+            if (insufficientStockItem) {
+                this.showAlert('error', 'Stok tidak mencukupi', 'Jumlah ' + insufficientStockItem.nama + ' melebihi stok tersedia ' + insufficientStockItem.available_stock + '.');
+                return false;
+            }
+        }
+
+        if (this.paymentMethod === 'CASH') {
+            if (this.hasEmptyCashInput) {
+                this.showAlert('error', 'Nominal uang kosong', 'Masukkan nominal uang yang dibayarkan customer.');
+                return false;
+            }
+
+            if ((parseFloat(this.amountReceived) || 0) < this.totalAmount) {
+                this.showAlert('error', 'Uang kurang', 'Uang yang dibayar kurang ' + this.formatCurrency(this.shortageAmount) + '.');
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    submitCheckout(event) {
+        if (!this.validateCheckout()) {
+            return;
+        }
+
+        if (this.paymentMethod === 'QRIS') {
+            this.isSubmitting = true;
+            this.createQrisPayment(event.target)
+                .catch(error => {
+                    this.showAlert('error', 'QRIS gagal dibuat', error.message || 'Pembayaran QRIS tidak berhasil dibuat.');
+                })
+                .finally(() => {
+                    this.isSubmitting = false;
+                });
+            return;
+        }
+
+        this.isSubmitting = true;
+        this.showToast('success', 'Validasi berhasil. Transaksi sedang diproses.');
+        event.target.submit();
+    },
+
     async saveMember() {
         try {
             const response = await fetch('{{ route('kasir.member.store') }}', {
@@ -156,8 +492,11 @@
                 this.selectedMember = data.member;
                 this.showNewMemberModal = false;
                 this.searchMember = '';
+                this.showToast('success', 'Member baru berhasil ditambahkan dan dipilih.');
             }
-        } catch (error) { alert('Failed to save member'); }
+        } catch (error) {
+            this.showAlert('error', 'Gagal menyimpan member', 'Member baru tidak berhasil disimpan. Silakan coba lagi.');
+        }
     }
 }">
     {{-- Header --}}
@@ -334,7 +673,7 @@
                                         <div class="sm:col-span-3 space-y-2">
                                             <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Berat (Kg)</label>
                                             <div class="relative">
-                                                <input type="number" x-model="detail.weight" class="block w-full rounded-xl border-slate-100 bg-white py-2.5 px-4 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
+                                                <input type="number" min="0.1" step="0.1" x-model="detail.weight" class="block w-full rounded-xl border-slate-100 bg-white py-2.5 px-4 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
                                                 <div class="absolute inset-y-0 right-0 flex items-center pr-4">
                                                     <span class="text-[10px] font-bold text-slate-400 uppercase">Kg</span>
                                                 </div>
@@ -390,7 +729,7 @@
                                     </div>
                                     <div class="w-20 space-y-1.5">
                                         <label x-show="index === 0" class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 ml-1">Qty</label>
-                                        <input type="number" x-model="item.qty" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-2.5 px-4 text-xs font-bold text-slate-900">
+                                        <input type="number" min="1" step="1" x-model="item.qty" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-2.5 px-4 text-xs font-bold text-slate-900">
                                     </div>
                                     <div class="flex-[1.5] space-y-1.5">
                                         <label x-show="index === 0" class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 ml-1">Catatan</label>
@@ -594,15 +933,15 @@
                 <h3 class="mb-4 text-sm font-extrabold text-slate-900">6. Pembayaran</h3>
                 <p class="mb-4 text-[11px] font-bold text-slate-400">Metode Pembayaran</p>
                 
-                <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-2 gap-3 mb-4">
                     <button @click="paymentMethod = 'CASH'" :class="paymentMethod === 'CASH' ? 'ring-2 ring-primary-600 bg-primary-50/50' : 'bg-slate-50'" class="flex flex-col items-center justify-center rounded-2xl py-3 transition">
                         <svg class="mb-1.5 h-5 w-5 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>
                         <span class="text-[10px] font-extrabold text-slate-900">Tunai</span>
                     </button>
-                    <button @click="paymentMethod = 'MEMBER_BALANCE'" :class="paymentMethod === 'MEMBER_BALANCE' ? 'ring-2 ring-primary-600 bg-primary-50/50' : 'bg-slate-50'" class="flex flex-col items-center justify-center rounded-2xl py-3 transition">
+                    <!-- <button @click="paymentMethod = 'MEMBER_BALANCE'" :class="paymentMethod === 'MEMBER_BALANCE' ? 'ring-2 ring-primary-600 bg-primary-50/50' : 'bg-slate-50'" class="flex flex-col items-center justify-center rounded-2xl py-3 transition">
                         <svg class="mb-1.5 h-5 w-5 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         <span class="text-[10px] font-extrabold text-slate-900">Saldo Member</span>
-                    </button>
+                    </button> -->
                     <button @click="paymentMethod = 'QRIS'" :class="paymentMethod === 'QRIS' ? 'ring-2 ring-primary-600 bg-primary-50/50' : 'bg-slate-50'" class="flex flex-col items-center justify-center rounded-2xl py-3 transition">
                         <svg class="mb-1.5 h-5 w-5 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         <span class="text-[10px] font-extrabold text-slate-900">QRIS</span>
@@ -624,10 +963,19 @@
 
                 <div x-show="paymentMethod === 'CASH'" class="mb-6 space-y-2">
                     <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Uang Tunai Diterima</label>
-                    <input type="number" x-model="amountReceived" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-2.5 px-4 text-sm font-extrabold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
+                    <input type="number" min="0" step="1000" x-model="amountReceived" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-2.5 px-4 text-sm font-extrabold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
+                    <p x-show="paymentMethod === 'CASH' && hasEmptyCashInput" class="mt-2 text-xs font-bold text-rose-500">Nominal uang wajib diisi sebelum checkout.</p>
+                    <p x-show="paymentMethod === 'CASH' && !hasEmptyCashInput && shortageAmount > 0" class="mt-2 text-xs font-bold text-rose-500" x-text="'Uang kurang ' + formatCurrency(shortageAmount)"></p>
+                    <p x-show="paymentMethod === 'CASH' && !hasEmptyCashInput && shortageAmount === 0" class="mt-2 text-xs font-bold text-emerald-600" x-text="'Kembalian otomatis: ' + formatCurrency(changeAmount)"></p>
                 </div>
 
-                <form action="{{ route('kasir.store') }}" method="POST">
+                <div x-show="paymentMethod === 'QRIS'" class="mb-6 rounded-2xl border border-primary-100 bg-primary-50/70 px-4 py-4">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-primary-600">QRIS Payment</p>
+                    <p class="mt-2 text-sm font-bold text-slate-700">Klik tombol bayar untuk generate QRIS dari backend dan tampilkan QR Code ke customer.</p>
+                    <p class="mt-2 text-xs font-semibold text-slate-500">Timer, biaya admin, dan status pembayaran akan mengikuti response WijayaPay.</p>
+                </div>
+
+                <form x-ref="checkoutForm" action="{{ route('kasir.store') }}" method="POST" @submit.prevent="submitCheckout($event)">
                     @csrf
                     <input type="hidden" name="service_type" :value="service.toUpperCase()">
                     <input type="hidden" name="member_id" :value="selectedMember?.id">
@@ -647,10 +995,10 @@
                     <input type="hidden" name="note" :value="dropOff.catatan">
                     <input type="hidden" name="estimated_finish" :value="dropOff.estimasiSelesai">
                     
-                    <button type="submit" class="w-full rounded-2xl bg-primary-600 py-4 text-sm font-extrabold text-white shadow-xl shadow-primary-500/25 transition hover:bg-primary-700 active:scale-[0.98]" :disabled="(service === 'self_service' && selectedMachines.length === 0) || (service === 'drop_off' && dropOff.details.some(d => !d.package_id)) || (paymentMethod === 'CASH' && amountReceived < totalAmount)">
+                    <button type="submit" class="w-full rounded-2xl bg-primary-600 py-4 text-sm font-extrabold shadow-xl text-white shadow-primary-500/25 transition hover:bg-primary-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60" :disabled="isSubmitting">
                         <div class="flex items-center justify-center gap-2">
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Proses Pembayaran
+                            <span x-text="isSubmitting ? 'Memproses...' : (paymentMethod === 'QRIS' ? 'Bayar QRIS' : 'Proses Pembayaran')"></span>
                         </div>
                     </button>
                 </form>
@@ -677,6 +1025,133 @@
         <button @click="selectedMachines = []; selectedMember = null" class="flex items-center gap-2 rounded-lg bg-rose-50 px-4 py-2 text-[10px] font-extrabold text-rose-600">
             <span class="rounded bg-white px-1.5 py-0.5 text-[9px] shadow-sm">Esc</span> Batal
         </button>
+    </div>
+
+    <div x-show="toast.show" x-transition.opacity class="fixed right-5 top-5 z-[110] w-full max-w-sm" x-cloak>
+        <div :class="toast.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'" class="rounded-3xl border px-5 py-4 shadow-2xl">
+            <div class="flex items-start gap-3">
+                <div :class="toast.type === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'" class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
+                    <svg x-show="toast.type === 'success'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <svg x-show="toast.type !== 'success'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 8v4m0 4h.01"></path>
+                        <circle cx="12" cy="12" r="9"></circle>
+                    </svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-extrabold" x-text="toast.type === 'success' ? 'Berhasil' : 'Perhatian'"></p>
+                    <p class="mt-1 text-sm font-medium leading-6" x-text="toast.message"></p>
+                </div>
+                <button type="button" @click="toast.show = false" class="text-current/70 transition hover:text-current">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6 6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="alertModal.show" class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm" x-cloak>
+        <div @click.away="closeAlert()" class="w-full max-w-md overflow-hidden rounded-[32px] bg-white shadow-2xl ring-1 ring-slate-100">
+            <div :class="alertModal.type === 'success' ? 'bg-emerald-50' : 'bg-rose-50'" class="px-6 py-5">
+                <div class="flex items-center gap-4">
+                    <div :class="alertModal.type === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'" class="flex h-14 w-14 items-center justify-center rounded-2xl">
+                        <svg x-show="alertModal.type === 'success'" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M20 6 9 17l-5-5"></path>
+                        </svg>
+                        <svg x-show="alertModal.type !== 'success'" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M12 8v5m0 3h.01"></path>
+                            <circle cx="12" cy="12" r="9"></circle>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900" x-text="alertModal.title"></h3>
+                        <p class="mt-1 text-sm font-medium text-slate-500" x-text="alertModal.message"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-5">
+                <button type="button" @click="closeAlert()" :class="alertModal.type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'" class="w-full rounded-2xl px-5 py-3 text-sm font-extrabold text-white transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="qrisModal.show" class="fixed inset-0 z-[85] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" x-cloak>
+        <div class="w-full max-w-lg overflow-hidden rounded-[34px] bg-white shadow-2xl ring-1 ring-slate-100" @click.away="closeQrisModal()">
+            <div class="border-b border-slate-100 bg-slate-50 px-6 py-5">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-extrabold uppercase tracking-[0.26em] text-primary-600">QRIS WijayaPay</p>
+                        <h3 class="mt-2 text-xl font-extrabold text-slate-900">Scan QR untuk bayar</h3>
+                        <p class="mt-1 text-sm font-medium text-slate-500" x-text="'Ref: ' + qrisModal.trxReference"></p>
+                    </div>
+                    <button type="button" @click="closeQrisModal()" class="rounded-2xl bg-white p-3 text-slate-400 transition hover:text-slate-700">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6 6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-5 px-6 py-6">
+                <div class="rounded-[28px] border border-slate-100 bg-white p-5 text-center shadow-sm">
+                    <img :src="qrisModal.qrImage" alt="QRIS Code" class="mx-auto h-64 w-64 rounded-2xl border border-slate-100 object-contain p-3">
+                    <p class="mt-4 text-sm font-semibold text-slate-500">Tunjukkan QR ini ke customer untuk discan dari aplikasi pembayaran.</p>
+                </div>
+
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="rounded-2xl bg-slate-50 px-4 py-4">
+                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Total Bayar</p>
+                        <p class="mt-2 text-xl font-extrabold text-slate-900" x-text="formatCurrency(qrisModal.totalBayar)"></p>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 px-4 py-4">
+                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Biaya Admin</p>
+                        <p class="mt-2 text-xl font-extrabold text-slate-900" x-text="formatCurrency(qrisModal.totalFee)"></p>
+                    </div>
+                </div>
+
+                <div x-show="qrisModal.tutorialPembayaran" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Tutorial Pembayaran</p>
+                    <p class="mt-2 whitespace-pre-line text-sm font-medium leading-6 text-slate-600" x-text="qrisModal.tutorialPembayaran"></p>
+                </div>
+
+                <div class="flex items-center justify-between rounded-2xl border border-dashed border-slate-200 px-4 py-4">
+                    <div>
+                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Countdown</p>
+                        <p class="mt-1 text-lg font-extrabold" :class="qrisModal.status === 'expired' ? 'text-rose-600' : 'text-primary-600'" x-text="formatCountdown(qrisModal.remainingSeconds)"></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Status</p>
+                        <p class="mt-1 text-sm font-extrabold" :class="qrisModal.status === 'paid' ? 'text-emerald-600' : (qrisModal.status === 'expired' ? 'text-rose-600' : 'text-amber-600')" x-text="qrisModal.status.toUpperCase()"></p>
+                    </div>
+                </div>
+
+                <div x-show="qrisModal.status !== 'expired'" class="grid gap-3 sm:grid-cols-2">
+                    <button type="button" @click="checkQrisStatus(true)" class="rounded-2xl bg-primary-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-primary-700">
+                        Cek Status Pembayaran
+                    </button>
+                    <button type="button" @click="closeQrisModal()" class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
+                        Tutup
+                    </button>
+                </div>
+
+                <div x-show="qrisModal.status === 'expired'" class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm font-medium text-rose-700">
+                    QRIS sudah expired. Silakan generate ulang QRIS untuk melanjutkan pembayaran.
+                </div>
+
+                <div x-show="qrisModal.status === 'expired'" class="grid gap-3 sm:grid-cols-2">
+                    <button type="button" @click="regenerateQris($refs.checkoutForm)" class="rounded-2xl bg-primary-600 px-5 py-3 text-sm font-extrabold text-white transition hover:bg-primary-700">
+                        Generate Ulang QRIS
+                    </button>
+                    <button type="button" @click="closeQrisModal()" class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- New Member Modal --}}
@@ -748,6 +1223,38 @@
         </div>
     </div>
     @endif
+
+    <div x-show="showPaymentSuccessModal" class="fixed inset-0 z-[86] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" x-cloak>
+        <div class="bg-white rounded-[40px] w-full max-w-md overflow-hidden shadow-2xl ring-1 ring-slate-100 p-10 text-center" @click.away="showPaymentSuccessModal = false">
+            <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 text-emerald-500">
+                <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-900">Pembayaran QRIS Berhasil!</h3>
+            <p class="mt-2 text-sm font-bold text-slate-400" x-text="'Transaksi ' + (lastPaidTransaction?.number || '')"></p>
+
+            <div class="mt-8 rounded-3xl bg-slate-50 p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Bayar</span>
+                    <span class="text-lg font-extrabold text-slate-900" x-text="formatCurrency(lastPaidTransaction?.total || 0)"></span>
+                </div>
+                <div class="flex items-center justify-between border-t border-slate-200 pt-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Metode</span>
+                    <span class="text-xl font-extrabold text-emerald-600">QRIS</span>
+                </div>
+            </div>
+
+            <div class="mt-10 flex flex-col gap-3">
+                <a :href="receiptUrl(lastPaidTransaction?.id || '')" target="_blank" class="flex items-center justify-center gap-3 w-full rounded-2xl bg-primary-600 py-4 text-sm font-extrabold text-white shadow-xl shadow-primary-500/25 transition hover:bg-primary-700">
+                    Cetak Struk
+                </a>
+                <button @click="showPaymentSuccessModal = false; location.reload();" class="w-full rounded-2xl border-2 border-slate-100 py-4 text-sm font-extrabold text-slate-500 transition hover:bg-slate-50">
+                    Selesai
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
