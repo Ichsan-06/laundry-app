@@ -15,7 +15,14 @@ class Transaction extends Model
         'cashier_id',
         'member_id',
         'transaction_number',
+        'transaction_type',
         'service_type',
+        'weight',
+        'estimated_finish',
+        'discount_percent',
+        'discount_amount',
+        'tax_percent',
+        'tax_amount',
         'status',
         'subtotal',
         'member_discount',
@@ -32,6 +39,7 @@ class Transaction extends Model
         'total_amount' => 'decimal:2',
         'amount_received' => 'decimal:2',
         'change_amount' => 'decimal:2',
+        'estimated_finish' => 'datetime',
     ];
 
     public function outlet()
@@ -52,5 +60,24 @@ class Transaction extends Model
     public function selfServiceDetails()
     {
         return $this->hasMany(SelfServiceDetail::class);
+    }
+
+    public function servicePackages()
+    {
+        return $this->belongsToMany(ServicePackage::class, 'transaction_services')
+            ->withPivot('price')
+            ->withTimestamps();
+    }
+
+    public function addonOptions()
+    {
+        return $this->belongsToMany(AddonOption::class, 'transaction_addons')
+            ->withPivot('price')
+            ->withTimestamps();
+    }
+
+    public function items()
+    {
+        return $this->hasMany(TransactionItem::class);
     }
 }

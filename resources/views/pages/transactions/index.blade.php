@@ -15,6 +15,7 @@
             <form action="{{ route('transactions.index') }}" method="GET">
                 {{-- Keep existing filters when searching --}}
                 @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}"> @endif
+                @if(request('transaction_type')) <input type="hidden" name="transaction_type" value="{{ request('transaction_type') }}"> @endif
                 @if(request('service_type')) <input type="hidden" name="service_type" value="{{ request('service_type') }}"> @endif
                 @if(request('payment_method')) <input type="hidden" name="payment_method" value="{{ request('payment_method') }}"> @endif
                 @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
@@ -26,13 +27,13 @@
         </div>
     </div>
     <div class="flex shrink-0 items-center gap-6">
-        <button class="relative rounded-full p-2 text-slate-400 transition hover:bg-slate-50 hover:text-primary-600">
+        {{-- <button class="relative rounded-full p-2 text-slate-400 transition hover:bg-slate-50 hover:text-primary-600">
             <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
             </svg>
             <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
-        </button>
+        </button> --}}
         <div class="flex items-center gap-3">
             <div class="text-right">
                 <p class="text-sm font-extrabold text-slate-900">Marcus Reed</p>
@@ -142,6 +143,44 @@
         </div>
     </div>
 
+    {{-- Tabs & Filters --}}
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        {{-- Custom Tabs --}}
+        <div class="flex items-center gap-1 rounded-[18px] bg-slate-100 p-1.5 shadow-inner ring-1 ring-slate-200/50">
+            @php
+                $activeTab = request('transaction_type', 'all');
+                $tabs = [
+                    'all' => ['label' => 'All Orders', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z'],
+                    'SELF_SERVICE' => ['label' => 'Self Service', 'icon' => 'M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'],
+                    'DROP_OFF' => ['label' => 'Drop Off', 'icon' => 'M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2M17 12h.01M11 12h.01M14 12h.01M7 12h.01']
+                ];
+            @endphp
+            @foreach($tabs as $key => $tab)
+                <a href="{{ route('transactions.index', array_merge(request()->all(), ['transaction_type' => $key])) }}" 
+                   class="flex items-center gap-2.5 rounded-[14px] px-5 py-2.5 text-[13px] font-extrabold transition-all duration-300 {{ $activeTab === $key ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="{{ $tab['icon'] }}"></path></svg>
+                    {{ $tab['label'] }}
+                </a>
+            @endforeach
+        </div>
+
+        <div class="flex items-center gap-4">
+            <p class="text-sm font-bold text-slate-400">Showing {{ $transactions->firstItem() }}-{{ $transactions->lastItem() }} of {{ $transactions->total() }}</p>
+            <div class="flex gap-1">
+                <a href="{{ $transactions->previousPageUrl() }}" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-white transition hover:bg-slate-50 {{ $transactions->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </a>
+                <a href="{{ $transactions->nextPageUrl() }}" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-white transition hover:bg-slate-50 {{ !$transactions->hasMorePages() ? 'opacity-50 cursor-not-allowed' : '' }}">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
     {{-- Main Content Table --}}
     <div class="rounded-[28px] bg-white shadow-soft ring-1 ring-slate-100">
         {{-- Table Toolbar --}}
@@ -156,7 +195,7 @@
                         Status: {{ request('status') ? str_replace('_', ' ', request('status')) : 'All' }}
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
-                        @foreach(['all', 'PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] as $status)
+                        @foreach(['all', 'PENDING', 'IN_PROGRESS', 'READY', 'COMPLETED', 'CANCELLED'] as $status)
                         <a href="{{ route('transactions.index', array_merge(request()->all(), ['status' => $status])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
                             {{ $status == 'all' ? 'All Status' : str_replace('_', ' ', $status) }}
                         </a>
@@ -197,24 +236,9 @@
                     </div>
                 </div>
 
-                @if(request()->anyFilled(['status', 'service_type', 'payment_method', 'sort', 'search']))
+                @if(request()->anyFilled(['status', 'transaction_type', 'service_type', 'payment_method', 'sort', 'search']))
                 <a href="{{ route('transactions.index') }}" class="text-xs font-extrabold text-rose-500 hover:underline">Clear All Filters</a>
                 @endif
-            </div>
-            <div class="flex items-center gap-4">
-                <p class="text-sm font-bold text-slate-400">Showing {{ $transactions->firstItem() }}-{{ $transactions->lastItem() }} of {{ $transactions->total() }}</p>
-                <div class="flex gap-1">
-                    <a href="{{ $transactions->previousPageUrl() }}" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-white transition hover:bg-slate-50 {{ $transactions->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m15 18-6-6 6-6"></path>
-                        </svg>
-                    </a>
-                    <a href="{{ $transactions->nextPageUrl() }}" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-white transition hover:bg-slate-50 {{ !$transactions->hasMorePages() ? 'opacity-50 cursor-not-allowed' : '' }}">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m9 18 6-6-6-6"></path>
-                        </svg>
-                    </a>
-                </div>
             </div>
         </div>
 
@@ -251,7 +275,12 @@
                             </div>
                         </td>
                         <td class="px-6 py-5">
-                            <span class="text-[13px] font-bold text-slate-600">{{ str_replace('_', ' ', $trx->service_type) }}</span>
+                            <div class="flex flex-col">
+                                <span class="text-[13px] font-bold text-slate-600">{{ str_replace('_', ' ', $trx->service_type) }}</span>
+                                <span class="text-[9px] font-extrabold uppercase tracking-widest {{ $trx->transaction_type === 'SELF_SERVICE' ? 'text-indigo-400' : 'text-emerald-400' }}">
+                                    {{ str_replace('_', ' ', $trx->transaction_type) }}
+                                </span>
+                            </div>
                         </td>
                         <td class="px-6 py-5">
                             <span class="text-[13px] font-bold text-slate-600">{{ $trx->payment_method }}</span>
@@ -264,6 +293,7 @@
                                 $statusClasses = [
                                     'PENDING' => 'bg-amber-50 text-amber-600 ring-amber-100',
                                     'IN_PROGRESS' => 'bg-blue-50 text-blue-600 ring-blue-100',
+                                    'READY' => 'bg-indigo-50 text-indigo-600 ring-indigo-100',
                                     'COMPLETED' => 'bg-emerald-50 text-emerald-600 ring-emerald-100',
                                     'CANCELLED' => 'bg-rose-50 text-rose-600 ring-rose-100',
                                 ];
@@ -274,6 +304,12 @@
                         </td>
                         <td class="px-8 py-5 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('transactions.show', $trx->id) }}" class="rounded-lg p-2 text-slate-300 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </a>
                                 <button @click="openEditModal({{ json_encode($trx) }})" class="rounded-lg p-2 text-slate-300 transition hover:bg-white hover:text-primary-600 hover:shadow-sm">
                                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -436,6 +472,9 @@
                     <select name="status" x-model="currentTrx.status" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
                         <option value="PENDING">Pending</option>
                         <option value="IN_PROGRESS">In Progress</option>
+                        <template x-if="currentTrx.transaction_type === 'DROP_OFF'">
+                            <option value="READY">Ready for Pick-up</option>
+                        </template>
                         <option value="COMPLETED">Completed</option>
                         <option value="CANCELLED">Cancelled</option>
                     </select>

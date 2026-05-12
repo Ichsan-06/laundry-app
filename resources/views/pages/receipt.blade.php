@@ -46,12 +46,45 @@
     <div class="divider"></div>
 
     <div class="items">
-        @foreach($transaction->selfServiceDetails as $detail)
-        <div class="item-row">
-            <span>{{ $detail->machine->machine_code }} - {{ $detail->duration_minutes }}m</span>
-            <span>Rp {{ number_format($detail->price, 0, ',', '.') }}</span>
-        </div>
-        @endforeach
+        @if($transaction->transaction_type === 'SELF_SERVICE')
+            @foreach($transaction->selfServiceDetails as $detail)
+            <div class="item-row">
+                <span>{{ $detail->machine->machine_code }} - {{ $detail->duration_minutes }}m</span>
+                <span>Rp {{ number_format($detail->price, 0, ',', '.') }}</span>
+            </div>
+            @endforeach
+        @else
+            {{-- Drop Off --}}
+            @foreach($transaction->servicePackages as $pkg)
+            <div class="item-row">
+                <span>{{ $pkg->nama_paket }} ({{ $pkg->pivot->weight }}kg)</span>
+                <span>Rp {{ number_format($pkg->pivot->price * $pkg->pivot->weight, 0, ',', '.') }}</span>
+            </div>
+            @if($pkg->pivot->note)
+            <div style="font-size: 9px; color: #666; margin-bottom: 5px; margin-left: 5px;">
+                Note: {{ $pkg->pivot->note }}
+            </div>
+            @endif
+            @endforeach
+
+            @foreach($transaction->addonOptions as $addon)
+            <div class="item-row">
+                <span>{{ $addon->nama }}</span>
+                <span>Rp {{ number_format($addon->pivot->price, 0, ',', '.') }}</span>
+            </div>
+            @endforeach
+
+            @if($transaction->items->count() > 0)
+            <div class="divider"></div>
+            <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px;">DETAIL ITEM:</div>
+            @foreach($transaction->items as $item)
+            <div class="item-row" style="font-size: 10px;">
+                <span>{{ $item->qty }}x {{ $item->nama_item }}</span>
+                <span>{{ $item->note }}</span>
+            </div>
+            @endforeach
+            @endif
+        @endif
     </div>
 
     <div class="divider"></div>
@@ -61,10 +94,18 @@
             <span>SUBTOTAL</span>
             <span>Rp {{ number_format($transaction->subtotal, 0, ',', '.') }}</span>
         </div>
+        @if($transaction->discount_amount > 0)
         <div class="item-row">
-            <span>DISKON</span>
-            <span>Rp {{ number_format($transaction->member_discount, 0, ',', '.') }}</span>
+            <span>DISKON ({{ number_format($transaction->discount_percent, 0) }}%)</span>
+            <span>- Rp {{ number_format($transaction->discount_amount, 0, ',', '.') }}</span>
         </div>
+        @endif
+        @if($transaction->tax_amount > 0)
+        <div class="item-row">
+            <span>PAJAK ({{ number_format($transaction->tax_percent, 0) }}%)</span>
+            <span>+ Rp {{ number_format($transaction->tax_amount, 0, ',', '.') }}</span>
+        </div>
+        @endif
         <div class="item-row" style="font-size: 14px; margin-top: 5px;">
             <span>TOTAL</span>
             <span>Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>

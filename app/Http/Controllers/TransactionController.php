@@ -31,6 +31,11 @@ class TransactionController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by Transaction Type (Tab)
+        if ($request->has('transaction_type') && $request->transaction_type !== 'all') {
+            $query->where('transaction_type', $request->transaction_type);
+        }
+
         // Filter by Service Type
         if ($request->has('service_type') && $request->service_type !== 'all') {
             $query->where('service_type', $request->service_type);
@@ -104,7 +109,7 @@ class TransactionController extends Controller
     public function update(Request $request, Transaction $transaction)
     {
         $validated = $request->validate([
-            'status' => 'required|in:PENDING,IN_PROGRESS,COMPLETED,CANCELLED',
+            'status' => 'required|in:PENDING,IN_PROGRESS,READY,COMPLETED,CANCELLED',
             'payment_method' => 'required|in:CASH,TRANSFER,E_WALLET,QRIS',
             'notes' => 'nullable|string',
         ]);
@@ -112,6 +117,22 @@ class TransactionController extends Controller
         $transaction->update($validated);
 
         return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully.');
+    }
+
+    public function show($id)
+    {
+        $transaction = Transaction::with([
+            'member',
+            'cashier',
+            'outlet',
+            'selfServiceDetails.machine',
+            'selfServiceDetails.machineDuration',
+            'servicePackages',
+            'addonOptions',
+            'items'
+        ])->findOrFail($id);
+
+        return view('pages.transactions.show', compact('transaction'));
     }
 
     public function destroy(Transaction $transaction)
