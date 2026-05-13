@@ -3,13 +3,13 @@ version: "3.8"
 services:
   app:
     build: .
-    container_name: pos-app
+    container_name: laundry-app
     restart: unless-stopped
     working_dir: /var/www
     depends_on:
       - mysql
     networks:
-      - pos-network
+      - laundry-network
     volumes:
       - ./.env.docker:/var/www/.env 
     ports:
@@ -17,7 +17,7 @@ services:
       
   nginx:
     image: nginx:alpine
-    container_name: pos-nginx
+    container_name: laundry-nginx
     restart: unless-stopped
     ports:
       - "8001:80"
@@ -27,11 +27,11 @@ services:
     depends_on:
       - app
     networks:
-      - pos-network
+      - laundry-network
 
   mysql:
     image: mysql:8.0
-    container_name: pos-mysql
+    container_name: laundry-mysql
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: laundry_db
@@ -43,11 +43,11 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - pos-network
+      - laundry-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: pos-phpmyadmin
+    container_name: laundry-phpmyadmin
     restart: unless-stopped
     ports:
       - "8080:80"
@@ -57,11 +57,11 @@ services:
     depends_on:
       - mysql
     networks:
-      - pos-network
+      - laundry-network
 
 volumes:
   mysql_data:
 
 networks:
-  pos-network:
+  laundry-network:
     driver: bridge
