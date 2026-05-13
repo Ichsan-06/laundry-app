@@ -21,21 +21,24 @@ class WijayaPayCallbackController extends Controller
         $merchantCode = (string) ($request->input('code_merchant') ?? data_get($request->input('data'), 'code_merchant'));
         $signature = (string) $request->header('X-Signature', '');
 
-        if ($merchantCode && $merchantCode !== (string) config('services.wijayapay.merchant_code')) {
-            return response('invalid merchant', 422);
-        }
-
-        if ($signature && $refId && $signature !== $this->wijayaPayService->signatureFor($refId)) {
-            return response('invalid signature', 403);
-        }
-
         $transaction = Transaction::query()
+            ->with('outlet')
             ->when($refId, fn ($query) => $query->where('ref_id', $refId))
             ->orWhere('trx_reference', (string) ($request->input('trx_reference') ?? data_get($request->input('data'), 'trx_reference')))
             ->first();
 
         if (! $transaction) {
             return response('transaction not found', 404);
+        }
+
+        $config = $this->wijayaPayService->configForOutlet($transaction->outlet);
+
+        if ($merchantCode && $merchantCode !== $config['merchant_code']) {
+            return response('invalid merchant', 422);
+        }
+
+        if ($signature && $refId && $signature !== $this->wijayaPayService->signatureFor($refId, $transaction->outlet)) {
+            return response('invalid signature', 403);
         }
 
         $this->kasirController->applyPaymentPayload($transaction, $request->all());

@@ -8,12 +8,19 @@ use App\Models\Outlet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\TenantContextService;
 
 class TransactionController extends Controller
 {
+    public function __construct(
+        private readonly TenantContextService $tenantContextService,
+    ) {
+    }
+
     public function index(Request $request)
     {
-        $query = Transaction::with(['member', 'cashier']);
+        $query = Transaction::with(['member', 'cashier', 'outlet']);
+        $query = $this->tenantContextService->scopeByUser($query, $request->user());
 
         // Search
         if ($request->has('search') && !empty($request->search)) {
@@ -59,27 +66,35 @@ class TransactionController extends Controller
         }
 
         $transactions = $query->paginate(10)->withQueryString();
+        $statsQuery = Transaction::query();
+        $statsQuery = $this->tenantContextService->scopeByUser($statsQuery, $request->user());
 
         // Statistics
         $stats = [
-            'total_revenue' => Transaction::where('status', 'COMPLETED')->sum('total_amount'),
-            'total_orders' => Transaction::count(),
-            'active_orders' => Transaction::whereIn('status', ['PENDING', 'IN_PROGRESS'])->count(),
-            'completed_today' => Transaction::where('status', 'COMPLETED')
+            'total_revenue' => (clone $statsQuery)->where('status', 'COMPLETED')->sum('total_amount'),
+            'total_orders' => (clone $statsQuery)->count(),
+            'active_orders' => (clone $statsQuery)->whereIn('status', ['PENDING', 'IN_PROGRESS'])->count(),
+            'completed_today' => (clone $statsQuery)->where('status', 'COMPLETED')
                                             ->whereDate('created_at', now()->toDateString())
                                             ->count(),
         ];
 
         // For modals
-        $members = Member::all();
-        $outlets = Outlet::all();
-        $cashiers = User::all();
+        $members = $this->tenantContextService->scopeByUser(Member::query(), $request->user())->get();
+        $outlets = $request->user()->isSuperAdmin()
+            ? Outlet::all()
+            : Outlet::query()->whereIn('id', $request->user()->accessibleOutletIds())->get();
+        $cashiers = User::query()
+            ->when(! $request->user()->isSuperAdmin(), fn ($builder) => $builder->where('tenant_id', $request->user()->tenant_id))
+            ->get();
 
         return view('pages.transactions.index', compact('transactions', 'stats', 'members', 'outlets', 'cashiers'));
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', Transaction::class);
+
         $validated = $request->validate([
             'outlet_id' => 'required|exists:outlets,id',
             'cashier_id' => 'required|exists:users,id',
@@ -108,6 +123,8 @@ class TransactionController extends Controller
 
     public function update(Request $request, Transaction $transaction)
     {
+        $this->authorize('update', $transaction);
+
         $validated = $request->validate([
             'status' => 'required|in:PENDING,IN_PROGRESS,READY,COMPLETED,CANCELLED',
             'payment_method' => 'required|in:CASH,TRANSFER,E_WALLET,QRIS',
@@ -131,12 +148,15 @@ class TransactionController extends Controller
             'addonOptions',
             'items'
         ])->findOrFail($id);
+        $this->authorize('view', $transaction);
 
         return view('pages.transactions.show', compact('transaction'));
     }
 
     public function destroy(Transaction $transaction)
     {
+        $this->authorize('delete', $transaction);
+
         $transaction->delete();
 
         return redirect()->route('transactions.index')->with('success', 'Transaction deleted successfully.');

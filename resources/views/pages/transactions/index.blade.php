@@ -74,12 +74,12 @@
             <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Transactions</h2>
             <p class="mt-1 text-sm font-semibold text-slate-400 uppercase tracking-wider">Overview of all laundry orders and payments.</p>
         </div>
-        <button @click="showAddModal = true" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700 active:scale-95">
+        <!-- <button @click="showAddModal = true" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700 active:scale-95">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 5v14M5 12h14"></path>
             </svg>
             New Transaction
-        </button>
+        </button> -->
     </div>
 
     {{-- Stats Cards --}}

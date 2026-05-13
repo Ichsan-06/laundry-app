@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\AddonOption;
 use Illuminate\Http\Request;
+use App\Services\TenantContextService;
 
 class AddonController extends Controller
 {
+    public function __construct(
+        private readonly TenantContextService $tenantContextService,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $query = AddonOption::query();
+        $query = $this->tenantContextService->scopeByUser($query, $request->user());
 
         // Search
         if ($request->has('search')) {
@@ -41,8 +48,12 @@ class AddonController extends Controller
             'aktif' => 'boolean',
         ]);
 
+        $outletId = $request->user()->isOwner()
+            ? \App\Models\Outlet::query()->where('tenant_id', $request->user()->tenant_id)->orderBy('nama_outlet')->value('id')
+            : $request->user()->outlet_id;
+
         AddonOption::create([
-            'outlet_id' => \App\Models\Outlet::first()->id,
+            'outlet_id' => $outletId,
             'nama' => $validated['nama'],
             'deskripsi' => $validated['deskripsi'],
             'harga' => $validated['harga'],
@@ -54,11 +65,14 @@ class AddonController extends Controller
 
     public function edit(AddonOption $addon)
     {
+        abort_if(! in_array($addon->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
         return view('pages.addons.edit', compact('addon'));
     }
 
     public function update(Request $request, AddonOption $addon)
     {
+        abort_if(! in_array($addon->outlet_id, $request->user()->accessibleOutletIds(), true), 403);
+
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -78,6 +92,7 @@ class AddonController extends Controller
 
     public function destroy(AddonOption $addon)
     {
+        abort_if(! in_array($addon->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
         $addon->delete();
         return redirect()->route('addons.index')->with('success', 'Addon deleted successfully.');
     }

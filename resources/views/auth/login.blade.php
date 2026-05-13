@@ -96,11 +96,16 @@
                         </button>
                     </form>
 
-                    <div class="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+                    <div class="mt-4 text-center text-sm font-medium text-slate-500">
+                        Belum punya akun owner?
+                        <a href="{{ route('register.owner') }}" class="font-extrabold text-brand-700 hover:text-brand-500">Daftar free trial</a>
+                    </div>
+
+                    {{-- <div class="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
                         <p class="font-bold text-slate-800">Akun seed default</p>
                         <p class="mt-2">superadmin@laundry.com, admin@laundry.com, user@laundry.com</p>
                         <p class="mt-1">Password semua akun: password</p>
-                    </div>
+                    </div> --}}
                 </div>
             </section>
         </div>

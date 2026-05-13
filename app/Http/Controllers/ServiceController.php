@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\ServicePackage;
 use Illuminate\Http\Request;
+use App\Services\TenantContextService;
 
 class ServiceController extends Controller
 {
+    public function __construct(
+        private readonly TenantContextService $tenantContextService,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $query = ServicePackage::query();
+        $query = $this->tenantContextService->scopeByUser($query, $request->user());
 
         // Search
         if ($request->has('search')) {
@@ -42,8 +49,12 @@ class ServiceController extends Controller
             'aktif' => 'boolean',
         ]);
 
+        $outletId = $request->user()->isOwner()
+            ? \App\Models\Outlet::query()->where('tenant_id', $request->user()->tenant_id)->orderBy('nama_outlet')->value('id')
+            : $request->user()->outlet_id;
+
         ServicePackage::create([
-            'outlet_id' => \App\Models\Outlet::first()->id,
+            'outlet_id' => $outletId,
             'nama_paket' => $validated['nama_paket'],
             'deskripsi' => $validated['deskripsi'],
             'harga_per_kg' => $validated['harga_per_kg'],
@@ -56,11 +67,14 @@ class ServiceController extends Controller
 
     public function edit(ServicePackage $service)
     {
+        abort_if(! in_array($service->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
         return view('pages.services.edit', compact('service'));
     }
 
     public function update(Request $request, ServicePackage $service)
     {
+        abort_if(! in_array($service->outlet_id, $request->user()->accessibleOutletIds(), true), 403);
+
         $validated = $request->validate([
             'nama_paket' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -82,6 +96,7 @@ class ServiceController extends Controller
 
     public function destroy(ServicePackage $service)
     {
+        abort_if(! in_array($service->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
         $service->delete();
         return redirect()->route('services.index')->with('success', 'Service package deleted successfully.');
     }

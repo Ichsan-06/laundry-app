@@ -1,77 +1,127 @@
 <?php
 
-use App\Http\Controllers\MemberController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\MachineController;
+use App\Http\Controllers\AddonController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\OwnerRegistrationController;
+use App\Http\Controllers\BillingController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KasirController;
+use App\Http\Controllers\MachineController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SubscriptionPlanController;
+use App\Http\Controllers\TenantController;
+use App\Http\Controllers\TenantSubscriptionController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WijayaPayCallbackController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\KasirController;
+Route::get('/', function () {
+    if (auth()->check()) {
+        return app(LoginController::class)->redirect();
+    }
+
+    return view('welcome');
+})->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+    Route::get('/register-owner', [OwnerRegistrationController::class, 'create'])->name('register.owner');
+    Route::post('/register-owner', [OwnerRegistrationController::class, 'store'])->name('register.owner.store');
 });
 
 Route::middleware(['auth', 'active.user'])->group(function () {
-    Route::get('/', [LoginController::class, 'redirect'])->name('home');
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
-        ->middleware('rbac:permission,view dashboard')
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware(['rbac:permission,dashboard.view'])
         ->name('dashboard');
-    Route::get('/dashboard/export', [\App\Http\Controllers\DashboardController::class, 'export'])
-        ->middleware('rbac:permission,export reports')
+
+    Route::get('/dashboard/export', [DashboardController::class, 'export'])
+        ->middleware(['subscription', 'rbac:permission,reports.export', 'plan.permission:reports.export'])
         ->name('dashboard.export');
 
-    Route::middleware('rbac:permission,access cashier')->group(function () {
-        Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
-        Route::get('/kasir/receipt/{id}', [KasirController::class, 'printReceipt'])->name('kasir.receipt');
-        Route::post('/kasir/transaction', [KasirController::class, 'store'])->name('kasir.store');
-        Route::post('/kasir/qris', [KasirController::class, 'createQrisPayment'])->name('kasir.qris.create');
-        Route::get('/kasir/qris/{transaction}/status', [KasirController::class, 'checkQrisStatus'])->name('kasir.qris.status');
-        Route::post('/kasir/member', [KasirController::class, 'storeMember'])->name('kasir.member.store');
+    Route::get('/billing', [BillingController::class, 'index'])
+        ->middleware(['rbac:permission,billing.view'])
+        ->name('billing.index');
+
+    Route::middleware('subscription')->group(function () {
+        Route::middleware(['rbac:permission,cashier.access', 'plan.permission:cashier.access'])->group(function () {
+            Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
+            Route::get('/kasir/receipt/{id}', [KasirController::class, 'printReceipt'])->name('kasir.receipt');
+            Route::post('/kasir/transaction', [KasirController::class, 'store'])->name('kasir.store');
+            Route::post('/kasir/qris', [KasirController::class, 'createQrisPayment'])->name('kasir.qris.create');
+            Route::get('/kasir/qris/{transaction}/status', [KasirController::class, 'checkQrisStatus'])->name('kasir.qris.status');
+            Route::post('/kasir/member', [KasirController::class, 'storeMember'])->name('kasir.member.store');
+        });
+
+        Route::resource('members', MemberController::class)
+            ->except(['create', 'show', 'edit'])
+            ->middleware(['rbac:permission,customers.view,customers.create,customers.update,customers.delete', 'plan.permission:customers.view,customers.create,customers.update,customers.delete']);
+
+        Route::resource('transactions', TransactionController::class)
+            ->except(['create', 'edit'])
+            ->middleware(['rbac:permission,transactions.view,transactions.create,transactions.update,transactions.delete', 'plan.permission:transactions.view,transactions.create,transactions.update,transactions.delete']);
+
+        Route::resource('machines', MachineController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,machines.view,machines.create,machines.update,machines.delete', 'plan.permission:machines.view,machines.create,machines.update,machines.delete']);
+
+        Route::resource('addons', AddonController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,addons.view,addons.create,addons.update,addons.delete', 'plan.permission:addons.view,addons.create,addons.update,addons.delete']);
+
+        Route::resource('services', ServiceController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,services.view,services.create,services.update,services.delete', 'plan.permission:services.view,services.create,services.update,services.delete']);
+
+        Route::resource('outlets', OutletController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,outlets.view,outlets.create,outlets.update,outlets.delete', 'plan.permission:outlets.view,outlets.create,outlets.update,outlets.delete']);
+
+        Route::resource('users', UserController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,staff.view,staff.create,staff.update,staff.delete', 'plan.permission:staff.view,staff.create,staff.update,staff.delete']);
+
+        Route::resource('roles', RoleController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,roles.view,roles.create,roles.update,roles.delete', 'plan.permission:roles.view,roles.create,roles.update,roles.delete']);
+
+        Route::resource('permissions', PermissionController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,permissions.view,permissions.create,permissions.update,permissions.delete']);
+
+        Route::resource('subscription-plans', SubscriptionPlanController::class)
+            ->except('show')
+            ->middleware(['rbac:permission,plans.manage']);
+
+        Route::resource('tenants', TenantController::class)
+            ->except('show', 'destroy')
+            ->middleware(['rbac:permission,tenants.manage']);
+
+        Route::put('/tenants/{tenant}/subscription', [TenantSubscriptionController::class, 'update'])
+            ->middleware(['rbac:permission,subscription.manage'])
+            ->name('tenants.subscription.update');
+
+        Route::get('/settings', [SettingController::class, 'index'])
+            ->middleware(['rbac:permission,settings.manage', 'plan.permission:settings.manage'])
+            ->name('settings.index');
+
+        Route::put('/settings/outlet', [SettingController::class, 'updateOutlet'])
+            ->middleware(['rbac:permission,settings.manage', 'plan.permission:settings.manage'])
+            ->name('settings.outlet.update');
+
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->middleware(['rbac:permission,reports.view', 'plan.permission:reports.view'])
+            ->name('reports.index');
     });
-
-    Route::resource('members', MemberController::class)
-        ->except(['create', 'show', 'edit'])
-        ->middleware('rbac:permission,manage members');
-    Route::resource('transactions', TransactionController::class)
-        ->except(['create', 'edit'])
-        ->middleware('rbac:permission,manage transactions');
-    Route::resource('machines', MachineController::class)
-        ->except('show')
-        ->middleware('rbac:permission,manage machines');
-    Route::resource('users', \App\Http\Controllers\UserController::class)
-        ->except('show')
-        ->middleware('rbac:permission,manage users');
-    Route::resource('addons', \App\Http\Controllers\AddonController::class)
-        ->except('show')
-        ->middleware('rbac:permission,manage addons');
-    Route::resource('services', \App\Http\Controllers\ServiceController::class)
-        ->except('show')
-        ->middleware('rbac:permission,manage services');
-
-    Route::resource('roles', RoleController::class)
-        ->except('show')
-        ->middleware('rbac:permission,manage roles');
-    Route::resource('permissions', PermissionController::class)
-        ->except('show')
-        ->middleware('rbac:permission,manage permissions');
-
-    Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])
-        ->middleware('rbac:permission,manage settings')
-        ->name('settings.index');
-    Route::put('/settings/outlet', [\App\Http\Controllers\SettingController::class, 'updateOutlet'])
-        ->middleware('rbac:permission,manage settings')
-        ->name('settings.outlet.update');
-
-    Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])
-        ->middleware('rbac:permission,view reports')
-        ->name('reports.index');
 });
 
 Route::post('/callback/wijayapay', WijayaPayCallbackController::class)->name('callback.wijayapay');

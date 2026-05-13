@@ -2,28 +2,39 @@
 
 namespace App\Services;
 
+use App\Models\Outlet;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
+use Illuminate\Support\Facades\Log;
 
 class WijayaPayService
 {
     public function createQrisTransaction(Transaction $transaction): array
     {
-        $response = $this->client($transaction->ref_id)->post(config('services.wijayapay.create_url'), [
-            'code_merchant' => config('services.wijayapay.merchant_code'),
-            'api_key' => config('services.wijayapay.api_key'),
+        $config = $this->configForOutlet($transaction->outlet);
+
+
+        $response = $this->client($transaction->ref_id, $config)->post($config['create_url'], [
+            'code_merchant' => $config['merchant_code'],
+            'api_key' => $config['api_key'],
             'code_payment' => 'QRIS',
             'ref_id' => $transaction->ref_id,
             'nominal' => (int) round($transaction->total_amount),
             'amount' => (int) round($transaction->total_amount),
-            'callback_url' => config('services.wijayapay.callback_url'),
+            'callback_url' => 'https://yoursite.com/callback/wijayapay',
+        ]);
+
+        Log::info('WijayaPay create transaction response', [
+            'status' => $response->status(),
+            'body' => $response->body(),
         ]);
 
         $payload = $response->json();
+
 
         if (! $response->successful() || ! is_array($payload)) {
             throw new RuntimeException('WijayaPay create transaction gagal dihubungi.');
@@ -38,9 +49,16 @@ class WijayaPayService
 
     public function checkTransactionStatus(string $refId): array
     {
-        $response = $this->client($refId)->get(config('services.wijayapay.status_url'), [
-            'code_merchant' => config('services.wijayapay.merchant_code'),
-            'api_key' => config('services.wijayapay.api_key'),
+        $transaction = Transaction::query()
+            ->with('outlet')
+            ->where('ref_id', $refId)
+            ->first();
+
+        $config = $this->configForOutlet($transaction?->outlet);
+
+        $response = $this->client($refId, $config)->get($config['status_url'], [
+            'code_merchant' => $config['merchant_code'],
+            'api_key' => $config['api_key'],
             'ref_id' => $refId,
         ]);
 
@@ -53,11 +71,13 @@ class WijayaPayService
         return $payload;
     }
 
-    public function signatureFor(string $refId): string
+    public function signatureFor(string $refId, ?Outlet $outlet = null): string
     {
+        $config = $this->configForOutlet($outlet);
+
         return md5(
-            (string) config('services.wijayapay.merchant_code')
-            . (string) config('services.wijayapay.api_key')
+            $config['merchant_code']
+            . $config['api_key']
             . $refId
         );
     }
@@ -99,14 +119,25 @@ class WijayaPayService
         };
     }
 
-    private function client(string $refId): PendingRequest
+    private function client(string $refId, array $config): PendingRequest
     {
         return Http::acceptJson()
             ->asForm()
             ->timeout(30)
             ->withHeaders([
-                'X-Signature' => $this->signatureFor($refId),
+                'X-Signature' => md5($config['merchant_code'] . $config['api_key'] . $refId),
             ]);
+    }
+
+    public function configForOutlet(?Outlet $outlet): array
+    {
+        return [
+            'merchant_code' => (string) ($outlet?->wijayapay_merchant_code ?: config('services.wijayapay.merchant_code')),
+            'api_key' => (string) ($outlet?->wijayapay_api_key ?: config('services.wijayapay.api_key')),
+            'create_url' => (string) ($outlet?->wijayapay_create_url ?: config('services.wijayapay.create_url')),
+            'status_url' => (string) ($outlet?->wijayapay_status_url ?: config('services.wijayapay.status_url')),
+            'callback_url' => (string) ($outlet?->wijayapay_callback_url ?: config('services.wijayapay.callback_url')),
+        ];
     }
 
     private function extractMessage(array $payload, string $fallback = 'Terjadi kesalahan pada response WijayaPay.'): string

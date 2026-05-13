@@ -67,11 +67,11 @@ class LoginController extends Controller
             return 'login';
         }
 
-        if ($user->hasAnyRole([User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN])) {
+        if ($user->isSuperAdmin() || $user->isOwner()) {
             return 'dashboard';
         }
 
-        if ($user->can('access cashier')) {
+        if ($user->can('cashier.access')) {
             return 'kasir.index';
         }
 

@@ -1,23 +1,36 @@
 @php
+    $currentUser = auth()->user();
+    $currentTenant = $currentUser?->tenant;
+    $currentSubscription = $currentTenant?->activeSubscription;
+    $subscriptionStatus = $currentUser
+        ? app(\App\Services\SubscriptionAccessService::class)->statusLabel($currentSubscription)
+        : 'inactive';
+
     $mainMenus = [
-        ['label' => 'Dashboard', 'route' => 'dashboard', 'match' => 'dashboard*', 'permission' => 'view dashboard'],
-        ['label' => 'Kasir', 'route' => 'kasir.index', 'match' => 'kasir*', 'permission' => 'access cashier'],
-        ['label' => 'Member', 'route' => 'members.index', 'match' => 'members*', 'permission' => 'manage members'],
-        ['label' => 'Transaksi', 'route' => 'transactions.index', 'match' => 'transactions*', 'permission' => 'manage transactions'],
-        ['label' => 'Mesin', 'route' => 'machines.index', 'match' => 'machines*', 'permission' => 'manage machines'],
-        ['label' => 'Layanan', 'route' => 'services.index', 'match' => 'services*', 'permission' => 'manage services'],
-        ['label' => 'Addon', 'route' => 'addons.index', 'match' => 'addons*', 'permission' => 'manage addons'],
-        ['label' => 'Laporan', 'route' => 'reports.index', 'match' => 'reports*', 'permission' => 'view reports'],
-        ['label' => 'Pengguna', 'route' => 'users.index', 'match' => 'users*', 'permission' => 'manage users'],
+        ['label' => 'Dashboard', 'route' => 'dashboard', 'match' => 'dashboard*', 'permission' => 'dashboard.view'],
+        ['label' => 'Kasir', 'route' => 'kasir.index', 'match' => 'kasir*', 'permission' => 'cashier.access'],
+        ['label' => 'Member', 'route' => 'members.index', 'match' => 'members*', 'permission' => 'customers.view'],
+        ['label' => 'Transaksi', 'route' => 'transactions.index', 'match' => 'transactions*', 'permission' => 'transactions.view'],
+        ['label' => 'Mesin', 'route' => 'machines.index', 'match' => 'machines*', 'permission' => 'machines.view'],
+        ['label' => 'Layanan', 'route' => 'services.index', 'match' => 'services*', 'permission' => 'services.view'],
+        ['label' => 'Addon', 'route' => 'addons.index', 'match' => 'addons*', 'permission' => 'addons.view'],
+        ['label' => 'Outlet', 'route' => 'outlets.index', 'match' => 'outlets*', 'permission' => 'outlets.view'],
+        ['label' => 'Laporan', 'route' => 'reports.index', 'match' => 'reports*', 'permission' => 'reports.view'],
+        ['label' => 'Staff', 'route' => 'users.index', 'match' => 'users*', 'permission' => 'staff.view'],
+        ['label' => 'Billing', 'route' => 'billing.index', 'match' => 'billing*', 'permission' => 'billing.view'],
     ];
 
     $systemMenus = [
-        ['label' => 'Roles', 'route' => 'roles.index', 'match' => 'roles*', 'permission' => 'manage roles'],
-        ['label' => 'Permissions', 'route' => 'permissions.index', 'match' => 'permissions*', 'permission' => 'manage permissions'],
-        ['label' => 'Settings', 'route' => 'settings.index', 'match' => 'settings*', 'permission' => 'manage settings'],
+        ['label' => 'Roles', 'route' => 'roles.index', 'match' => 'roles*', 'permission' => 'roles.view'],
+        ['label' => 'Permissions', 'route' => 'permissions.index', 'match' => 'permissions*', 'permission' => 'permissions.view'],
+        ['label' => 'Plans', 'route' => 'subscription-plans.index', 'match' => 'subscription-plans*', 'permission' => 'plans.manage'],
+        ['label' => 'Tenants', 'route' => 'tenants.index', 'match' => 'tenants*', 'permission' => 'tenants.manage'],
+        ['label' => 'Settings', 'route' => 'settings.index', 'match' => 'settings*', 'permission' => 'settings.manage'],
     ];
 
-    $outletName = \App\Models\Outlet::first()?->nama_outlet ?? 'Laundry Control';
+    $outletName = $currentUser?->isOwner()
+        ? ($currentTenant?->name ?? 'Laundry Control')
+        : ($currentUser?->outlet?->nama_outlet ?? $currentTenant?->name ?? 'Laundry Control');
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -84,19 +97,25 @@
                 </div>
                 <div>
                     <p class="text-lg font-extrabold text-ink">{{ $outletName }}</p>
-                    <p class="text-sm font-semibold text-slate-400">RBAC Laundry Panel</p>
+                    <p class="text-sm font-semibold text-slate-400">Laundry SaaS Panel</p>
                 </div>
             </div>
 
             <div class="mt-8 rounded-3xl bg-slate-50 p-4">
                 <p class="text-xs font-bold uppercase tracking-[0.28em] text-slate-400">Signed In</p>
-                <p class="mt-2 text-base font-extrabold text-ink">{{ auth()->user()?->nama }}</p>
+                <p class="mt-2 text-base font-extrabold text-ink">{{ $currentUser?->nama }}</p>
                 <div class="mt-3 flex items-center gap-2">
-                    <span class="rounded-full bg-brand-100 px-3 py-1 text-xs font-bold text-brand-700">{{ auth()->user()?->display_role }}</span>
+                    <span class="rounded-full bg-brand-100 px-3 py-1 text-xs font-bold text-brand-700">{{ $currentUser?->display_role }}</span>
                     @role('Super Admin')
                         <span class="rounded-full bg-accent-100 px-3 py-1 text-xs font-bold text-amber-700">Root Access</span>
                     @endrole
                 </div>
+                @if ($currentTenant)
+                    <div class="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs font-semibold text-slate-500">
+                        <p class="font-bold text-slate-700">Tenant: {{ $currentTenant->name }}</p>
+                        <p class="mt-1 uppercase tracking-[0.18em] text-slate-400">Subscription {{ $subscriptionStatus }}</p>
+                    </div>
+                @endif
             </div>
 
             <nav class="mt-8 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -112,7 +131,7 @@
                     @endcan
                 @endforeach
 
-                @canany(['manage roles', 'manage permissions', 'manage settings'])
+                @canany(['roles.view', 'permissions.view', 'settings.manage', 'plans.manage', 'tenants.manage'])
                     <div class="pt-6">
                         <p class="px-3 text-xs font-bold uppercase tracking-[0.28em] text-slate-400">System</p>
                         <div class="mt-2 space-y-2">
@@ -168,6 +187,12 @@
             </header>
 
             <main class="px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+                @if ($subscriptionStatus === 'expired')
+                    <div class="mb-6 rounded-[28px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
+                        Langganan Anda telah habis. Anda masih bisa membuka dashboard dan billing, tetapi fitur transaksi serta fitur premium dikunci sampai subscription diperpanjang.
+                    </div>
+                @endif
+
                 @if (session('success'))
                     <div class="mb-6 rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
                         {{ session('success') }}

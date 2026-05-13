@@ -30,6 +30,18 @@ class Machine extends Model
         return $this->belongsTo(Outlet::class);
     }
 
+    public function tenant()
+    {
+        return $this->hasOneThrough(
+            Tenant::class,
+            Outlet::class,
+            'id',
+            'id',
+            'outlet_id',
+            'tenant_id',
+        );
+    }
+
     public function durations()
     {
         return $this->hasMany(MachineDuration::class);

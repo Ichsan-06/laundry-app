@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active.user' => \App\Http\Middleware\EnsureUserIsActive::class,
             'rbac' => \App\Http\Middleware\AccessControlMiddleware::class,
+            'subscription' => \App\Http\Middleware\CheckSubscription::class,
+            'plan.permission' => \App\Http\Middleware\CheckPlanPermission::class,
+            'outlet.access' => \App\Http\Middleware\CheckOutletAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

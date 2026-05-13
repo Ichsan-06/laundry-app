@@ -56,6 +56,18 @@ class Transaction extends Model
         return $this->belongsTo(Outlet::class);
     }
 
+    public function tenant()
+    {
+        return $this->hasOneThrough(
+            Tenant::class,
+            Outlet::class,
+            'id',
+            'id',
+            'outlet_id',
+            'tenant_id',
+        );
+    }
+
     public function cashier()
     {
         return $this->belongsTo(User::class, 'cashier_id');

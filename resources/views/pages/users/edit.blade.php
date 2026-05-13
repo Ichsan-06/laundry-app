@@ -2,7 +2,7 @@
 
 @section('title', 'Edit User')
 @section('page-title', 'Edit User')
-@section('page-subtitle', 'Perbarui data user, role, password, dan status akun.')
+@section('page-subtitle', 'Perbarui data staff, role, outlet penugasan, password, dan status akun.')
 
 @section('content')
     <div class="mx-auto max-w-3xl rounded-[32px] border border-white/70 bg-white p-6 shadow-soft sm:p-8">
@@ -35,6 +35,19 @@
                         @endforeach
                     </select>
                     @error('role')
+                        <p class="text-sm font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="space-y-2 md:col-span-2">
+                    <label class="text-sm font-bold text-slate-700">Outlet Penugasan</label>
+                    <select name="outlet_id" class="block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 outline-none transition focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-100">
+                        <option value="">Tidak ditentukan / Owner</option>
+                        @foreach ($outlets as $outlet)
+                            <option value="{{ $outlet->id }}" @selected(old('outlet_id', $user->outlet_id) === $outlet->id)>{{ $outlet->nama_outlet }}</option>
+                        @endforeach
+                    </select>
+                    @error('outlet_id')
                         <p class="text-sm font-semibold text-rose-600">{{ $message }}</p>
                     @enderror
                 </div>

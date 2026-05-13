@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class PermissionController extends Controller
 {
@@ -23,6 +23,8 @@ class PermissionController extends Controller
 
     public function create(): View
     {
+        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+
         return view('pages.permissions.create', [
             'permission' => new Permission(['guard_name' => 'web']),
             'roles' => Role::orderBy('name')->get(),
@@ -32,6 +34,8 @@ class PermissionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        abort_unless($request->user()?->isSuperAdmin(), 403);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:permissions,name'],
             'roles' => ['nullable', 'array'],
@@ -60,6 +64,8 @@ class PermissionController extends Controller
 
     public function edit(Permission $permission): View
     {
+        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+
         return view('pages.permissions.edit', [
             'permission' => $permission->load('roles'),
             'roles' => Role::orderBy('name')->get(),
@@ -69,6 +75,8 @@ class PermissionController extends Controller
 
     public function update(Request $request, Permission $permission): RedirectResponse
     {
+        abort_unless($request->user()?->isSuperAdmin(), 403);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:permissions,name,'.$permission->id],
             'roles' => ['nullable', 'array'],
@@ -98,6 +106,8 @@ class PermissionController extends Controller
 
     public function destroy(Permission $permission): RedirectResponse
     {
+        abort_unless(auth()->user()?->isSuperAdmin(), 403);
+
         $permission->delete();
 
         return redirect()

@@ -5,12 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Machine;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Services\TenantContextService;
 
 class MachineController extends Controller
 {
+    public function __construct(
+        private readonly TenantContextService $tenantContextService,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $query = Machine::query();
+        $query = $this->tenantContextService->scopeByUser($query, $request->user());
 
         // Search
         if ($request->has('search') && !empty($request->search)) {
@@ -23,11 +30,14 @@ class MachineController extends Controller
         $machines = $query->with('durations')->orderBy('machine_code', 'asc')->get();
 
         // Statistics
+        $machineStatsQuery = $this->tenantContextService->scopeByUser(Machine::query(), $request->user());
+        $transactionStatsQuery = $this->tenantContextService->scopeByUser(Transaction::query(), $request->user());
+
         $stats = [
-            'available' => Machine::where('status', 'AVAILABLE')->count(),
-            'in_use' => Machine::where('status', 'IN_USE')->count(),
-            'maintenance' => Machine::whereIn('status', ['MAINTENANCE', 'FAULTY'])->count(),
-            'today_revenue' => Transaction::where('status', 'COMPLETED')
+            'available' => (clone $machineStatsQuery)->where('status', 'AVAILABLE')->count(),
+            'in_use' => (clone $machineStatsQuery)->where('status', 'IN_USE')->count(),
+            'maintenance' => (clone $machineStatsQuery)->whereIn('status', ['MAINTENANCE', 'FAULTY'])->count(),
+            'today_revenue' => (clone $transactionStatsQuery)->where('status', 'COMPLETED')
                                           ->whereDate('created_at', now()->toDateString())
                                           ->sum('total_amount'),
         ];
@@ -41,6 +51,8 @@ class MachineController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Machine::class);
+
         $validated = $request->validate([
             'machine_code' => 'required|unique:machines,machine_code',
             'machine_type' => 'required|in:WASHER,DRYER',
@@ -52,8 +64,12 @@ class MachineController extends Controller
             'durations.*.duration_minutes' => 'required|numeric',
         ]);
 
+        $outletId = $request->user()->isOwner()
+            ? \App\Models\Outlet::query()->where('tenant_id', $request->user()->tenant_id)->orderBy('nama_outlet')->value('id')
+            : $request->user()->outlet_id;
+
         $machine = Machine::create([
-            'outlet_id' => \App\Models\Outlet::first()->id, // Assuming single outlet for now
+            'outlet_id' => $outletId,
             'machine_code' => $validated['machine_code'],
             'machine_type' => $validated['machine_type'],
             'brand' => $validated['brand'],
@@ -75,12 +91,15 @@ class MachineController extends Controller
 
     public function edit(Machine $machine)
     {
+        $this->authorize('update', $machine);
         $machine->load('durations');
         return view('pages.machines.edit', compact('machine'));
     }
 
     public function update(Request $request, Machine $machine)
     {
+        $this->authorize('update', $machine);
+
         $validated = $request->validate([
             'machine_code' => 'required|unique:machines,machine_code,' . $machine->id,
             'machine_type' => 'required|in:WASHER,DRYER',
@@ -116,6 +135,7 @@ class MachineController extends Controller
 
     public function destroy(Machine $machine)
     {
+        $this->authorize('delete', $machine);
         $machine->delete();
         return redirect()->route('machines.index')->with('success', 'Machine deleted successfully.');
     }

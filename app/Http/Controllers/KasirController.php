@@ -11,6 +11,7 @@ use App\Models\AddonOption;
 use App\Models\Machine;
 use App\Models\SelfServiceDetail;
 use App\Models\ServicePackage;
+use App\Services\TenantContextService;
 use App\Services\WijayaPayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,17 +23,28 @@ class KasirController extends Controller
 {
     public function __construct(
         private readonly WijayaPayService $wijayaPayService,
+        private readonly TenantContextService $tenantContextService,
     ) {
     }
 
     public function index()
     {
-        $members = Member::orderBy('nama', 'asc')->get();
-        $machines = Machine::with('durations')->get();
-        $services = ServicePackage::where('aktif', true)->get();
-        $addons = AddonOption::where('aktif', true)->get();
+        $user = auth()->user();
+        $activeOutlet = $user->isOwner()
+            ? Outlet::query()->where('tenant_id', $user->tenant_id)->orderBy('nama_outlet')->first()
+            : $user->outlet;
+        $members = $this->tenantContextService->scopeByUser(Member::query(), $user)->orderBy('nama', 'asc')->get();
+        $machines = $this->tenantContextService->scopeByUser(Machine::with('durations'), $user)->get();
+        $services = $this->tenantContextService->scopeByUser(ServicePackage::query(), $user)->where('aktif', true)->get();
+        $addons = $this->tenantContextService->scopeByUser(AddonOption::query(), $user)->where('aktif', true)->get();
 
-        return view('pages.kasir', compact('members', 'machines', 'services', 'addons'));
+        return view('pages.kasir', [
+            'members' => $members,
+            'machines' => $machines,
+            'services' => $services,
+            'addons' => $addons,
+            'qrisConfigReady' => $this->hasCompleteWijayaPayConfig($activeOutlet),
+        ]);
     }
 
     public function store(Request $request)
@@ -73,6 +85,17 @@ class KasirController extends Controller
     public function createQrisPayment(Request $request): JsonResponse
     {
         $validated = $this->validateCheckoutRequest($request, true);
+        $user = $request->user();
+        $activeOutlet = $user->isOwner()
+            ? Outlet::query()->where('tenant_id', $user->tenant_id)->orderBy('nama_outlet')->first()
+            : $user->outlet;
+
+        if (! $this->hasCompleteWijayaPayConfig($activeOutlet)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengaturan WijayaPay untuk outlet ini belum lengkap. Silakan lengkapi dulu di menu Settings.',
+            ], 422);
+        }
 
         try {
             $transaction = DB::transaction(function () use ($validated, $request) {
@@ -109,6 +132,7 @@ class KasirController extends Controller
                 }
 
                 $payload = $this->wijayaPayService->createQrisTransaction($transaction);
+
                 $normalized = $this->wijayaPayService->normalizedTransactionPayload($payload);
 
                 $transaction->update([
@@ -147,13 +171,15 @@ class KasirController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal membuat pembayaran QRIS: ' . $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 
     public function checkQrisStatus(Transaction $transaction): JsonResponse
     {
+        abort_if(! in_array($transaction->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
+
         if ($transaction->payment_method !== 'QRIS' || ! $transaction->ref_id) {
             return response()->json([
                 'success' => false,
@@ -198,6 +224,7 @@ class KasirController extends Controller
             'addonOptions',
             'items',
         ])->findOrFail($id);
+        abort_if(! in_array($transaction->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
 
         return view('pages.receipt', compact('transaction'));
     }
@@ -210,7 +237,9 @@ class KasirController extends Controller
             'email' => 'nullable|email|max:255',
         ]);
 
-        $validated['outlet_id'] = Outlet::first()->id;
+        $validated['outlet_id'] = $request->user()->isOwner()
+            ? Outlet::query()->where('tenant_id', $request->user()->tenant_id)->orderBy('nama_outlet')->value('id')
+            : $request->user()->outlet_id;
         $validated['id_member'] = 'MBR-' . strtoupper(bin2hex(random_bytes(2)));
         $validated['saldo'] = 0;
         $validated['status'] = 'AKTIF';
@@ -243,6 +272,18 @@ class KasirController extends Controller
         if ($localStatus === 'paid') {
             $this->activatePaidTransaction($transaction->fresh());
         }
+    }
+
+    private function hasCompleteWijayaPayConfig(?Outlet $outlet): bool
+    {
+        if (! $outlet) {
+            return false;
+        }
+
+        return filled($outlet->wijayapay_merchant_code)
+            && filled($outlet->wijayapay_api_key)
+            && filled($outlet->wijayapay_create_url)
+            && filled($outlet->wijayapay_status_url);
     }
 
     private function validateCheckoutRequest(Request $request, bool $forQris): array
@@ -283,12 +324,20 @@ class KasirController extends Controller
     {
         $member = ! empty($validated['member_id']) ? Member::find($validated['member_id']) : null;
         $cashier = $request->user() ?? User::first();
-        $outletId = Outlet::first()->id;
+        $outletId = $cashier?->isOwner()
+            ? Outlet::query()->where('tenant_id', $cashier->tenant_id)->orderBy('nama_outlet')->value('id')
+            : $cashier?->outlet_id;
         $subtotal = 0.0;
         $totalWeight = 0.0;
         $transactionDetails = [];
         $dropOffDetails = [];
         $items = [];
+
+        if ($member && ! in_array($member->outlet_id, $cashier->accessibleOutletIds(), true)) {
+            throw ValidationException::withMessages([
+                'member_id' => 'Member tidak termasuk outlet yang dapat Anda akses.',
+            ]);
+        }
 
         if ($validated['service_type'] === 'SELF_SERVICE') {
             $machineIds = array_values(array_filter(explode(',', $validated['machine_ids'] ?? '')));
@@ -299,7 +348,10 @@ class KasirController extends Controller
                 ]);
             }
 
-            $machines = Machine::with('durations')->whereIn('id', $machineIds)->get();
+            $machines = Machine::with('durations')
+                ->whereIn('id', $machineIds)
+                ->whereIn('outlet_id', $cashier->accessibleOutletIds())
+                ->get();
 
             if ($machines->count() !== count($machineIds)) {
                 throw ValidationException::withMessages([
@@ -356,7 +408,10 @@ class KasirController extends Controller
 
             foreach ($dropOffDetails as $detail) {
                 if (! empty($detail['package_id'])) {
-                    $pkg = ServicePackage::find($detail['package_id']);
+                    $pkg = ServicePackage::query()
+                        ->whereKey($detail['package_id'])
+                        ->whereIn('outlet_id', $cashier->accessibleOutletIds())
+                        ->first();
 
                     if ($pkg) {
                         $weight = (float) ($detail['weight'] ?? 1);
@@ -392,7 +447,10 @@ class KasirController extends Controller
 
             $addonIds = array_filter(explode(',', $validated['addon_ids'] ?? ''));
             if (! empty($addonIds)) {
-                $addons = AddonOption::whereIn('id', $addonIds)->get();
+                $addons = AddonOption::query()
+                    ->whereIn('id', $addonIds)
+                    ->whereIn('outlet_id', $cashier->accessibleOutletIds())
+                    ->get();
                 foreach ($addons as $addon) {
                     $subtotal += (float) $addon->harga;
                 }

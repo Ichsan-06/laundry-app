@@ -42,6 +42,7 @@
     qrisCreateUrl: @js(route('kasir.qris.create')),
     qrisStatusTemplate: @js(route('kasir.qris.status', ['transaction' => '__TRANSACTION__'])),
     receiptTemplate: @js(url('/kasir/receipt/__TRANSACTION__')),
+    qrisConfigReady: @js($qrisConfigReady),
     newMember: { nama: '', no_hp: '', email: '' },
 
     // Data from Backend
@@ -234,6 +235,10 @@
     },
 
     async createQrisPayment(form, transactionId = null) {
+        if (!this.qrisConfigReady) {
+            throw new Error('Pengaturan WijayaPay belum lengkap. Silakan isi dulu di halaman Settings.');
+        }
+
         const formData = new FormData(form);
 
         if (transactionId) {
@@ -463,6 +468,11 @@
         }
 
         if (this.paymentMethod === 'QRIS') {
+            if (!this.qrisConfigReady) {
+                this.showAlert('error', 'QRIS belum bisa digunakan', 'Pengaturan WijayaPay belum lengkap. Silakan lengkapi dulu di menu Settings.');
+                return;
+            }
+
             this.isSubmitting = true;
             this.createQrisPayment(event.target)
                 .catch(error => {
@@ -703,7 +713,7 @@
                                     </div>
                                     <div class="space-y-2">
                                         <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Estimasi Selesai</label>
-                                        <input type="text" x-model="dropOff.estimasiSelesai" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-2.5 px-4 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
+                                        <input type="datetime-local" x-model="dropOff.estimasiSelesai" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-2.5 px-4 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
                                     </div>
                                 </div>
                             </div>
@@ -763,7 +773,7 @@
 
             {{-- Self Service Mode Content --}}
             <template x-if="service === 'self_service'">
-                <div class="space-y-6 flex flex-col h-full">
+                <div class="space-y-6 flex flex-col">
                     <div class="flex-1 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-100 overflow-y-auto">
                         <div class="mb-6 flex items-center justify-between">
                             <h3 class="text-sm font-extrabold text-slate-900">4. Pilih Mesin</h3>

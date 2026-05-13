@@ -81,6 +81,64 @@
                     </div>
                 </div>
 
+                <div class="mt-10 rounded-3xl border border-slate-100 bg-slate-50/70 p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-500/20">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 7h20"></path>
+                                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                <path d="M6 15h4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-extrabold text-slate-900">Pengaturan QRIS WijayaPay</h3>
+                            <p class="mt-1 text-sm font-semibold text-slate-400">Data ini dipakai saat kasir membuat transaksi QRIS untuk outlet yang sedang aktif.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid gap-6 md:grid-cols-2">
+                        <div class="space-y-2">
+                            <label for="wijayapay_merchant_code" class="text-[13px] font-extrabold uppercase tracking-wider text-slate-400">Merchant Code</label>
+                            <input type="text" id="wijayapay_merchant_code" name="wijayapay_merchant_code" value="{{ old('wijayapay_merchant_code', $outlet->wijayapay_merchant_code ?? '') }}"
+                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                                placeholder="Masukkan merchant code WijayaPay">
+                            @error('wijayapay_merchant_code') <p class="mt-1 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="wijayapay_api_key" class="text-[13px] font-extrabold uppercase tracking-wider text-slate-400">API Key</label>
+                            <input type="text" id="wijayapay_api_key" name="wijayapay_api_key" value="{{ old('wijayapay_api_key', $outlet->wijayapay_api_key ?? '') }}"
+                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                                placeholder="Masukkan API key WijayaPay">
+                            @error('wijayapay_api_key') <p class="mt-1 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="wijayapay_create_url" class="text-[13px] font-extrabold uppercase tracking-wider text-slate-400">Create URL</label>
+                            <input type="url" id="wijayapay_create_url" name="wijayapay_create_url" value="{{ old('wijayapay_create_url', $outlet->wijayapay_create_url ?? '') }}"
+                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                                placeholder="https://wijayapay.com/api/transaction/create">
+                            @error('wijayapay_create_url') <p class="mt-1 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="wijayapay_status_url" class="text-[13px] font-extrabold uppercase tracking-wider text-slate-400">Status URL</label>
+                            <input type="url" id="wijayapay_status_url" name="wijayapay_status_url" value="{{ old('wijayapay_status_url', $outlet->wijayapay_status_url ?? '') }}"
+                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                                placeholder="https://wijayapay.com/api/get-status">
+                            @error('wijayapay_status_url') <p class="mt-1 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- <div class="space-y-2">
+                            <label for="wijayapay_callback_url" class="text-[13px] font-extrabold uppercase tracking-wider text-slate-400">Callback URL</label>
+                            <input type="url" id="wijayapay_callback_url" name="wijayapay_callback_url" value="{{ old('wijayapay_callback_url', $outlet->wijayapay_callback_url ?? '') }}"
+                                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10"
+                                placeholder="https://domain-anda.com/wijayapay/callback">
+                            @error('wijayapay_callback_url') <p class="mt-1 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                        </div> -->
+                    </div>
+                </div>
+
                 <div class="mt-10 flex justify-end">
                     <button type="submit" class="flex items-center gap-3 rounded-2xl bg-primary-600 px-8 py-4 text-sm font-extrabold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700 hover:shadow-primary-500/40 active:scale-95">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

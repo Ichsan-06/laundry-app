@@ -9,13 +9,20 @@ use App\Models\SelfServiceDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Services\TenantContextService;
 
 class ReportController extends Controller
 {
+    public function __construct(
+        private readonly TenantContextService $tenantContextService,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'monthly'); // monthly, weekly, daily
         $now = Carbon::now();
+        $user = $request->user();
         
         $startDate = $now->copy()->startOfMonth();
         $endDate = $now->copy()->endOfMonth();
@@ -33,13 +40,17 @@ class ReportController extends Controller
         }
 
         // 1. Summary Cards (Calculated based on the selected range)
-        $totalRevenue = Transaction::whereBetween('created_at', [$startDate, $endDate])->sum('total_amount');
-        $totalTransactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->count();
-        $newMembers = Member::whereBetween('created_at', [$startDate, $endDate])->count();
+        $transactionQuery = $this->tenantContextService->scopeByUser(Transaction::query(), $user);
+        $machineQuery = $this->tenantContextService->scopeByUser(Machine::query(), $user);
+        $memberQuery = $this->tenantContextService->scopeByUser(Member::query(), $user);
+
+        $totalRevenue = (clone $transactionQuery)->whereBetween('created_at', [$startDate, $endDate])->sum('total_amount');
+        $totalTransactions = (clone $transactionQuery)->whereBetween('created_at', [$startDate, $endDate])->count();
+        $newMembers = (clone $memberQuery)->whereBetween('created_at', [$startDate, $endDate])->count();
 
         // Efficiency calculation
-        $totalMachines = Machine::count();
-        $activeMachines = Machine::where('status', 'READY')->count();
+        $totalMachines = (clone $machineQuery)->count();
+        $activeMachines = (clone $machineQuery)->where('status', 'READY')->count();
         $avgEfficiency = $totalMachines > 0 ? ($activeMachines / $totalMachines) * 100 : 0;
 
         // 2. Chart Data
@@ -47,7 +58,7 @@ class ReportController extends Controller
         $chartData = [];
 
         if ($filter === 'daily') {
-            $hourlyRevenue = Transaction::select(
+            $hourlyRevenue = $this->tenantContextService->scopeByUser(Transaction::query(), $user)->select(
                 DB::raw('HOUR(created_at) as hour'),
                 DB::raw('SUM(total_amount) as total')
             )
@@ -61,7 +72,7 @@ class ReportController extends Controller
                 $chartData[] = $hourlyRevenue[$i] ?? 0;
             }
         } else {
-            $dailyRevenue = Transaction::select(
+            $dailyRevenue = $this->tenantContextService->scopeByUser(Transaction::query(), $user)->select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(total_amount) as total')
             )
@@ -78,7 +89,7 @@ class ReportController extends Controller
         }
 
         // 3. Service Usage Breakdown
-        $serviceUsage = Transaction::select('service_type', DB::raw('count(*) as count'))
+        $serviceUsage = $this->tenantContextService->scopeByUser(Transaction::query(), $user)->select('service_type', DB::raw('count(*) as count'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('service_type')
             ->get()
@@ -91,7 +102,7 @@ class ReportController extends Controller
             });
 
         // 4. Machine Statistics
-        $machineStats = Machine::all()->map(function ($machine) use ($startDate, $endDate) {
+        $machineStats = (clone $machineQuery)->get()->map(function ($machine) use ($startDate, $endDate) {
             $details = SelfServiceDetail::where('machine_id', $machine->id)
                 ->whereBetween('created_at', [$startDate, $endDate]);
             

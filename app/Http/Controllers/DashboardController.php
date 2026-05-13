@@ -10,31 +10,41 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Response;
+use App\Services\TenantContextService;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private readonly TenantContextService $tenantContextService,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date'))->startOfDay() : Carbon::now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : Carbon::now()->endOfDay();
+        $user = $request->user();
+        $transactions = $this->tenantContextService->scopeByUser(Transaction::query(), $user);
+        $machines = $this->tenantContextService->scopeByUser(Machine::query(), $user);
+        $members = $this->tenantContextService->scopeByUser(Member::query(), $user);
 
         // 1. Summary Cards (Filtered by date)
-        $totalRevenue = Transaction::where('status', 'COMPLETED')
+        $totalRevenue = (clone $transactions)->where('status', 'COMPLETED')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('total_amount');
-        
-        $totalMachines = Machine::count();
-        $activeMachinesCount = Machine::where('status', 'RUNNING')->count();
+
+        $totalMachines = (clone $machines)->count();
+        $activeMachinesCount = (clone $machines)->where('status', 'RUNNING')->count();
         $machineCapacityPercent = $totalMachines > 0 ? round(($activeMachinesCount / $totalMachines) * 100) : 0;
 
-        $pendingOrders = Transaction::whereIn('status', ['PENDING', 'IN_PROGRESS'])
+        $pendingOrders = (clone $transactions)->whereIn('status', ['PENDING', 'IN_PROGRESS'])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
-        
-        $newMembersCount = Member::whereBetween('created_at', [$startDate, $endDate])->count();
+
+        $newMembersCount = (clone $members)->whereBetween('created_at', [$startDate, $endDate])->count();
 
         // 2. Live Machines (Always current status)
-        $liveMachines = Machine::all()->map(function($machine) {
+        $liveMachines = (clone $machines)->get()->map(function($machine) {
             $status = $machine->status;
             $timeLeft = null;
             
@@ -69,13 +79,13 @@ class DashboardController extends Controller
 
         for ($date = $startDate->copy(); $date <= $endDate; $date->addDays($step)) {
             $chartLabels[] = $date->format('d M');
-            $chartData[] = Transaction::whereDate('created_at', $date)
+            $chartData[] = $this->tenantContextService->scopeByUser(Transaction::query(), $user)->whereDate('created_at', $date)
                 ->where('status', 'COMPLETED')
                 ->sum('total_amount');
         }
 
         // 4. Recent Transactions (Within range)
-        $recentTransactions = Transaction::with(['member'])
+        $recentTransactions = $this->tenantContextService->scopeByUser(Transaction::with(['member']), $user)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
             ->take(3)
@@ -112,7 +122,7 @@ class DashboardController extends Controller
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date'))->startOfDay() : Carbon::now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : Carbon::now()->endOfDay();
 
-        $transactions = Transaction::with(['member', 'cashier'])
+        $transactions = $this->tenantContextService->scopeByUser(Transaction::with(['member', 'cashier']), $request->user())
             ->whereBetween('created_at', [$startDate, $endDate])
             ->get();
 

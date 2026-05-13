@@ -29,4 +29,16 @@ class ServicePackage extends Model
     {
         return $this->belongsTo(Outlet::class);
     }
+
+    public function tenant()
+    {
+        return $this->hasOneThrough(
+            Tenant::class,
+            Outlet::class,
+            'id',
+            'id',
+            'outlet_id',
+            'tenant_id',
+        );
+    }
 }
