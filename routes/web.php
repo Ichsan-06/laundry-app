@@ -4,6 +4,8 @@ use App\Http\Controllers\AddonController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\OwnerRegistrationController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\BillingPaymentController;
+use App\Http\Controllers\BillingWijayaPayCallbackController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\MachineController;
@@ -51,6 +53,12 @@ Route::middleware(['auth', 'active.user'])->group(function () {
     Route::get('/billing', [BillingController::class, 'index'])
         ->middleware(['rbac:permission,billing.view'])
         ->name('billing.index');
+    Route::post('/billing/purchase', [BillingPaymentController::class, 'create'])
+        ->middleware(['rbac:permission,billing.view'])
+        ->name('billing.purchase');
+    Route::get('/billing/purchase/{purchase}/status', [BillingPaymentController::class, 'status'])
+        ->middleware(['rbac:permission,billing.view'])
+        ->name('billing.purchase.status');
 
     Route::middleware('subscription')->group(function () {
         Route::middleware(['rbac:permission,cashier.access', 'plan.permission:cashier.access'])->group(function () {
@@ -125,3 +133,4 @@ Route::middleware(['auth', 'active.user'])->group(function () {
 });
 
 Route::post('/callback/wijayapay', WijayaPayCallbackController::class)->name('callback.wijayapay');
+Route::post('/callback/wijayapay/billing', BillingWijayaPayCallbackController::class)->name('callback.wijayapay.billing');

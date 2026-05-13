@@ -30,6 +30,8 @@ class Transaction extends Model
         'payment_method',
         'payment_status',
         'trx_reference',
+        'qris_qr_image',
+        'qris_tutorial_pembayaran',
         'ref_id',
         'payment_fee',
         'payment_expires_at',

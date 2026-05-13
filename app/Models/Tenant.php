@@ -46,6 +46,11 @@ class Tenant extends Model
         return $this->hasOne(TenantSubscription::class)->latestOfMany();
     }
 
+    public function planPurchaseHistories()
+    {
+        return $this->hasMany(PlanPurchaseHistory::class);
+    }
+
     public function getCurrentSubscriptionStatusAttribute(): string
     {
         return $this->activeSubscription?->status ?? 'inactive';

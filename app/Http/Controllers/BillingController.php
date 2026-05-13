@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PlanPurchaseHistory;
 use App\Models\SubscriptionPlan;
 use App\Services\SubscriptionAccessService;
 use Illuminate\Support\Collection;
@@ -20,6 +21,7 @@ class BillingController extends Controller
         $tenant = $user->tenant;
         $subscription = $this->subscriptionAccessService->currentSubscription($tenant);
         $plans = SubscriptionPlan::query()
+            ->where('name','!=', 'trial')
             ->with('permissions')
             ->where('is_active', true)
             ->orderBy('name')
@@ -29,12 +31,19 @@ class BillingController extends Controller
 
                 return $plan;
             });
+        $purchases = PlanPurchaseHistory::query()
+            ->with('plan')
+            ->where('tenant_id', $tenant?->id)
+            ->latest()
+            ->get();
 
         return view('pages.billing.index', [
             'tenant' => $tenant,
             'subscription' => $subscription,
             'status' => $this->subscriptionAccessService->statusLabel($subscription),
             'plans' => $plans,
+            'pendingPurchases' => $purchases->where('status', 'pending')->values(),
+            'purchaseHistories' => $purchases,
         ]);
     }
 

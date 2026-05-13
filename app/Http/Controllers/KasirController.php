@@ -37,6 +37,14 @@ class KasirController extends Controller
         $machines = $this->tenantContextService->scopeByUser(Machine::with('durations'), $user)->get();
         $services = $this->tenantContextService->scopeByUser(ServicePackage::query(), $user)->where('aktif', true)->get();
         $addons = $this->tenantContextService->scopeByUser(AddonOption::query(), $user)->where('aktif', true)->get();
+        $pendingQrisTransactions = $this->tenantContextService->scopeByUser(
+            Transaction::query()->with('member'),
+            $user
+        )
+            ->where('payment_method', 'QRIS')
+            ->where('payment_status', 'pending')
+            ->latest()
+            ->get();
 
         return view('pages.kasir', [
             'members' => $members,
@@ -44,6 +52,7 @@ class KasirController extends Controller
             'services' => $services,
             'addons' => $addons,
             'qrisConfigReady' => $this->hasCompleteWijayaPayConfig($activeOutlet),
+            'pendingQrisTransactions' => $pendingQrisTransactions,
         ]);
     }
 
@@ -137,6 +146,8 @@ class KasirController extends Controller
 
                 $transaction->update([
                     'trx_reference' => $normalized['trx_reference'] ?: $transaction->trx_reference,
+                    'qris_qr_image' => $normalized['qr_image'],
+                    'qris_tutorial_pembayaran' => $normalized['tutorial_pembayaran'],
                     'payment_fee' => $normalized['total_fee'],
                     'payment_expires_at' => $normalized['expired'],
                     'payment_status' => $this->wijayaPayService->toLocalPaymentStatus($normalized['status']),

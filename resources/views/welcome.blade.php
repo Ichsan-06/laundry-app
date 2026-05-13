@@ -136,12 +136,9 @@
         }
 
         .brand-mark {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(0, 180, 216, 0.16), rgba(15, 23, 42, 0.1));
-            display: grid;
-            place-items: center;
+            width: 54px;
+            height: 54px;
+            object-fit: contain;
         }
 
         .nav-links {
@@ -481,6 +478,45 @@
             position: relative;
         }
 
+        .promo-strip {
+            margin-top: 28px;
+            display: grid;
+            gap: 16px;
+            padding: 20px 22px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.14), rgba(15, 23, 42, 0.06));
+            border: 1px solid rgba(0, 180, 216, 0.18);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .promo-strip strong {
+            display: block;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+
+        .promo-strip p {
+            margin: 6px 0 0;
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .voucher-code {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: var(--secondary);
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
         .pricing-card.popular {
             border: 2px solid var(--primary);
             transform: translateY(-6px);
@@ -656,6 +692,7 @@
             .testimonial-grid { grid-template-columns: repeat(3, 1fr); }
             .footer-grid { grid-template-columns: 1.2fr repeat(4, 1fr); }
             .cta-banner { grid-template-columns: 1.2fr auto; padding: 48px 54px; }
+            .promo-strip { grid-template-columns: 1fr auto; align-items: center; }
         }
 
         @media (min-width: 1024px) {
@@ -676,13 +713,7 @@
     <header class="site-header">
         <div class="container navbar">
             <a href="#top" class="brand">
-                <span class="brand-mark" aria-hidden="true">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 3a2 2 0 0 0-2 2v1H8a2 2 0 0 0-2 2v2h12V8a2 2 0 0 0-2-2h-2V5a2 2 0 0 0-2-2Z"/>
-                        <path d="M6 10v7a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-7"/>
-                        <path d="M9 10v2a3 3 0 0 0 6 0v-2"/>
-                    </svg>
-                </span>
+                <img src="{{ asset('logo.png') }}" alt="WashKita Logo" class="brand-mark">
                 WashKita
             </a>
             <nav class="nav-links">
@@ -861,51 +892,59 @@
                 <div class="reveal">
                     <span class="eyebrow">Harga</span>
                     <h2 class="section-title">Pilih paket sesuai tahap bisnis laundry kamu</h2>
-                    <p class="section-copy">Mulai dari gratis untuk mencoba, lalu naik ke paket yang lebih kuat saat outlet dan transaksi kamu terus berkembang.</p>
+                    <p class="section-copy">Paket WashKita dibuat simpel dan langsung nyambung dengan kebutuhan operasional laundry, dari outlet pertama sampai bisnis dengan banyak cabang.</p>
+                </div>
+
+                <div class="promo-strip reveal">
+                    <div>
+                        <strong>Promo spesial bulan ini, diskon 50% untuk semua paket berbayar</strong>
+                        <p>Pakai kode voucher <b>WASHKITAPROMO</b> saat daftar untuk dapat harga promo dan mulai digitalisasi laundry dengan biaya lebih hemat.</p>
+                    </div>
+                    <div class="voucher-code">WASHKITAPROMO</div>
                 </div>
 
                 <div class="pricing-grid">
                     <article class="pricing-card reveal">
-                        <h3>Starter</h3>
-                        <div class="price">Gratis <small>/selamanya</small></div>
-                        <p>Cocok untuk pemilik laundry baru yang ingin mulai digital tanpa biaya awal.</p>
+                        <h3>Basic</h3>
+                        <div class="price">Rp 30.000 <small>/bln</small></div>
+                        <p>Paket ringan untuk laundry yang ingin operasional harian lebih rapi dan cepat.</p>
                         <ul class="pricing-list">
                             <li><span class="check">✓</span>1 outlet aktif</li>
-                            <li><span class="check">✓</span>Manajemen order dasar</li>
-                            <li><span class="check">✓</span>Dashboard ringkas</li>
-                            <li><span class="check">✓</span>Data pelanggan</li>
-                            <li><span class="check">✓</span>Support email</li>
+                            <li><span class="check">✓</span>Dashboard</li>
+                            <li><span class="check">✓</span>Kasir dan transaksi</li>
+                            <li><span class="check">✓</span>Pelanggan dan staff</li>
+                            <li><span class="check">✓</span>Pengaturan, role akses, dan outlet</li>
                         </ul>
-                        <a href="{{ route('register.owner') }}" class="btn btn-secondary" style="width:100%;">Mulai Gratis</a>
+                        <a href="{{ route('register.owner') }}" class="btn btn-secondary" style="width:100%;">Pilih Basic</a>
                     </article>
 
                     <article class="pricing-card popular reveal">
                         <span class="popular-badge">Paling Populer</span>
-                        <h3>Pro</h3>
-                        <div class="price">Rp 199.000 <small>/bln</small></div>
-                        <p>Paket favorit untuk laundry yang ingin proses lebih cepat dan laporan lebih rapi.</p>
+                        <h3>Pro Plan</h3>
+                        <div class="price">Rp 55.000 <small>/bln</small></div>
+                        <p>Pilihan ideal untuk laundry berkembang yang butuh fitur operasional lebih lengkap.</p>
                         <ul class="pricing-list">
                             <li><span class="check">✓</span>3 outlet aktif</li>
-                            <li><span class="check">✓</span>QRIS & notifikasi pelanggan</li>
-                            <li><span class="check">✓</span>Laporan keuangan real-time</li>
-                            <li><span class="check">✓</span>Manajemen staff</li>
-                            <li><span class="check">✓</span>Support prioritas</li>
+                            <li><span class="check">✓</span>Dashboard, kasir, transaksi, pelanggan</li>
+                            <li><span class="check">✓</span>Mesin, layanan, dan add on</li>
+                            <li><span class="check">✓</span>Laporan dan staff</li>
+                            <li><span class="check">✓</span>Multi outlet</li>
                         </ul>
-                        <a href="{{ route('register.owner') }}" class="btn btn-primary" style="width:100%;">Pilih Pro</a>
+                        <a href="{{ route('register.owner') }}" class="btn btn-primary" style="width:100%;">Pilih Pro Plan</a>
                     </article>
 
                     <article class="pricing-card reveal">
-                        <h3>Business</h3>
-                        <div class="price">Rp 499.000 <small>/bln</small></div>
-                        <p>Untuk bisnis laundry yang butuh kontrol multi-cabang dan operasional yang lebih matang.</p>
+                        <h3>Enterprise</h3>
+                        <div class="price">Rp 80.000 <small>/bln</small></div>
+                        <p>Untuk bisnis laundry yang ingin fitur penuh, kontrol cabang, dan dukungan promo penjualan.</p>
                         <ul class="pricing-list">
-                            <li><span class="check">✓</span>Multi-cabang tanpa ribet</li>
-                            <li><span class="check">✓</span>Dashboard owner lengkap</li>
-                            <li><span class="check">✓</span>Analitik performa outlet</li>
-                            <li><span class="check">✓</span>Akses mobile penuh</li>
-                            <li><span class="check">✓</span>Onboarding tim</li>
+                            <li><span class="check">✓</span>Outlet dan staff tanpa batas kaku</li>
+                            <li><span class="check">✓</span>Dashboard, kasir, transaksi, pelanggan</li>
+                            <li><span class="check">✓</span>Mesin, layanan, add on, dan laporan</li>
+                            <li><span class="check">✓</span>Role akses dan multi outlet</li>
+                            <li><span class="check">✓</span>Fitur promo untuk dorong penjualan</li>
                         </ul>
-                        <a href="{{ route('register.owner') }}" class="btn btn-dark" style="width:100%;">Pilih Business</a>
+                        <a href="{{ route('register.owner') }}" class="btn btn-dark" style="width:100%;">Pilih Enterprise</a>
                     </article>
                 </div>
             </div>
@@ -978,13 +1017,7 @@
                 <div class="footer-grid">
                     <div class="footer-brand">
                         <a href="#top" class="brand">
-                            <span class="brand-mark" aria-hidden="true">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 3a2 2 0 0 0-2 2v1H8a2 2 0 0 0-2 2v2h12V8a2 2 0 0 0-2-2h-2V5a2 2 0 0 0-2-2Z"/>
-                                    <path d="M6 10v7a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-7"/>
-                                    <path d="M9 10v2a3 3 0 0 0 6 0v-2"/>
-                                </svg>
-                            </span>
+                            <img src="{{ asset('logo.png') }}" alt="WashKita Logo" class="brand-mark">
                             WashKita
                         </a>
                         <p>Aplikasi manajemen laundry untuk owner yang ingin operasional rapi, cepat, dan siap berkembang.</p>

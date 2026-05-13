@@ -42,4 +42,12 @@ class Member extends Model
             'tenant_id',
         );
     }
+
+    // before creating status always set to active
+    protected static function booted()
+    {
+        static::creating(function ($member) {
+            $member->status = 'active';
+        });
+    }
 }

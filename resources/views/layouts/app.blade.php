@@ -88,13 +88,7 @@
 
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 flex w-80 flex-col border-r border-white/70 bg-white/90 p-6 shadow-panel backdrop-blur transition-transform duration-300 lg:translate-x-0">
             <div class="flex items-center gap-4">
-                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-soft">
-                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <rect x="5" y="3" width="14" height="18" rx="3"></rect>
-                        <circle cx="12" cy="13" r="4"></circle>
-                        <path d="M8 7h2M14 7h2"></path>
-                    </svg>
-                </div>
+                <img src="{{ asset('logo.png') }}" alt="WashKita Logo" class="h-14 w-14 rounded-2xl object-cover shadow-soft">
                 <div>
                     <p class="text-lg font-extrabold text-ink">{{ $outletName }}</p>
                     <p class="text-sm font-semibold text-slate-400">Laundry SaaS Panel</p>
@@ -114,6 +108,10 @@
                     <div class="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs font-semibold text-slate-500">
                         <p class="font-bold text-slate-700">Tenant: {{ $currentTenant->name }}</p>
                         <p class="mt-1 uppercase tracking-[0.18em] text-slate-400">Subscription {{ $subscriptionStatus }}</p>
+                        <!-- Upgrade Plan -->
+                            <a href="{{ route('billing.index') }}" class="mt-3 inline-block rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700 transition hover:bg-amber-100">
+                                Upgrade Plan
+                            </a>
                     </div>
                 @endif
             </div>

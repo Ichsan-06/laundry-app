@@ -40,4 +40,9 @@ class TenantSubscription extends Model
     {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
     }
+
+    public function purchaseHistories()
+    {
+        return $this->hasMany(PlanPurchaseHistory::class, 'activated_subscription_id');
+    }
 }

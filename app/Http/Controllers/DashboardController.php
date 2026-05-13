@@ -88,7 +88,7 @@ class DashboardController extends Controller
         $recentTransactions = $this->tenantContextService->scopeByUser(Transaction::with(['member']), $user)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
-            ->take(3)
+            ->take(10)
             ->get()
             ->map(function($t) {
                 return [

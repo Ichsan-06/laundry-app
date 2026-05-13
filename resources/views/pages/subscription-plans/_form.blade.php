@@ -20,6 +20,11 @@
             <textarea name="description" rows="3" class="block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100">{{ old('description', $plan->description) }}</textarea>
         </div>
         <div class="space-y-2">
+            <label class="text-sm font-bold text-slate-700">Harga Bulanan</label>
+            <input type="number" min="0" name="price_monthly" value="{{ old('price_monthly', $plan->price_monthly) }}" class="block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100">
+            @error('price_monthly') <p class="text-sm font-semibold text-rose-600">{{ $message }}</p> @enderror
+        </div>
+        <div class="space-y-2">
             <label class="text-sm font-bold text-slate-700">Max Outlet</label>
             <input type="number" min="1" name="max_outlets" value="{{ old('max_outlets', $plan->max_outlets) }}" class="block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-medium text-slate-900 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100">
         </div>

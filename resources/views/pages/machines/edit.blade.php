@@ -76,7 +76,7 @@
             <div class="rounded-[32px] bg-white p-8 shadow-sm ring-1 ring-slate-100 space-y-6">
                 <h3 class="text-lg font-extrabold text-slate-900">Program Pricing</h3>
                 
-                @foreach(['WASH' => 'Wash Program', 'DRY' => 'Dry Program', 'COMPLETE' => 'Complete Cycle'] as $key => $label)
+                @foreach(['WASH' => 'Price 1', 'DRY' => 'Price 2', 'COMPLETE' => 'Price 3'] as $key => $label)
                 @php $duration = $machine->durations->where('duration_type', $key)->first(); @endphp
                 <div class="rounded-2xl border border-slate-50 bg-slate-50/50 p-4 space-y-4">
                     <p class="text-[10px] font-extrabold uppercase tracking-widest text-primary-600">{{ $label }}</p>

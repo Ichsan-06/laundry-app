@@ -13,6 +13,7 @@ class SubscriptionPlanSeeder extends Seeder
         $plans = [
             'trial' => [
                 'name' => 'Trial',
+                'price_monthly' => 0,
                 'max_outlets' => 1,
                 'max_staff' => 3,
                 'is_custom_permission' => false,
@@ -38,6 +39,7 @@ class SubscriptionPlanSeeder extends Seeder
             ],
             'basic' => [
                 'name' => 'Basic Plan',
+                'price_monthly' => 30000,
                 'max_outlets' => 1,
                 'max_staff' => 3,
                 'is_custom_permission' => false,
@@ -64,6 +66,7 @@ class SubscriptionPlanSeeder extends Seeder
             ],
             'pro' => [
                 'name' => 'Pro Plan',
+                'price_monthly' => 55000,
                 'max_outlets' => 3,
                 'max_staff' => 10,
                 'is_custom_permission' => false,
@@ -106,6 +109,7 @@ class SubscriptionPlanSeeder extends Seeder
             ],
             'enterprise' => [
                 'name' => 'Enterprise Plan',
+                'price_monthly' => 80000,
                 'max_outlets' => null,
                 'max_staff' => null,
                 'is_custom_permission' => true,
@@ -123,6 +127,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'is_custom_permission' => $planData['is_custom_permission'],
                 'is_active' => true,
                 'description' => $planData['name'],
+                'price_monthly' => $planData['price_monthly'] ?? 0,
             ]);
 
             $permissionIds = Permission::query()

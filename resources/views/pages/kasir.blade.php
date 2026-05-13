@@ -19,6 +19,7 @@
     isSubmitting: false,
     toast: { show: false, type: 'success', message: '', timeout: null },
     alertModal: { show: false, type: 'error', title: '', message: '' },
+    showHistoryModal: false,
     showPaymentSuccessModal: false,
     lastPaidTransaction: null,
     qrisModal: {
@@ -50,6 +51,7 @@
     allMachines: {{ json_encode($machines) }},
     allServices: {{ json_encode($services) }},
     allAddons: {{ json_encode($addons) }},
+    pendingQrisTransactions: {{ json_encode($pendingQrisTransactions) }},
 
     // Drop Off State
     dropOff: {
@@ -116,6 +118,29 @@
     closeQrisModal() {
         this.resetQrisTimers();
         this.qrisModal.show = false;
+    },
+
+    openPendingTransaction(transaction) {
+        const expiredAt = transaction.payment_expires_at ? new Date(transaction.payment_expires_at) : null;
+        this.showHistoryModal = false;
+        this.resetQrisTimers();
+        this.qrisModal = {
+            show: true,
+            transactionId: transaction.id,
+            transactionNumber: transaction.transaction_number,
+            refId: transaction.ref_id || '',
+            trxReference: transaction.trx_reference || '',
+            paymentName: 'QRIS',
+            qrImage: transaction.qris_qr_image || '',
+            totalBayar: Number(transaction.total_amount || 0),
+            totalFee: Number(transaction.payment_fee || 0),
+            expired: expiredAt,
+            remainingSeconds: expiredAt ? Math.max(0, Math.floor((expiredAt.getTime() - Date.now()) / 1000)) : 0,
+            status: transaction.payment_status || 'pending',
+            tutorialPembayaran: transaction.qris_tutorial_pembayaran || '',
+        };
+        this.startQrisCountdown();
+        this.startQrisPolling();
     },
 
     openQrisModal(payload) {
@@ -516,7 +541,7 @@
             <p class="text-sm font-medium text-slate-400">Buat Transaksi Baru</p>
         </div>
         <div class="flex items-center gap-4">
-            <button class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
+            <button @click="showHistoryModal = true" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 transition hover:bg-slate-50">
                 <div class="flex items-center gap-2">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -1085,6 +1110,55 @@
                 <button type="button" @click="closeAlert()" :class="alertModal.type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'" class="w-full rounded-2xl px-5 py-3 text-sm font-extrabold text-white transition">
                     Tutup
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="showHistoryModal" class="fixed inset-0 z-[84] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" x-cloak>
+        <div class="w-full max-w-3xl overflow-hidden rounded-[34px] bg-white shadow-2xl ring-1 ring-slate-100" @click.away="showHistoryModal = false">
+            <div class="border-b border-slate-100 bg-slate-50 px-6 py-5">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-extrabold uppercase tracking-[0.26em] text-primary-600">Riwayat QRIS</p>
+                        <h3 class="mt-2 text-xl font-extrabold text-slate-900">Transaksi Belum Dibayar</h3>
+                        <p class="mt-1 text-sm font-medium text-slate-500">Daftar transaksi QRIS yang masih pending dan bisa dibuka lagi QR pembayarannya.</p>
+                    </div>
+                    <button type="button" @click="showHistoryModal = false" class="rounded-2xl bg-white p-3 text-slate-400 transition hover:text-slate-700">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6 6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-6">
+                <template x-if="pendingQrisTransactions.length === 0">
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-6 text-center text-sm font-medium text-slate-500">
+                        Belum ada transaksi QRIS yang masih belum dibayar.
+                    </div>
+                </template>
+
+                <template x-for="trx in pendingQrisTransactions" :key="trx.id">
+                    <div class="rounded-3xl border border-slate-200 bg-white px-5 py-5 shadow-sm">
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-lg font-extrabold text-slate-900" x-text="trx.transaction_number"></p>
+                                <p class="mt-1 text-sm font-medium text-slate-500" x-text="'Ref: ' + (trx.ref_id || '-')"></p>
+                                <div class="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+                                    <p><span class="font-bold text-slate-800">Pelanggan:</span> <span x-text="trx.member?.nama || 'Non Member'"></span></p>
+                                    <p><span class="font-bold text-slate-800">Total:</span> <span x-text="formatCurrency(trx.total_amount || 0)"></span></p>
+                                    <p><span class="font-bold text-slate-800">Expire:</span> <span x-text="trx.payment_expires_at ? new Date(trx.payment_expires_at).toLocaleString('id-ID') : '-'"></span></p>
+                                    <p><span class="font-bold text-slate-800">Status:</span> <span class="font-extrabold uppercase text-amber-600" x-text="trx.payment_status"></span></p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button type="button" @click="openPendingTransaction(trx)" class="rounded-2xl bg-primary-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-primary-700">
+                                    Lihat QR Pembayaran
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
