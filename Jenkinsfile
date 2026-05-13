@@ -36,9 +36,12 @@ pipeline {
                 script {
                     echo 'Memperbarui kontainer Laravel app di VPS...'
                     sh '''
-                        cd ~/laundry-app-production
-                        docker compose pull
-                        docker compose up -d --remove-orphan
+                        # Menggunakan user ubuntu sesuai kredensial yang baru dibuat
+                        ssh -o StrictHostKeyChecking=no ubuntu@43.173.1.182'
+                            cd /laundry-app-production
+                            docker compose pull app
+                            docker compose up -d app
+                        '
                     '''
                 }
             }
