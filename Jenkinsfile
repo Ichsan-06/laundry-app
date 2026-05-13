@@ -31,5 +31,17 @@ pipeline {
                 }
             }
         }
+        stage('Deploy ke VPS') {
+            steps {
+                script {
+                    echo 'Memperbarui kontainer Laravel app di VPS...'
+                    sh '''
+                        cd ~/laundry-app-production
+                        docker compose pull
+                        docker compose up -d --remove-orphan
+                    '''
+                }
+            }
+        }
     }
 }
