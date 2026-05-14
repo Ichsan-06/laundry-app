@@ -81,7 +81,7 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {{-- Total Members --}}
         <div class="group rounded-[24px] bg-white p-6 shadow-soft ring-1 ring-slate-100 transition duration-300 hover:shadow-xl">
             <div class="flex items-start justify-between">
@@ -101,53 +101,39 @@
             </div>
         </div>
 
-        {{-- Total Balance --}}
+        {{-- Total Active Members --}}
         <div class="group rounded-[24px] bg-white p-6 shadow-soft ring-1 ring-slate-100 transition duration-300 hover:shadow-xl">
             <div class="flex items-start justify-between">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 transition group-hover:scale-110">
+                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 transition group-hover:scale-110">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-slate-400">Avg RP. {{ number_format($stats['total_balance'] / max(1, $stats['total_members']), 0, '.', ',') }}</span>
+                <span class="text-xs font-bold text-emerald-600">Active</span>
             </div>
             <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Total Balance</p>
-                <h3 class="mt-1 text-3xl font-extrabold text-slate-900">RP. {{ number_format($stats['total_balance'], 0, '.', ',') }}</h3>
+                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Active Members</p>
+                <h3 class="mt-1 text-3xl font-extrabold text-slate-900">{{ number_format($stats['active_members']) }}</h3>
             </div>
         </div>
 
-        {{-- Active Passports --}}
-        <div class="group rounded-[24px] bg-white p-6 shadow-soft ring-1 ring-slate-100 transition duration-300 hover:shadow-xl">
-            <div class="flex items-start justify-between">
-                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 transition group-hover:scale-110">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                </div>
-                <span class="text-xs font-bold text-purple-600">Premium</span>
-            </div>
-            <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Active Passports</p>
-                <h3 class="mt-1 text-3xl font-extrabold text-slate-900">{{ number_format($stats['active_passports']) }}</h3>
-            </div>
-        </div>
 
-        {{-- Low Balance Alerts --}}
+        {{-- New Members Today --}}
         <div class="group rounded-[24px] bg-white p-6 shadow-soft ring-1 ring-slate-100 transition duration-300 hover:shadow-xl">
             <div class="flex items-start justify-between">
                 <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 transition group-hover:scale-110">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                        <line x1="22" y1="11" x2="16" y2="11"></line>
                     </svg>
                 </div>
             </div>
             <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Low Balance Alerts</p>
-                <h3 class="mt-1 text-3xl font-extrabold text-slate-900">{{ number_format($stats['low_balance_alerts']) }}</h3>
+                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Growth Rate</p>
+                <h3 class="mt-1 text-3xl font-extrabold text-slate-900">+5.4%</h3>
             </div>
         </div>
     </div>
@@ -168,7 +154,6 @@
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100">
                         <a href="{{ route('members.index', array_merge(request()->all(), ['status' => 'all'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">All Status</a>
                         <a href="{{ route('members.index', array_merge(request()->all(), ['status' => 'ACTIVE'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Active</a>
-                        <a href="{{ route('members.index', array_merge(request()->all(), ['status' => 'LOW_BALANCE'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Low Balance</a>
                         <a href="{{ route('members.index', array_merge(request()->all(), ['status' => 'INACTIVE'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Inactive</a>
                         <a href="{{ route('members.index', array_merge(request()->all(), ['status' => 'PREMIUM'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Premium</a>
                     </div>
@@ -183,12 +168,11 @@
                             <path d="m21 8-4-4-4 4"></path>
                             <path d="M17 4v16"></path>
                         </svg>
-                        Sort: {{ request('sort') == 'nama' ? 'Nama' : (request('sort') == 'saldo_high' ? 'Balance High' : 'Latest') }}
+                        Sort: {{ request('sort') == 'nama' ? 'Nama' : 'Latest' }}
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100">
                         <a href="{{ route('members.index', array_merge(request()->all(), ['sort' => 'latest'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Latest</a>
                         <a href="{{ route('members.index', array_merge(request()->all(), ['sort' => 'nama'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Nama (A-Z)</a>
-                        <a href="{{ route('members.index', array_merge(request()->all(), ['sort' => 'saldo_high'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Highest Balance</a>
                     </div>
                 </div>
             </div>
@@ -216,7 +200,6 @@
                     <tr class="bg-slate-50/50 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
                         <th class="px-8 py-5">Member Nama</th>
                         <th class="px-6 py-5">Member ID</th>
-                        <th class="px-6 py-5 text-right">Balance</th>
                         <th class="px-6 py-5">Registered At</th>
                         <th class="px-6 py-5">Status</th>
                         <th class="px-8 py-5 text-right">Actions</th>
@@ -240,9 +223,7 @@
                         <td class="px-6 py-5">
                             <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">{{ $member->id_member }}</span>
                         </td>
-                        <td class="px-6 py-5 text-right">
-                            <span class="text-[15px] font-extrabold text-slate-900">${{ number_format($member->saldo, 2) }}</span>
-                        </td>
+
                         <td class="px-6 py-5">
                             <div>
                                 <p class="text-[13px] font-extrabold text-slate-800">{{ $member->tanggal_daftar->format('M d, Y') }}</p>
@@ -253,7 +234,6 @@
                             @php
                                 $statusClasses = [
                                     'ACTIVE' => 'bg-emerald-50 text-emerald-600 ring-emerald-100',
-                                    'LOW_BALANCE' => 'bg-orange-50 text-orange-600 ring-orange-100',
                                     'INACTIVE' => 'bg-slate-100 text-slate-500 ring-slate-200',
                                     'PREMIUM' => 'bg-indigo-50 text-indigo-600 ring-indigo-100',
                                 ];
@@ -320,17 +300,11 @@
                         @error('no_hp') <p class="text-[11px] font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Initial Balance</label>
-                        <input type="number" step="0.01" name="saldo" value="{{ old('saldo', '0') }}" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-primary-500/20 @error('saldo') ring-2 ring-rose-500 @enderror">
-                        @error('saldo') <p class="text-[11px] font-bold text-rose-500">{{ $message }}</p> @enderror
-                    </div>
+
                     <div class="space-y-2">
                         <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Status</label>
                         <select name="status" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-primary-500/20 @error('status') ring-2 ring-rose-500 @enderror">
                             <option value="ACTIVE" {{ old('status') == 'ACTIVE' ? 'selected' : '' }}>Active</option>
-                            <option value="LOW_BALANCE" {{ old('status') == 'LOW_BALANCE' ? 'selected' : '' }}>Low Balance</option>
                             <option value="INACTIVE" {{ old('status') == 'INACTIVE' ? 'selected' : '' }}>Inactive</option>
                             <option value="PREMIUM" {{ old('status') == 'PREMIUM' ? 'selected' : '' }}>Premium</option>
                         </select>
@@ -374,16 +348,11 @@
                         <input type="text" name="no_hp" x-model="currentMember.no_hp" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-primary-500/20">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Balance</label>
-                        <input type="number" step="0.01" name="saldo" x-model="currentMember.saldo" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-primary-500/20">
-                    </div>
+
                     <div class="space-y-2">
                         <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Status</label>
                         <select name="status" x-model="currentMember.status" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900 focus:bg-white focus:ring-2 focus:ring-primary-500/20">
                             <option value="ACTIVE">Active</option>
-                            <option value="LOW_BALANCE">Low Balance</option>
                             <option value="INACTIVE">Inactive</option>
                             <option value="PREMIUM">Premium</option>
                         </select>

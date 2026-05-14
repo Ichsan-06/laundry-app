@@ -16,14 +16,12 @@ class Member extends Model
         'nama',
         'no_hp',
         'email',
-        'saldo',
         'status',
         'tanggal_daftar',
     ];
 
     protected $casts = [
         'tanggal_daftar' => 'datetime',
-        'saldo' => 'decimal:2',
     ];
 
     public function outlet()

@@ -53,6 +53,11 @@ class TransactionController extends Controller
             $query->where('payment_method', $request->payment_method);
         }
 
+        // Filter by Outlet (For Owner/Admin)
+        if ($request->has('outlet_id') && $request->outlet_id !== 'all') {
+            $query->where('outlet_id', $request->outlet_id);
+        }
+
         // Sorting
         $sort = $request->get('sort', 'latest');
         if ($sort === 'oldest') {

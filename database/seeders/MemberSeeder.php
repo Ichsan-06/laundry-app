@@ -20,7 +20,6 @@ class MemberSeeder extends Seeder
                 'nama' => 'John Doe',
                 'no_hp' => '081234567890',
                 'email' => 'john@example.com',
-                'saldo' => 500.00,
                 'status' => 'PREMIUM',
                 'tanggal_daftar' => now(),
             ],
@@ -30,8 +29,7 @@ class MemberSeeder extends Seeder
                 'nama' => 'Jane Smith',
                 'no_hp' => '081298765432',
                 'email' => 'jane@example.com',
-                'saldo' => 50.00,
-                'status' => 'LOW_BALANCE',
+                'status' => 'ACTIVE',
                 'tanggal_daftar' => now(),
             ],
         ];

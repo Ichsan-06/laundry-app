@@ -167,7 +167,7 @@
                 <div class="space-y-2">
                     @foreach($machine->durations as $duration)
                     <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <span class="text-[11px] font-bold text-slate-600">{{ $duration->duration_type }} ({{ $duration->duration_minutes }}m)</span>
+                        <span class="text-[11px] font-bold text-slate-600">Durasi {{ $duration->duration_minutes }}m</span>
                         <span class="text-[11px] font-extrabold text-slate-900">Rp {{ number_format($duration->price, 0, ',', '.') }}</span>
                     </div>
                     @endforeach

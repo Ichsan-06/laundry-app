@@ -38,8 +38,6 @@ class MemberController extends Controller
         $sort = $request->get('sort', 'latest');
         if ($sort === 'nama') {
             $query->orderBy('nama', 'asc');
-        } elseif ($sort === 'saldo_high') {
-            $query->orderBy('saldo', 'desc');
         } else {
             $query->latest();
         }
@@ -51,9 +49,7 @@ class MemberController extends Controller
         // Stats
         $stats = [
             'total_members' => (clone $statsQuery)->count(),
-            'total_balance' => (clone $statsQuery)->sum('saldo'),
-            'active_passports' => (clone $statsQuery)->where('status', 'PREMIUM')->count(),
-            'low_balance_alerts' => (clone $statsQuery)->where('status', 'LOW_BALANCE')->count(),
+            'active_members' => (clone $statsQuery)->where('status', 'ACTIVE')->count(),
         ];
 
         return view('pages.members.index', compact('members', 'stats'));
@@ -67,8 +63,7 @@ class MemberController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'no_hp' => 'nullable|string|max:20',
-            'saldo' => 'required|numeric|min:0',
-            'status' => 'required|in:ACTIVE,LOW_BALANCE,INACTIVE,PREMIUM',
+            'status' => 'required|in:ACTIVE,INACTIVE,PREMIUM',
         ]);
 
         $outlet = $request->user()->isOwner()
@@ -92,8 +87,7 @@ class MemberController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'no_hp' => 'nullable|string|max:20',
-            'saldo' => 'required|numeric|min:0',
-            'status' => 'required|in:ACTIVE,LOW_BALANCE,INACTIVE,PREMIUM',
+            'status' => 'required|in:ACTIVE,INACTIVE,PREMIUM',
         ]);
 
         $member->update($validated);

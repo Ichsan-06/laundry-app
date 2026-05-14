@@ -225,19 +225,36 @@ class KasirController extends Controller
         }
     }
 
+    public function cancelQrisPayment(Transaction $transaction): JsonResponse
+    {
+        $transaction->update([
+            'status' => 'CANCELLED',
+            'payment_status' => 'failed'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaction cancelled successfully.'
+        ]);
+    }
+
     public function printReceipt($id)
     {
         $transaction = Transaction::with([
             'member',
             'cashier',
+            'outlet',
             'selfServiceDetails.machine',
             'servicePackages',
             'addonOptions',
             'items',
         ])->findOrFail($id);
+        
         abort_if(! in_array($transaction->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
 
-        return view('pages.receipt', compact('transaction'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.receipt', compact('transaction'));
+        
+        return $pdf->stream('receipt-' . $transaction->transaction_number . '.pdf');
     }
 
     public function storeMember(Request $request)
@@ -252,7 +269,6 @@ class KasirController extends Controller
             ? Outlet::query()->where('tenant_id', $request->user()->tenant_id)->orderBy('nama_outlet')->value('id')
             : $request->user()->outlet_id;
         $validated['id_member'] = 'MBR-' . strtoupper(bin2hex(random_bytes(2)));
-        $validated['saldo'] = 0;
         $validated['status'] = 'AKTIF';
         $validated['tanggal_daftar'] = now();
 
@@ -309,7 +325,8 @@ class KasirController extends Controller
             'tax_percent' => 'nullable|numeric|min:0|max:100',
             'tax_amount' => 'nullable|numeric|min:0',
             'total_amount' => 'required|numeric|min:0',
-            'machine_ids' => 'required_if:service_type,SELF_SERVICE|string|nullable',
+            'machine_ids' => 'nullable|string',
+            'machine_selections' => 'required_if:service_type,SELF_SERVICE|string|nullable',
             'drop_off_details' => 'required_if:service_type,DROP_OFF|string|nullable',
             'addon_ids' => 'nullable|string',
             'items' => 'required_if:service_type,DROP_OFF|string|nullable',
@@ -351,7 +368,8 @@ class KasirController extends Controller
         }
 
         if ($validated['service_type'] === 'SELF_SERVICE') {
-            $machineIds = array_values(array_filter(explode(',', $validated['machine_ids'] ?? '')));
+            $machineSelections = json_decode($validated['machine_selections'] ?? '[]', true);
+            $machineIds = array_column($machineSelections, 'machine_id');
 
             if (empty($machineIds)) {
                 throw ValidationException::withMessages([
@@ -377,9 +395,12 @@ class KasirController extends Controller
                     ]);
                 }
 
-                $duration = $machine->durations
-                    ->firstWhere('duration_type', $machine->machine_type === 'WASHER' ? 'WASH' : 'DRY')
-                    ?? $machine->durations->first();
+                $selection = collect($machineSelections)->firstWhere('machine_id', $machine->id);
+                $durationId = $selection['duration_id'] ?? null;
+
+                $duration = $machine->durations->firstWhere('id', $durationId)
+                    ?? ($machine->durations->firstWhere('duration_type', $machine->machine_type === 'WASHER' ? 'WASH' : 'DRY')
+                    ?? $machine->durations->first());
 
                 if (! $duration) {
                     throw ValidationException::withMessages([
@@ -425,7 +446,8 @@ class KasirController extends Controller
                         ->first();
 
                     if ($pkg) {
-                        $weight = (float) ($detail['weight'] ?? 1);
+                        $weightInput = $detail['weight'] ?? null;
+                        $weight = (is_null($weightInput) || $weightInput === '') ? 1.0 : (float) $weightInput;
 
                         if ($weight <= 0) {
                             throw ValidationException::withMessages([
@@ -586,9 +608,12 @@ class KasirController extends Controller
             if (! empty($detail['package_id'])) {
                 $pkg = ServicePackage::find($detail['package_id']);
                 if ($pkg) {
+                    $weightInput = $detail['weight'] ?? null;
+                    $weight = (is_null($weightInput) || $weightInput === '') ? 1.0 : (float) $weightInput;
+
                     $transaction->servicePackages()->attach($pkg->id, [
                         'id' => Str::uuid(),
-                        'weight' => $detail['weight'] ?? 1,
+                        'weight' => $weight,
                         'note' => $detail['note'] ?? null,
                         'price' => $pkg->harga_per_kg,
                     ]);

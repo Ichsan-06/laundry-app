@@ -66,7 +66,8 @@ Route::middleware(['auth', 'active.user'])->group(function () {
             Route::get('/kasir/receipt/{id}', [KasirController::class, 'printReceipt'])->name('kasir.receipt');
             Route::post('/kasir/transaction', [KasirController::class, 'store'])->name('kasir.store');
             Route::post('/kasir/qris', [KasirController::class, 'createQrisPayment'])->name('kasir.qris.create');
-            Route::get('/kasir/qris/{transaction}/status', [KasirController::class, 'checkQrisStatus'])->name('kasir.qris.status');
+            Route::post('/kasir/qris/{transaction}/status', [KasirController::class, 'checkQrisStatus'])->name('kasir.qris.status');
+            Route::post('/kasir/qris/{transaction}/cancel', [KasirController::class, 'cancelQrisPayment'])->name('kasir.qris.cancel');
             Route::post('/kasir/member', [KasirController::class, 'storeMember'])->name('kasir.member.store');
         });
 

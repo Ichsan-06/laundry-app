@@ -28,14 +28,53 @@
         <span class="inline-flex rounded-xl px-4 py-2 text-[11px] font-extrabold tracking-widest ring-1 ring-inset {{ $statusClasses[$transaction->status] ?? 'bg-slate-100 text-slate-500' }}">
             {{ str_replace('_', ' ', $transaction->status) }}
         </span>
-        <button onclick="window.print()" class="flex h-10 items-center gap-2 rounded-xl bg-primary-600 px-6 text-xs font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">
+        <a href="{{ route('kasir.receipt', $transaction->id) }}" target="_blank" class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 text-xs font-extrabold text-slate-600 transition hover:bg-slate-50">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                 <rect x="6" y="14" width="12" height="8"></rect>
             </svg>
             Print Receipt
-        </button>
+        </a>
+
+        @if($transaction->member && $transaction->member->no_hp)
+            @php
+                $waMessage = "Halo *" . ($transaction->member->nama ?? 'Pelanggan') . "*,\n\n";
+                $waMessage .= "Berikut adalah ringkasan transaksi Anda di *" . $transaction->outlet->nama_outlet . "*:\n\n";
+                $waMessage .= "📌 *Detail Transaksi*\n";
+                $waMessage .= "No. Transaksi: " . $transaction->transaction_number . "\n";
+                $waMessage .= "Tanggal: " . $transaction->created_at->format('d/m/Y H:i') . "\n";
+                $waMessage .= "Status: " . str_replace('_', ' ', $transaction->status) . "\n";
+                $waMessage .= "--------------------------------\n";
+                
+                if($transaction->transaction_type === 'SELF_SERVICE') {
+                    foreach($transaction->selfServiceDetails as $detail) {
+                        $waMessage .= "• " . $detail->machine->machine_type . " (" . $detail->duration_minutes . " mnt): Rp " . number_format($detail->price, 0, ',', '.') . "\n";
+                    }
+                } else {
+                    foreach($transaction->servicePackages as $pkg) {
+                        $waMessage .= "• " . $pkg->nama_paket . " (" . $pkg->pivot->weight . "kg): Rp " . number_format($pkg->pivot->price * $pkg->pivot->weight, 0, ',', '.') . "\n";
+                    }
+                    foreach($transaction->addonOptions as $addon) {
+                        $waMessage .= "• " . $addon->nama . ": Rp " . number_format($addon->pivot->price, 0, ',', '.') . "\n";
+                    }
+                }
+                
+                $waMessage .= "--------------------------------\n";
+                $waMessage .= "💰 *TOTAL: Rp " . number_format($transaction->total_amount, 0, ',', '.') . "*\n";
+                $waMessage .= "--------------------------------\n\n";
+                $waMessage .= "Terima kasih telah mempercayakan cucian Anda kepada kami! 🙏✨";
+                
+                $cleanPhone = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $transaction->member->no_hp));
+                $waUrl = "https://wa.me/" . $cleanPhone . "?text=" . urlencode($waMessage);
+            @endphp
+            <a href="{{ $waUrl }}" target="_blank" class="flex h-10 items-center gap-2 rounded-xl bg-emerald-600 px-6 text-xs font-extrabold text-white shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-700">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3z"></path>
+                </svg>
+                Kirim WA
+            </a>
+        @endif
     </div>
 </header>
 @endsection
@@ -98,7 +137,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <p class="text-sm font-extrabold text-slate-900">Rp {{ number_format($pkg->pivot->price * $pkg->pivot->weight, 0, ',', '.') }}</p>
+                                <p class="text-sm font-extrabold text-slate-900">Rp {{ number_format($pkg->pivot->price * max($pkg->pivot->weight, 1), 0, ',', '.') }}</p>
                             </div>
                         @endforeach
 
@@ -181,10 +220,6 @@
                     <div>
                         <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">No. HP</p>
                         <p class="text-xs font-bold text-slate-900">{{ $transaction->member->no_hp }}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Sisa Saldo</p>
-                        <p class="text-xs font-bold text-emerald-600">Rp {{ number_format($transaction->member->saldo, 0, ',', '.') }}</p>
                     </div>
                 </div>
                 @endif

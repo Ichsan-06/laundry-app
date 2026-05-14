@@ -217,6 +217,29 @@
                     </div>
                 </div>
 
+                {{-- Filter: Outlet (Only for Owner/Admin) --}}
+                @if(auth()->user()->isOwner() || auth()->user()->isSuperAdmin())
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-white hover:shadow-sm">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        Outlet: {{ request('outlet_id') && request('outlet_id') !== 'all' ? ($outlets->firstWhere('id', request('outlet_id'))?->nama_outlet ?? 'All') : 'All' }}
+                    </button>
+                    <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['outlet_id' => 'all'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
+                            All Outlets
+                        </a>
+                        @foreach($outlets as $outlet)
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['outlet_id' => $outlet->id])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
+                            {{ $outlet->nama_outlet }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 {{-- Sort --}}
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-white hover:shadow-sm">
@@ -236,7 +259,7 @@
                     </div>
                 </div>
 
-                @if(request()->anyFilled(['status', 'transaction_type', 'service_type', 'payment_method', 'sort', 'search']))
+                @if(request()->anyFilled(['status', 'transaction_type', 'service_type', 'payment_method', 'sort', 'search', 'outlet_id']))
                 <a href="{{ route('transactions.index') }}" class="text-xs font-extrabold text-rose-500 hover:underline">Clear All Filters</a>
                 @endif
             </div>

@@ -339,12 +339,16 @@
         if (index > -1) {
             this.selectedMachines.splice(index, 1);
         } else {
+            // Default duration based on machine type or first available
+            const defaultDuration = machine.durations.find(d => d.duration_type === (machine.machine_type === 'WASHER' ? 'WASH' : 'DRY')) || machine.durations[0];
+            const machineToSelect = { ...machine, selected_duration: defaultDuration, selected_duration_id: defaultDuration?.id };
+
             if (this.machineType === 'ALL') {
                 if (this.selectedMachines.length < 2) {
                     // Check if already has same type
                     const hasSameType = this.selectedMachines.some(m => m.machine_type === machine.machine_type);
                     if (!hasSameType) {
-                        this.selectedMachines.push(machine);
+                        this.selectedMachines.push(machineToSelect);
                     } else {
                         this.showToast('error', 'Anda sudah memilih mesin bertipe ' + machine.machine_type + '.');
                     }
@@ -352,7 +356,7 @@
                     this.showToast('error', 'Maksimal 2 mesin di mode Semua: 1 washer dan 1 dryer.');
                 }
             } else {
-                this.selectedMachines = [machine];
+                this.selectedMachines = [machineToSelect];
             }
         }
     },
@@ -379,8 +383,7 @@
     get subtotal() {
         if (this.service === 'self_service') {
             return this.selectedMachines.reduce((sum, machine) => {
-                const duration = machine.durations.find(d => d.duration_type === (machine.machine_type === 'WASHER' ? 'WASH' : 'DRY')) || machine.durations[0];
-                return sum + parseFloat(duration?.price || 0);
+                return sum + parseFloat(machine.selected_duration?.price || 0);
             }, 0);
         } else {
             let total = 0;
@@ -485,6 +488,32 @@
         }
 
         return true;
+    },
+
+    async cancelPendingTransaction(trx) {
+        if (!confirm('Apakah Anda yakin ingin membatalkan transaksi ini?')) return;
+
+        try {
+            const response = await fetch(`/kasir/qris/${trx.id}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.pendingQrisTransactions = this.pendingQrisTransactions.filter(t => t.id !== trx.id);
+                this.showToast('success', 'Transaksi berhasil dibatalkan.');
+            } else {
+                this.showToast('error', data.message || 'Gagal membatalkan transaksi.');
+            }
+        } catch (error) {
+            console.error('Error cancelling transaction:', error);
+            this.showToast('error', 'Terjadi kesalahan saat membatalkan transaksi.');
+        }
     },
 
     submitCheckout(event) {
@@ -635,8 +664,8 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-400 uppercase">Saldo</p>
-                                <p class="text-xs font-extrabold text-emerald-600" x-text="'Rp ' + parseFloat(selectedMember.saldo).toLocaleString('id-ID')"></p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase" x-text="selectedMember.status"></p>
+                                <p class="text-xs font-extrabold text-indigo-600" x-text="selectedMember.no_hp"></p>
                             </div>
                         </div>
                     </template>
@@ -820,7 +849,7 @@
                                     </div>
                                     <h4 class="text-sm font-extrabold text-slate-900" x-text="machine.machine_code"></h4>
                                     <p class="text-[9px] font-bold text-slate-400" x-text="machine.machine_type === 'WASHER' ? 'Washer ' + parseInt(machine.capacity_kg) + 'kg' : 'Dryer ' + parseInt(machine.capacity_kg) + 'kg'"></p>
-                                    <p class="mt-1 text-[10px] font-extrabold text-slate-600" x-text="'Rp ' + (parseFloat(machine.durations.find(d => d.duration_type === (machine.machine_type === 'WASHER' ? 'WASH' : 'DRY'))?.price || machine.durations[0]?.price || 0)).toLocaleString('id-ID') + '/30m'"></p>
+                                    <p class="mt-1 text-[10px] font-extrabold text-slate-600" x-text="'Rp ' + (parseFloat(machine.durations.find(d => d.duration_type === (machine.machine_type === 'WASHER' ? 'WASH' : 'DRY'))?.price || machine.durations[0]?.price || 0)).toLocaleString('id-ID') + ' / ' + (machine.durations.find(d => d.duration_type === (machine.machine_type === 'WASHER' ? 'WASH' : 'DRY'))?.duration_minutes || machine.durations[0]?.duration_minutes || 0) + 'mnt'"></p>
                                     
                                     <div class="mt-3 flex items-center gap-1.5">
                                         <div class="h-1.5 w-1.5 rounded-full" :class="machine.status === 'AVAILABLE' ? 'bg-emerald-500' : (machine.status === 'IN_USE' ? 'bg-amber-500' : 'bg-rose-500')"></div>
@@ -834,17 +863,26 @@
                     {{-- Selection Summary (Bottom of Middle) --}}
                     <div x-show="selectedMachines.length > 0" class="rounded-[28px] bg-white p-6 shadow-soft ring-1 ring-slate-100">
                         <div class="flex items-center justify-between">
-                            <div class="flex gap-4">
-                                <template x-for="sm in selectedMachines" :key="sm.id">
-                                    <div class="flex items-center gap-4 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
+                            <div class="flex flex-wrap gap-4">
+                                <template x-for="(sm, index) in selectedMachines" :key="sm.id">
+                                    <div class="flex items-center gap-4 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100 min-w-[280px]">
                                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-primary-600 shadow-sm">
                                             <svg x-show="sm.machine_type === 'WASHER'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="3" width="12" height="18" rx="2"></rect><circle cx="12" cy="14" r="3"></circle></svg>
                                             <svg x-show="sm.machine_type === 'DRYER'" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M5 7l7 5 7-5M5 17l7-5 7 5"></path></svg>
                                         </div>
-                                        <div>
-                                            <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-300">Mesin terpilih</p>
-                                            <h4 class="text-sm font-extrabold text-slate-900" x-text="sm.machine_code"></h4>
-                                            <p class="text-[9px] font-bold text-slate-400" x-text="sm.machine_type === 'WASHER' ? 'Washer ' + parseInt(sm.capacity_kg) + 'kg' : 'Dryer ' + parseInt(sm.capacity_kg) + 'kg'"></p>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-300">Mesin <span x-text="sm.machine_code"></span></p>
+                                            </div>
+                                            <div class="mt-1">
+                                                <select x-model="sm.selected_duration_id" 
+                                                        @change="sm.selected_duration = sm.durations.find(dur => dur.id === sm.selected_duration_id)"
+                                                        class="block w-full border-none bg-transparent p-0 text-xs font-bold text-slate-900 focus:ring-0 cursor-pointer">
+                                                    <template x-for="d in sm.durations" :key="d.id">
+                                                        <option :value="d.id" x-text="d.duration_type + ' - ' + d.duration_minutes + ' mnt (Rp ' + parseFloat(d.price).toLocaleString('id-ID') + ')'"></option>
+                                                    </template>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -898,7 +936,7 @@
                             <span class="text-xs font-bold text-slate-400">Mesin</span>
                             <div class="text-right">
                                 <template x-for="sm in selectedMachines" :key="sm.id">
-                                    <p class="text-[11px] font-extrabold text-slate-900" x-text="sm.machine_code + ' - ' + (sm.machine_type === 'WASHER' ? 'Washer' : 'Dryer')"></p>
+                                    <p class="text-[11px] font-extrabold text-slate-900" x-text="sm.machine_code + ' (' + (sm.selected_duration ? sm.selected_duration.duration_minutes + ' mnt' : '-') + ')'"></p>
                                 </template>
                             </div>
                         </div>
@@ -973,10 +1011,6 @@
                         <svg class="mb-1.5 h-5 w-5 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>
                         <span class="text-[10px] font-extrabold text-slate-900">Tunai</span>
                     </button>
-                    <!-- <button @click="paymentMethod = 'MEMBER_BALANCE'" :class="paymentMethod === 'MEMBER_BALANCE' ? 'ring-2 ring-primary-600 bg-primary-50/50' : 'bg-slate-50'" class="flex flex-col items-center justify-center rounded-2xl py-3 transition">
-                        <svg class="mb-1.5 h-5 w-5 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span class="text-[10px] font-extrabold text-slate-900">Saldo Member</span>
-                    </button> -->
                     <button @click="paymentMethod = 'QRIS'" :class="paymentMethod === 'QRIS' ? 'ring-2 ring-primary-600 bg-primary-50/50' : 'bg-slate-50'" class="flex flex-col items-center justify-center rounded-2xl py-3 transition">
                         <svg class="mb-1.5 h-5 w-5 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         <span class="text-[10px] font-extrabold text-slate-900">QRIS</span>
@@ -988,13 +1022,7 @@
                     EDC / Card
                 </button>
 
-                <div x-show="paymentMethod === 'MEMBER_BALANCE'" class="mb-6 flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400">Saldo Member</p>
-                        <p class="text-sm font-extrabold text-emerald-600" x-text="'Rp ' + (selectedMember ? parseFloat(selectedMember.saldo).toLocaleString('id-ID') : '0')"></p>
-                    </div>
-                    <button class="text-slate-400 hover:text-primary-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></button>
-                </div>
+
 
                 <div x-show="paymentMethod === 'CASH'" class="mb-6 space-y-2">
                     <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Uang Tunai Diterima</label>
@@ -1015,6 +1043,7 @@
                     <input type="hidden" name="service_type" :value="service.toUpperCase()">
                     <input type="hidden" name="member_id" :value="selectedMember?.id">
                     <input type="hidden" name="machine_ids" :value="selectedMachines.map(m => m.id).join(',')">
+                    <input type="hidden" name="machine_selections" :value="JSON.stringify(selectedMachines.map(m => ({ machine_id: m.id, duration_id: m.selected_duration?.id })))">
                     <input type="hidden" name="payment_method" :value="paymentMethod">
                     <input type="hidden" name="amount_received" :value="paymentMethod === 'CASH' ? amountReceived : totalAmount">
                     <input type="hidden" name="discount_percent" :value="discountPercent">
@@ -1154,6 +1183,9 @@
                             <div class="flex flex-col gap-2">
                                 <button type="button" @click="openPendingTransaction(trx)" class="rounded-2xl bg-primary-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-primary-700">
                                     Lihat QR Pembayaran
+                                </button>
+                                <button type="button" @click="cancelPendingTransaction(trx)" class="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-extrabold text-rose-600 transition hover:bg-rose-100">
+                                    Batalkan
                                 </button>
                             </div>
                         </div>
