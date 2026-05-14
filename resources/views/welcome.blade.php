@@ -731,7 +731,7 @@
             <div class="container hero-grid">
                 <div class="reveal">
                     <!-- <span class="eyebrow">SaaS Laundry Modern</span> -->
-                    <h1>Kelola Laundry Lebih Mudah, Lebih Cepat</h1>
+                    <h1>Atur Laundry jadi Lebih Mudah, Lebih Cepat</h1>
                     <p>WashKita membantu pemilik usaha laundry mencatat order, memantau status, dan mengelola keuangan — dari satu dashboard.</p>
                     <div class="hero-actions">
                         <a href="{{ route('register.owner') }}" class="btn btn-primary">Mulai Gratis 14 Hari</a>
