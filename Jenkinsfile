@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sshagent(['vps-ssh-credentials']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@43.173.1.182 "cd ~/laundry-app && docker compose -f docker-compose.dev.yml pull app && docker compose -f docker-compose.dev.yml up -d app"
+                        ssh -o StrictHostKeyChecking=no ubuntu@43.173.1.182 "cd ~/laundry-app && git pull && docker compose -f docker-compose.dev.yml pull app && docker compose -f docker-compose.dev.yml up -d app"
                     """
                 }
             }
