@@ -23,6 +23,7 @@ services:
       - "8006:80" # Biasanya VPS pakai port 80/443 standar
     volumes:
       # Nginx hanya butuh config, kode sudah ada di dalam image 'app'
+      - ./:/var/www
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
@@ -39,6 +40,20 @@ services:
     # Port MySQL sebaiknya tidak dibuka ke publik (hapus ports jika tidak perlu remote)
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - laundry-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laundry-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
     networks:
       - laundry-network
 
