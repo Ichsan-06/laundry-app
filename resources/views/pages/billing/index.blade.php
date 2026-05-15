@@ -11,6 +11,7 @@
             purchaseUrl: @js(route('billing.purchase')),
             purchaseStatusTemplate: @js(route('billing.purchase.status', ['purchase' => '__PURCHASE__'])),
             qrisModal: { show: false, purchaseId: null, planId: null, planName: '', refId: '', trxReference: '', paymentName: 'QRIS', qrImage: '', amount: 0, paymentFee: 0, expired: null, remainingSeconds: 0, status: 'pending', tutorialPembayaran: '' },
+            confirmModal: { show: false, planId: null, planName: '', price: 0, promoCode: '' },
             pollingTimer: null,
             countdownTimer: null,
             statusUrl(id) { return this.purchaseStatusTemplate.replace('__PURCHASE__', id); },
@@ -63,9 +64,10 @@
                 const total = Math.max(0, Number(seconds || 0));
                 return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
             },
-            async buyPlan(planId, purchaseId = null) {
+            async buyPlan(planId, purchaseId = null, promoCode = '') {
                 const formData = new FormData();
                 formData.set('subscription_plan_id', planId);
+                formData.set('promo_code', promoCode);
                 if (purchaseId) formData.set('purchase_id', purchaseId);
                 const response = await fetch(this.purchaseUrl, {
                     method: 'POST',
@@ -74,6 +76,7 @@
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) throw new Error(result.message || 'Pembayaran plan gagal dibuat.');
+                this.confirmModal.show = false;
                 this.openPaymentModal(result);
             },
             async checkPurchaseStatus(reloadOnPaid = true) {
@@ -174,7 +177,7 @@
                         <div class="mt-5">
                             <button
                                 type="button"
-                                @click="buyPlan(@js($plan->id))"
+                                @click="confirmModal = { show: true, planId: @js($plan->id), planName: @js($plan->name), price: @js($plan->price_monthly), promoCode: '' }"
                                 class="inline-flex w-full items-center justify-center rounded-2xl bg-brand-600 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-brand-700"
                             >
                                 Beli / Upgrade ke {{ $plan->name }}
@@ -202,7 +205,7 @@
                                 </div>
                                 <div class="flex flex-col gap-2">
                                     <span class="rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">{{ $purchase->status }}</span>
-                                    <button type="button" @click="buyPlan(@js($purchase->subscription_plan_id), @js($purchase->id))" class="rounded-2xl bg-brand-600 px-4 py-2 text-sm font-extrabold text-white">Bayar Lagi</button>
+                                    <button type="button" @click="confirmModal = { show: true, planId: @js($purchase->subscription_plan_id), planName: @js($purchase->plan_name_snapshot), price: @js($purchase->amount), promoCode: '', purchaseId: @js($purchase->id) }" class="rounded-2xl bg-brand-600 px-4 py-2 text-sm font-extrabold text-white">Bayar Lagi</button>
                                     <button
                                         type="button"
                                         @click="openPaymentModal({
@@ -263,6 +266,51 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="confirmModal.show" class="fixed inset-0 z-[85] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" x-cloak>
+            <div class="w-full max-w-lg rounded-[32px] bg-white p-6 shadow-2xl">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-extrabold uppercase tracking-[0.26em] text-primary-600">Konfirmasi Pembelian</p>
+                        <h3 class="mt-2 text-2xl font-extrabold text-slate-900" x-text="confirmModal.planName"></h3>
+                    </div>
+                    <button type="button" @click="confirmModal.show = false" class="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-600">Batal</button>
+                </div>
+
+                <div class="mt-6 space-y-6">
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-bold text-slate-500">Harga Paket</p>
+                            <p class="text-lg font-extrabold text-slate-900" x-text="formatCurrency(confirmModal.price)"></p>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-slate-200 space-y-4">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Voucher Promo</label>
+                                <input type="text" x-model="confirmModal.promoCode" placeholder="Masukkan kode promo" class="block w-full rounded-xl border-slate-200 bg-white py-2.5 px-4 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
+                            </div>
+                            
+                            <div x-show="confirmModal.promoCode.toUpperCase() === 'WASHKITAPROMO'" class="rounded-2xl bg-emerald-50 p-3 text-[11px] font-bold text-emerald-700 animate-in fade-in slide-in-from-top-2">
+                                Kode promo berhasil digunakan! Diskon 50% diterapkan.
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t-2 border-dashed border-slate-200 flex items-center justify-between">
+                            <p class="text-sm font-bold text-slate-500">Total Bayar</p>
+                            <p class="text-2xl font-black text-brand-600" x-text="formatCurrency(confirmModal.promoCode.toUpperCase() === 'WASHKITAPROMO' ? confirmModal.price * 0.5 : confirmModal.price)"></p>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="button" 
+                        @click="buyPlan(confirmModal.planId, confirmModal.purchaseId || null, confirmModal.promoCode)" 
+                        class="w-full rounded-2xl bg-brand-600 py-4 text-sm font-extrabold text-white shadow-xl shadow-brand-500/25 transition hover:bg-brand-700"
+                    >
+                        Lanjutkan ke Pembayaran
+                    </button>
                 </div>
             </div>
         </div>

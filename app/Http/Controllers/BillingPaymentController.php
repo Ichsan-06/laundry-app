@@ -21,6 +21,7 @@ class BillingPaymentController extends Controller
         $validated = $request->validate([
             'subscription_plan_id' => ['required', 'exists:subscription_plans,id'],
             'purchase_id' => ['nullable', 'exists:plan_purchase_histories,id'],
+            'promo_code' => ['nullable', 'string'],
         ]);
 
         $tenant = $request->user()->tenant;
@@ -35,6 +36,11 @@ class BillingPaymentController extends Controller
 
         $purchase = DB::transaction(function () use ($validated, $tenant, $plan) {
             $purchase = null;
+            $amount = (float) $plan->price_monthly;
+            
+            if (strtoupper($validated['promo_code'] ?? '') === 'WASHKITAPROMO') {
+                $amount *= 0.5;
+            }
 
             if (! empty($validated['purchase_id'])) {
                 $purchase = PlanPurchaseHistory::query()
@@ -49,7 +55,7 @@ class BillingPaymentController extends Controller
                     'tenant_id' => $tenant->id,
                     'subscription_plan_id' => $plan->id,
                     'plan_name_snapshot' => $plan->name,
-                    'amount' => $plan->price_monthly,
+                    'amount' => $amount,
                     'status' => 'pending',
                     'payment_method' => 'QRIS',
                     'ref_id' => 'BILL-' . strtoupper(str_replace('-', '', (string) str()->uuid())),
@@ -58,7 +64,7 @@ class BillingPaymentController extends Controller
                 $purchase->update([
                     'subscription_plan_id' => $plan->id,
                     'plan_name_snapshot' => $plan->name,
-                    'amount' => $plan->price_monthly,
+                    'amount' => $amount,
                     'status' => 'pending',
                     'paid_at' => null,
                 ]);

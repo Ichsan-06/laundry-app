@@ -310,7 +310,6 @@
                         </select>
                         @error('status') <p class="text-[11px] font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
-                </div>
                 <div class="pt-4 flex gap-3">
                     <button type="button" @click="showAddModal = false" class="flex-1 rounded-xl border-2 border-slate-100 px-6 py-3.5 text-sm font-extrabold text-slate-600 transition hover:bg-slate-50">Cancel</button>
                     <button type="submit" class="flex-1 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">Save Member</button>
@@ -357,7 +356,6 @@
                             <option value="PREMIUM">Premium</option>
                         </select>
                     </div>
-                </div>
                 <div class="pt-4 flex gap-3">
                     <button type="button" @click="showEditModal = false" class="flex-1 rounded-xl border-2 border-slate-100 px-6 py-3.5 text-sm font-extrabold text-slate-600 transition hover:bg-slate-50">Cancel</button>
                     <button type="submit" class="flex-1 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">Update Member</button>

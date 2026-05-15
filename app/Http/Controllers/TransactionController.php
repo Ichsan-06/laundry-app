@@ -136,9 +136,32 @@ class TransactionController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $transaction->update($validated);
+        DB::transaction(function () use ($transaction, $validated) {
+            $oldStatus = $transaction->status;
+            $transaction->update($validated);
 
-        return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully.');
+            // Handle machine availability for self service
+            if ($transaction->transaction_type === 'SELF_SERVICE') {
+                if (in_array($validated['status'], ['COMPLETED', 'CANCELLED'])) {
+                    foreach ($transaction->selfServiceDetails as $detail) {
+                        if ($detail->machine) {
+                            $detail->machine->update(['status' => 'AVAILABLE']);
+                            $detail->update(['machine_status' => 'STOPPED']);
+                        }
+                    }
+                } elseif ($validated['status'] === 'IN_PROGRESS' && $oldStatus !== 'IN_PROGRESS') {
+                    // If moving back to in progress, mark machines as in use
+                    foreach ($transaction->selfServiceDetails as $detail) {
+                        if ($detail->machine && $detail->machine->status === 'AVAILABLE') {
+                            $detail->machine->update(['status' => 'IN_USE']);
+                            $detail->update(['machine_status' => 'RUNNING']);
+                        }
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui.');
     }
 
     public function show($id)
@@ -162,8 +185,17 @@ class TransactionController extends Controller
     {
         $this->authorize('delete', $transaction);
 
-        $transaction->delete();
+        DB::transaction(function () use ($transaction) {
+            if ($transaction->transaction_type === 'SELF_SERVICE' && $transaction->status === 'IN_PROGRESS') {
+                foreach ($transaction->selfServiceDetails as $detail) {
+                    if ($detail->machine) {
+                        $detail->machine->update(['status' => 'AVAILABLE']);
+                    }
+                }
+            }
+            $transaction->delete();
+        });
 
-        return redirect()->route('transactions.index')->with('success', 'Transaction deleted successfully.');
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus.');
     }
 }

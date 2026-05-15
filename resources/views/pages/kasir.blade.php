@@ -381,12 +381,12 @@
     },
 
     get subtotal() {
+        let total = 0;
         if (this.service === 'self_service') {
-            return this.selectedMachines.reduce((sum, machine) => {
+            total = this.selectedMachines.reduce((sum, machine) => {
                 return sum + parseFloat(machine.selected_duration?.price || 0);
             }, 0);
         } else {
-            let total = 0;
             // Services: weight * price_per_kg
             this.dropOff.details.forEach(d => {
                 const pkg = this.allServices.find(s => s.id === d.package_id);
@@ -395,12 +395,14 @@
                     total += weight * parseFloat(pkg.harga_per_kg);
                 }
             });
-            // Addons: fixed price
-            this.dropOff.selectedAddons.forEach(a => {
-                total += parseFloat(a.harga);
-            });
-            return total;
         }
+
+        // Addons: fixed price
+        this.dropOff.selectedAddons.forEach(a => {
+            total += parseFloat(a.harga);
+        });
+
+        return total;
     },
 
     get discountAmount() {
@@ -691,14 +693,14 @@
                         </div>
                     </div>
                     
-                    <div>
+                    {{-- <div>
                         <p class="mb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Durasi</p>
                         <div class="flex gap-2">
                             <button @click="selectedDuration = 'Normal'" :class="selectedDuration === 'Normal' ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500'" class="flex-1 rounded-xl py-2 text-[11px] font-bold transition">Normal</button>
                             <button @click="selectedDuration = 'Cepat'" :class="selectedDuration === 'Cepat' ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500'" class="flex-1 rounded-xl py-2 text-[11px] font-bold transition">Cepat</button>
                             <button @click="selectedDuration = 'Ekstra'" :class="selectedDuration === 'Ekstra' ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500'" class="flex-1 rounded-xl py-2 text-[11px] font-bold transition">Ekstra Cepat</button>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -807,20 +809,6 @@
                         </div>
                     </div>
 
-                    {{-- 6. Opsi Tambahan (Add Ons) --}}
-                    <div class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-100">
-                        <h3 class="mb-6 text-sm font-extrabold text-slate-900">6. Opsi Tambahan (Add Ons)</h3>
-                        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                            <template x-for="addon in allAddons" :key="addon.id">
-                                <button @click="toggleAddon(addon)" :class="dropOff.selectedAddons.find(a => a.id === addon.id) ? 'ring-2 ring-primary-600 bg-primary-50/20' : 'bg-white border border-slate-100'" class="flex flex-col items-center justify-center rounded-2xl p-4 transition text-center shadow-sm">
-                                    <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
-                                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-                                    </div>
-                                    <h4 class="text-[11px] font-extrabold text-slate-900" x-text="addon.nama"></h4>
-                                    <p class="mt-0.5 text-[10px] font-extrabold text-primary-600" x-text="'Rp ' + parseFloat(addon.harga).toLocaleString('id-ID')"></p>
-                                </button>
-                            </template>
-                        </div>
                     </div>
                 </div>
             </template>
@@ -892,6 +880,22 @@
                     </div>
                 </div>
             </template>
+
+            {{-- 5. Opsi Tambahan (Add Ons) --}}
+            <div class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-100 mt-6">
+                <h3 class="mb-6 text-sm font-extrabold text-slate-900">Opsi Tambahan (Add Ons)</h3>
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    <template x-for="addon in allAddons" :key="addon.id">
+                        <button @click="toggleAddon(addon)" :class="dropOff.selectedAddons.find(a => a.id === addon.id) ? 'ring-2 ring-primary-600 bg-primary-50/20' : 'bg-white border border-slate-100'" class="flex flex-col items-center justify-center rounded-2xl p-4 transition text-center shadow-sm">
+                            <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+                            </div>
+                            <h4 class="text-[11px] font-extrabold text-slate-900" x-text="addon.nama"></h4>
+                            <p class="mt-0.5 text-[10px] font-extrabold text-primary-600" x-text="'Rp ' + parseFloat(addon.harga).toLocaleString('id-ID')"></p>
+                        </button>
+                    </template>
+                </div>
+            </div>
         </div>
 
         {{-- Column 3: Order Summary & Payment (3/12) --}}
@@ -954,16 +958,17 @@
                                 </div>
                             </div>
                             {{-- Weight and Paket Summary combined above --}}
-                            <template x-if="dropOff.selectedAddons.length > 0">
-                                <div class="flex justify-between border-t border-slate-50 pt-3">
-                                    <span class="text-xs font-bold text-slate-400">Add Ons</span>
-                                    <div class="text-right">
-                                        <template x-for="ad in dropOff.selectedAddons" :key="ad.id">
-                                            <p class="text-[10px] font-extrabold text-slate-700" x-text="ad.nama"></p>
-                                        </template>
-                                    </div>
-                                </div>
-                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="dropOff.selectedAddons.length > 0">
+                        <div class="flex justify-between border-t border-slate-50 pt-3">
+                            <span class="text-xs font-bold text-slate-400">Add Ons</span>
+                            <div class="text-right">
+                                <template x-for="ad in dropOff.selectedAddons" :key="ad.id">
+                                    <p class="text-[10px] font-extrabold text-slate-700" x-text="ad.nama"></p>
+                                </template>
+                            </div>
                         </div>
                     </template>
 
@@ -1017,10 +1022,10 @@
                     </button>
                 </div>
                 
-                <button class="mb-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-50 py-3 text-[10px] font-extrabold text-slate-600">
+                {{-- <button class="mb-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-50 py-3 text-[10px] font-extrabold text-slate-600">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     EDC / Card
-                </button>
+                </button> --}}
 
 
 
@@ -1072,7 +1077,7 @@
     </div>
 
     {{-- Bottom Shortcuts --}}
-    <div class="fixed bottom-0 left-[280px] right-0 bg-white/80 p-3 backdrop-blur border-t border-slate-100 flex gap-4">
+    {{-- <div class="fixed bottom-0 left-[280px] right-0 bg-white/80 p-3 backdrop-blur border-t border-slate-100 flex gap-4">
         <button @click="location.reload()" class="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-[10px] font-extrabold text-emerald-600">
             <span class="rounded bg-white px-1.5 py-0.5 text-[9px] shadow-sm">F2</span> Transaksi Baru
         </button>
@@ -1089,7 +1094,7 @@
         <button @click="selectedMachines = []; selectedMember = null" class="flex items-center gap-2 rounded-lg bg-rose-50 px-4 py-2 text-[10px] font-extrabold text-rose-600">
             <span class="rounded bg-white px-1.5 py-0.5 text-[9px] shadow-sm">Esc</span> Batal
         </button>
-    </div>
+    </div> --}}
 
     <div x-show="toast.show" x-transition.opacity class="fixed right-5 top-5 z-[110] w-full max-w-sm" x-cloak>
         <div :class="toast.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'" class="rounded-3xl border px-5 py-4 shadow-2xl">

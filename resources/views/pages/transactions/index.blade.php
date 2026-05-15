@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Transactions - Laundry Track')
+@section('title', 'Transaksi - Laundry Track')
 
 @section('header')
 <header class="sticky top-0 z-20 flex min-h-[84px] shrink-0 items-center justify-between gap-6 border-b border-slate-100 bg-white/95 px-4 py-4 backdrop-blur md:min-h-[108px] md:px-10">
@@ -21,7 +21,7 @@
                 @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
                 
                 <input type="text" name="search" value="{{ request('search') }}" 
-                    placeholder="Search by ID, Member Name..." 
+                    placeholder="Cari berdasarkan ID, Nama Member..." 
                     class="block w-full rounded-xl border-none bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-primary-500/20">
             </form>
         </div>
@@ -53,7 +53,7 @@
     showEditModal: false,
     currentTrx: null,
     confirmDelete(id) {
-        if(confirm('Are you sure you want to delete this transaction?')) {
+        if(confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
             document.getElementById('delete-form-' + id).submit();
         }
     },
@@ -62,6 +62,26 @@
         this.showEditModal = true;
     }
 }">
+@php
+    $serviceMap = [
+        'WASH_ONLY' => 'Cuci Saja',
+        'DRY_ONLY' => 'Kering Saja',
+        'WASH_DRY' => 'Cuci & Kering',
+        'IRONING' => 'Setrika',
+        'COMPLETE' => 'Komplit',
+    ];
+    $typeMap = [
+        'SELF_SERVICE' => 'Mandiri',
+        'DROP_OFF' => 'Drop Off',
+    ];
+    $statusMap = [
+        'PENDING' => 'Menunggu',
+        'IN_PROGRESS' => 'Diproses',
+        'READY' => 'Siap Diambil',
+        'COMPLETED' => 'Selesai',
+        'CANCELLED' => 'Dibatalkan',
+    ];
+@endphp
     @if(session('success'))
     <div class="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-600 ring-1 ring-emerald-100">
         {{ session('success') }}
@@ -71,8 +91,8 @@
     {{-- Page Title & Add Button --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Transactions</h2>
-            <p class="mt-1 text-sm font-semibold text-slate-400 uppercase tracking-wider">Overview of all laundry orders and payments.</p>
+            <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Transaksi</h2>
+            <p class="mt-1 text-sm font-semibold text-slate-400 uppercase tracking-wider">Ikhtisar semua pesanan laundry dan pembayaran.</p>
         </div>
         <!-- <button @click="showAddModal = true" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700 active:scale-95">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -96,7 +116,7 @@
                 <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-600">+12.5%</span>
             </div>
             <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Total Revenue</p>
+                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Total Pendapatan</p>
                 <h3 class="mt-1 text-3xl font-extrabold text-slate-900">Rp. {{ number_format($stats['total_revenue'], 2) }}</h3>
             </div>
         </div>
@@ -111,7 +131,7 @@
                 </svg>
             </div>
             <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Orders</p>
+                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Pesanan</p>
                 <h3 class="mt-1 text-3xl font-extrabold text-slate-900">{{ number_format($stats['total_orders']) }}</h3>
             </div>
         </div>
@@ -124,7 +144,7 @@
                 </svg>
             </div>
             <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Active</p>
+                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Aktif</p>
                 <h3 class="mt-1 text-3xl font-extrabold text-slate-900">{{ number_format($stats['active_orders']) }}</h3>
             </div>
         </div>
@@ -137,7 +157,7 @@
                 </svg>
             </div>
             <div class="mt-4">
-                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Completed Today</p>
+                <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Selesai Hari Ini</p>
                 <h3 class="mt-1 text-3xl font-extrabold text-slate-900">{{ number_format($stats['completed_today']) }}</h3>
             </div>
         </div>
@@ -150,8 +170,8 @@
             @php
                 $activeTab = request('transaction_type', 'all');
                 $tabs = [
-                    'all' => ['label' => 'All Orders', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z'],
-                    'SELF_SERVICE' => ['label' => 'Self Service', 'icon' => 'M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'],
+                    'all' => ['label' => 'Semua Pesanan', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z'],
+                    'SELF_SERVICE' => ['label' => 'Mandiri (Self Service)', 'icon' => 'M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'],
                     'DROP_OFF' => ['label' => 'Drop Off', 'icon' => 'M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2M17 12h.01M11 12h.01M14 12h.01M7 12h.01']
                 ];
             @endphp
@@ -165,7 +185,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <p class="text-sm font-bold text-slate-400">Showing {{ $transactions->firstItem() }}-{{ $transactions->lastItem() }} of {{ $transactions->total() }}</p>
+            <p class="text-sm font-bold text-slate-400">Menampilkan {{ $transactions->firstItem() }}-{{ $transactions->lastItem() }} dari {{ $transactions->total() }}</p>
             <div class="flex gap-1">
                 <a href="{{ $transactions->previousPageUrl() }}" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-white transition hover:bg-slate-50 {{ $transactions->onFirstPage() ? 'opacity-50 cursor-not-allowed' : '' }}">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -192,12 +212,12 @@
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
                         </svg>
-                        Status: {{ request('status') ? str_replace('_', ' ', request('status')) : 'All' }}
+                        Status: {{ request('status') ? str_replace('_', ' ', request('status')) : 'Semua' }}
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
                         @foreach(['all', 'PENDING', 'IN_PROGRESS', 'READY', 'COMPLETED', 'CANCELLED'] as $status)
                         <a href="{{ route('transactions.index', array_merge(request()->all(), ['status' => $status])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
-                            {{ $status == 'all' ? 'All Status' : str_replace('_', ' ', $status) }}
+                            {{ $status == 'all' ? 'Semua Status' : str_replace('_', ' ', $status) }}
                         </a>
                         @endforeach
                     </div>
@@ -206,12 +226,12 @@
                 {{-- Filter: Service Type --}}
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-white hover:shadow-sm">
-                        Service: {{ request('service_type') ? str_replace('_', ' ', request('service_type')) : 'All' }}
+                        Layanan: {{ request('service_type') ? str_replace('_', ' ', request('service_type')) : 'Semua' }}
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
                         @foreach(['all', 'WASH_ONLY', 'DRY_ONLY', 'WASH_DRY', 'IRONING', 'COMPLETE'] as $st)
                         <a href="{{ route('transactions.index', array_merge(request()->all(), ['service_type' => $st])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
-                            {{ $st == 'all' ? 'All Services' : str_replace('_', ' ', $st) }}
+                            {{ $st == 'all' ? 'Semua Layanan' : str_replace('_', ' ', $st) }}
                         </a>
                         @endforeach
                     </div>
@@ -225,11 +245,11 @@
                             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
-                        Outlet: {{ request('outlet_id') && request('outlet_id') !== 'all' ? ($outlets->firstWhere('id', request('outlet_id'))?->nama_outlet ?? 'All') : 'All' }}
+                        Outlet: {{ request('outlet_id') && request('outlet_id') !== 'all' ? ($outlets->firstWhere('id', request('outlet_id'))?->nama_outlet ?? 'Semua') : 'Semua' }}
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
                         <a href="{{ route('transactions.index', array_merge(request()->all(), ['outlet_id' => 'all'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
-                            All Outlets
+                            Semua Outlet
                         </a>
                         @foreach($outlets as $outlet)
                         <a href="{{ route('transactions.index', array_merge(request()->all(), ['outlet_id' => $outlet->id])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
@@ -249,18 +269,18 @@
                             <path d="m21 8-4-4-4 4"></path>
                             <path d="M17 4v16"></path>
                         </svg>
-                        Sort: {{ request('sort') ? str_replace('_', ' ', request('sort')) : 'Latest' }}
+                        Urutkan: {{ request('sort') ? str_replace('_', ' ', request('sort')) : 'Terbaru' }}
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
-                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'latest'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Latest</a>
-                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'oldest'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Oldest</a>
-                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'highest_amount'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Highest Amount</a>
-                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'lowest_amount'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Lowest Amount</a>
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'latest'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Terbaru</a>
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'oldest'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Terlama</a>
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'highest_amount'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Total Tertinggi</a>
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['sort' => 'lowest_amount'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">Total Terendah</a>
                     </div>
                 </div>
 
                 @if(request()->anyFilled(['status', 'transaction_type', 'service_type', 'payment_method', 'sort', 'search', 'outlet_id']))
-                <a href="{{ route('transactions.index') }}" class="text-xs font-extrabold text-rose-500 hover:underline">Clear All Filters</a>
+                <a href="{{ route('transactions.index') }}" class="text-xs font-extrabold text-rose-500 hover:underline">Hapus Semua Filter</a>
                 @endif
             </div>
         </div>
@@ -270,13 +290,13 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-slate-50/50 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
-                        <th class="px-8 py-5">Order ID</th>
-                        <th class="px-6 py-5">Customer / Member</th>
-                        <th class="px-6 py-5">Service</th>
-                        <th class="px-6 py-5">Payment</th>
+                        <th class="px-8 py-5">ID Pesanan</th>
+                        <th class="px-6 py-5">Pelanggan / Member</th>
+                        <th class="px-6 py-5">Layanan</th>
+                        <th class="px-6 py-5">Pembayaran</th>
                         <th class="px-6 py-5 text-right">Total</th>
                         <th class="px-6 py-5">Status</th>
-                        <th class="px-8 py-5 text-right">Action</th>
+                        <th class="px-8 py-5 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -292,16 +312,16 @@
                                     <img src="https://ui-avatars.com/api/?name={{ urlencode($trx->member?->nama ?? 'Guest') }}&background=f1f5f9&color=64748b" alt="">
                                 </div>
                                 <div>
-                                    <p class="text-sm font-extrabold text-slate-900">{{ $trx->member?->nama ?? 'Guest' }}</p>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $trx->cashier?->nama ?? 'System' }} (Cashier)</span>
+                                    <p class="text-sm font-extrabold text-slate-900">{{ $trx->member?->nama ?? 'Tamu' }}</p>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $trx->cashier?->nama ?? 'Sistem' }} (Kasir)</span>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-5">
                             <div class="flex flex-col">
-                                <span class="text-[13px] font-bold text-slate-600">{{ str_replace('_', ' ', $trx->service_type) }}</span>
+                                <span class="text-[13px] font-bold text-slate-600">{{ $serviceMap[$trx->service_type] ?? str_replace('_', ' ', $trx->service_type) }}</span>
                                 <span class="text-[9px] font-extrabold uppercase tracking-widest {{ $trx->transaction_type === 'SELF_SERVICE' ? 'text-indigo-400' : 'text-emerald-400' }}">
-                                    {{ str_replace('_', ' ', $trx->transaction_type) }}
+                                    {{ $typeMap[$trx->transaction_type] ?? str_replace('_', ' ', $trx->transaction_type) }}
                                 </span>
                             </div>
                         </td>
@@ -322,7 +342,7 @@
                                 ];
                             @endphp
                             <span class="inline-flex rounded-md px-2 py-1 text-[10px] font-extrabold tracking-widest ring-1 ring-inset {{ $statusClasses[$trx->status] ?? 'bg-slate-100 text-slate-500' }}">
-                                {{ str_replace('_', ' ', $trx->status) }}
+                                {{ $statusMap[$trx->status] ?? str_replace('_', ' ', $trx->status) }}
                             </span>
                         </td>
                         <td class="px-8 py-5 text-right">
@@ -361,7 +381,7 @@
                                         <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                 </div>
-                                <p class="text-sm font-bold text-slate-400">No transactions found matching your filters.</p>
+                                <p class="text-sm font-bold text-slate-400">Tidak ada transaksi yang cocok dengan filter Anda.</p>
                             </div>
                         </td>
                     </tr>
@@ -375,7 +395,7 @@
     <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-[32px] w-full max-w-2xl overflow-hidden shadow-2xl ring-1 ring-slate-100" @click.away="showAddModal = false">
             <div class="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
-                <h3 class="text-xl font-extrabold text-slate-900">New Transaction</h3>
+                <h3 class="text-xl font-extrabold text-slate-900">Transaksi Baru</h3>
                 <button @click="showAddModal = false" class="text-slate-400 hover:text-slate-600">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -395,7 +415,7 @@
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Cashier</label>
+                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Kasir</label>
                         <select name="cashier_id" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
                             @foreach($cashiers as $cashier)
                             <option value="{{ $cashier->id }}">{{ $cashier->nama }}</option>
@@ -408,20 +428,20 @@
                     <div class="space-y-2">
                         <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Member (Optional)</label>
                         <select name="member_id" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
-                            <option value="">Guest</option>
+                            <option value="">Tamu</option>
                             @foreach($members as $member)
                             <option value="{{ $member->id }}">{{ $member->nama }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Service Type</label>
+                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Tipe Layanan</label>
                         <select name="service_type" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
-                            <option value="WASH_ONLY">Wash Only</option>
-                            <option value="DRY_ONLY">Dry Only</option>
-                            <option value="WASH_DRY">Wash & Dry</option>
-                            <option value="IRONING">Ironing</option>
-                            <option value="COMPLETE">Complete</option>
+                            <option value="WASH_ONLY">Cuci Saja</option>
+                            <option value="DRY_ONLY">Kering Saja</option>
+                            <option value="WASH_DRY">Cuci & Kering</option>
+                            <option value="IRONING">Setrika</option>
+                            <option value="COMPLETE">Komplit</option>
                         </select>
                     </div>
                 </div>
@@ -432,20 +452,20 @@
                         <input type="number" step="0.01" name="subtotal" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Discount</label>
+                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Diskon</label>
                         <input type="number" step="0.01" name="member_discount" value="0" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Amount Received</label>
+                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Jumlah Diterima</label>
                         <input type="number" step="0.01" name="amount_received" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Payment Method</label>
+                        <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Metode Pembayaran</label>
                         <select name="payment_method" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
-                            <option value="CASH">Cash</option>
+                            <option value="CASH">Tunai</option>
                             <option value="TRANSFER">Transfer</option>
                             <option value="E_WALLET">E-Wallet</option>
                             <option value="QRIS">QRIS</option>
@@ -454,22 +474,22 @@
                     <div class="space-y-2">
                         <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Status</label>
                         <select name="status" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
-                            <option value="PENDING">Pending</option>
-                            <option value="IN_PROGRESS">In Progress</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="CANCELLED">Cancelled</option>
+                            <option value="PENDING">Menunggu</option>
+                            <option value="IN_PROGRESS">Diproses</option>
+                            <option value="COMPLETED">Selesai</option>
+                            <option value="CANCELLED">Dibatalkan</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Notes</label>
+                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Catatan</label>
                     <textarea name="notes" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900"></textarea>
                 </div>
 
                 <div class="pt-4 flex gap-3">
-                    <button type="button" @click="showAddModal = false" class="flex-1 rounded-xl border-2 border-slate-100 px-6 py-3.5 text-sm font-extrabold text-slate-600 transition hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="flex-1 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">Save Transaction</button>
+                    <button type="button" @click="showAddModal = false" class="flex-1 rounded-xl border-2 border-slate-100 px-6 py-3.5 text-sm font-extrabold text-slate-600 transition hover:bg-slate-50">Batal</button>
+                    <button type="submit" class="flex-1 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">Simpan Transaksi</button>
                 </div>
             </form>
         </div>
@@ -479,7 +499,7 @@
     <div x-show="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl ring-1 ring-slate-100" @click.away="showEditModal = false">
             <div class="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
-                <h3 class="text-xl font-extrabold text-slate-900">Update Transaction</h3>
+                <h3 class="text-xl font-extrabold text-slate-900">Update Transaksi</h3>
                 <button @click="showEditModal = false" class="text-slate-400 hover:text-slate-600">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -493,30 +513,30 @@
                 <div class="space-y-2">
                     <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Status</label>
                     <select name="status" x-model="currentTrx.status" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
-                        <option value="PENDING">Pending</option>
-                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="PENDING">Menunggu</option>
+                        <option value="IN_PROGRESS">Diproses</option>
                         <template x-if="currentTrx.transaction_type === 'DROP_OFF'">
-                            <option value="READY">Ready for Pick-up</option>
+                            <option value="READY">Siap Diambil</option>
                         </template>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="CANCELLED">Cancelled</option>
+                        <option value="COMPLETED">Selesai</option>
+                        <option value="CANCELLED">Dibatalkan</option>
                     </select>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Payment Method</label>
+                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Metode Pembayaran</label>
                     <select name="payment_method" x-model="currentTrx.payment_method" required class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900">
-                        <option value="CASH">Cash</option>
+                        <option value="CASH">Tunai</option>
                         <option value="TRANSFER">Transfer</option>
                         <option value="E_WALLET">E-Wallet</option>
                         <option value="QRIS">QRIS</option>
                     </select>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Notes</label>
+                    <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Catatan</label>
                     <textarea name="notes" x-model="currentTrx.notes" class="block w-full rounded-xl border-slate-100 bg-slate-50 py-3 text-sm font-bold text-slate-900"></textarea>
                 </div>
                 <div class="pt-4 flex gap-3">
-                    <button type="button" @click="showEditModal = false" class="flex-1 rounded-xl border-2 border-slate-100 px-6 py-3.5 text-sm font-extrabold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+                    <button type="button" @click="showEditModal = false" class="flex-1 rounded-xl border-2 border-slate-100 px-6 py-3.5 text-sm font-extrabold text-slate-600 transition hover:bg-slate-50">Batal</button>
                     <button type="submit" class="flex-1 rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">Update Status</button>
                 </div>
             </form>

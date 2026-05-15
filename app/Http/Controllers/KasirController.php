@@ -478,15 +478,16 @@ class KasirController extends Controller
                 }
             }
 
-            $addonIds = array_filter(explode(',', $validated['addon_ids'] ?? ''));
-            if (! empty($addonIds)) {
-                $addons = AddonOption::query()
-                    ->whereIn('id', $addonIds)
-                    ->whereIn('outlet_id', $cashier->accessibleOutletIds())
-                    ->get();
-                foreach ($addons as $addon) {
-                    $subtotal += (float) $addon->harga;
-                }
+        }
+
+        $addonIds = array_filter(explode(',', $validated['addon_ids'] ?? ''));
+        if (! empty($addonIds)) {
+            $addons = AddonOption::query()
+                ->whereIn('id', $addonIds)
+                ->whereIn('outlet_id', $cashier->accessibleOutletIds())
+                ->get();
+            foreach ($addons as $addon) {
+                $subtotal += (float) $addon->harga;
             }
         }
 
@@ -600,22 +601,31 @@ class KasirController extends Controller
                     $detail['machine']->update(['status' => 'IN_USE']);
                 }
             }
+        } else {
+            foreach ($prepared['drop_off_details'] as $detail) {
+                if (! empty($detail['package_id'])) {
+                    $pkg = ServicePackage::find($detail['package_id']);
+                    if ($pkg) {
+                        $weightInput = $detail['weight'] ?? null;
+                        $weight = (is_null($weightInput) || $weightInput === '') ? 1.0 : (float) $weightInput;
 
-            return;
-        }
+                        $transaction->servicePackages()->attach($pkg->id, [
+                            'id' => Str::uuid(),
+                            'weight' => $weight,
+                            'note' => $detail['note'] ?? null,
+                            'price' => $pkg->harga_per_kg,
+                        ]);
+                    }
+                }
+            }
 
-        foreach ($prepared['drop_off_details'] as $detail) {
-            if (! empty($detail['package_id'])) {
-                $pkg = ServicePackage::find($detail['package_id']);
-                if ($pkg) {
-                    $weightInput = $detail['weight'] ?? null;
-                    $weight = (is_null($weightInput) || $weightInput === '') ? 1.0 : (float) $weightInput;
-
-                    $transaction->servicePackages()->attach($pkg->id, [
-                        'id' => Str::uuid(),
-                        'weight' => $weight,
-                        'note' => $detail['note'] ?? null,
-                        'price' => $pkg->harga_per_kg,
+            foreach ($prepared['items'] as $item) {
+                if (! empty($item['nama'])) {
+                    TransactionItem::create([
+                        'transaction_id' => $transaction->id,
+                        'nama_item' => $item['nama'],
+                        'qty' => $item['qty'] ?? 1,
+                        'note' => $item['note'] ?? null,
                     ]);
                 }
             }
@@ -628,17 +638,6 @@ class KasirController extends Controller
                 $transaction->addonOptions()->attach($addon->id, [
                     'id' => Str::uuid(),
                     'price' => $addon->harga,
-                ]);
-            }
-        }
-
-        foreach ($prepared['items'] as $item) {
-            if (! empty($item['nama'])) {
-                TransactionItem::create([
-                    'transaction_id' => $transaction->id,
-                    'nama_item' => $item['nama'],
-                    'qty' => $item['qty'] ?? 1,
-                    'note' => $item['note'] ?? null,
                 ]);
             }
         }

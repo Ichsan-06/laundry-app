@@ -859,35 +859,43 @@
             </div>
         </section>
 
-        <section class="section">
+        <section id="preview" class="section" style="background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
             <div class="container">
                 <div class="reveal">
-                    <span class="eyebrow">Cara Kerja</span>
-                    <h2 class="section-title">Mulai dalam tiga langkah sederhana</h2>
-                    <p class="section-copy">WashKita dirancang untuk langsung dipakai tanpa setup yang rumit. Tim laundry kamu bisa adaptasi lebih cepat sejak hari pertama.</p>
+                    <span class="eyebrow">Preview Aplikasi</span>
+                    <h2 class="section-title">Tampilan Modern & Mudah Digunakan</h2>
+                    <p class="section-copy">Desain antarmuka yang bersih membantu tim laundry kamu fokus pada pekerjaan tanpa terganggu navigasi yang rumit.</p>
                 </div>
 
-                <div class="steps-grid">
-                    <article class="step-card reveal">
-                        <div class="step-number">1</div>
-                        <h3>Daftar akun gratis</h3>
-                        <p>Buat akun owner, pilih paket awal, lalu siapkan outlet pertama kamu dalam hitungan menit.</p>
-                    </article>
-                    <article class="step-card reveal">
-                        <div class="step-number">2</div>
-                        <h3>Input order pelanggan</h3>
-                        <p>Masukkan pesanan, jenis layanan, biaya, dan estimasi selesai dari dashboard yang mudah dipahami.</p>
-                    </article>
-                    <article class="step-card reveal">
-                        <div class="step-number">3</div>
-                        <h3>Pantau & kelola bisnis</h3>
-                        <p>Lihat performa outlet, status cucian, dan arus pemasukan tanpa harus cek banyak tempat.</p>
-                    </article>
+                <div class="card-grid" style="margin-top: 48px; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));">
+                    <div class="reveal">
+                        <div class="mockup-shell" style="padding: 12px; background: #f8fafc;">
+                            <p style="font-size: 11px; font-weight: 800; color: var(--text); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-left: 8px;">Dashboard Utama</p>
+                            <img src="{{ asset('feature/dashboard.png') }}" alt="Dashboard" style="border-radius: 12px; border: 1px solid rgba(15, 23, 42, 0.08); width: 100%;">
+                        </div>
+                    </div>
+                    <div class="reveal">
+                        <div class="mockup-shell" style="padding: 12px; background: #f8fafc;">
+                            <p style="font-size: 11px; font-weight: 800; color: var(--text); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-left: 8px;">Halaman Kasir</p>
+                            <img src="{{ asset('feature/kasir.png') }}" alt="Kasir" style="border-radius: 12px; border: 1px solid rgba(15, 23, 42, 0.08); width: 100%;">
+                        </div>
+                    </div>
+                    <div class="reveal">
+                        <div class="mockup-shell" style="padding: 12px; background: #f8fafc;">
+                            <p style="font-size: 11px; font-weight: 800; color: var(--text); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-left: 8px;">Daftar Transaksi</p>
+                            <img src="{{ asset('feature/transaction.png') }}" alt="Transactions" style="border-radius: 12px; border: 1px solid rgba(15, 23, 42, 0.08); width: 100%;">
+                        </div>
+                    </div>
+                    <div class="reveal">
+                        <div class="mockup-shell" style="padding: 12px; background: #f8fafc;">
+                            <p style="font-size: 11px; font-weight: 800; color: var(--text); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-left: 8px;">Laporan Mendalam</p>
+                            <img src="{{ asset('feature/Report.png') }}" alt="Reports" style="border-radius: 12px; border: 1px solid rgba(15, 23, 42, 0.08); width: 100%;">
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <section id="harga" class="section">
+                <section id="harga" class="section">
             <div class="container">
                 <div class="reveal">
                     <span class="eyebrow">Harga</span>
@@ -949,6 +957,36 @@
                 </div>
             </div>
         </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="reveal">
+                    <span class="eyebrow">Cara Kerja</span>
+                    <h2 class="section-title">Mulai dalam tiga langkah sederhana</h2>
+                    <p class="section-copy">WashKita dirancang untuk langsung dipakai tanpa setup yang rumit. Tim laundry kamu bisa adaptasi lebih cepat sejak hari pertama.</p>
+                </div>
+
+                <div class="steps-grid">
+                    <article class="step-card reveal">
+                        <div class="step-number">1</div>
+                        <h3>Daftar akun gratis</h3>
+                        <p>Buat akun owner, pilih paket awal, lalu siapkan outlet pertama kamu dalam hitungan menit.</p>
+                    </article>
+                    <article class="step-card reveal">
+                        <div class="step-number">2</div>
+                        <h3>Input order pelanggan</h3>
+                        <p>Masukkan pesanan, jenis layanan, biaya, dan estimasi selesai dari dashboard yang mudah dipahami.</p>
+                    </article>
+                    <article class="step-card reveal">
+                        <div class="step-number">3</div>
+                        <h3>Pantau & kelola bisnis</h3>
+                        <p>Lihat performa outlet, status cucian, dan arus pemasukan tanpa harus cek banyak tempat.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+
 
         <section id="testimoni" class="section">
             <div class="container">
