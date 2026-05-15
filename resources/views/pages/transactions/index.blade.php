@@ -226,12 +226,24 @@
                 {{-- Filter: Service Type --}}
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-white hover:shadow-sm">
-                        Layanan: {{ request('service_type') ? str_replace('_', ' ', request('service_type')) : 'Semua' }}
+                        Layanan: {{ request('service_type') && request('service_type') !== 'all' ? ($servicePackages->firstWhere('id', request('service_type'))?->nama_paket ?? ($serviceMap[request('service_type')] ?? str_replace('_', ' ', request('service_type')))) : 'Semua' }}
                     </button>
-                    <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-48 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
-                        @foreach(['all', 'WASH_ONLY', 'DRY_ONLY', 'WASH_DRY', 'IRONING', 'COMPLETE'] as $st)
+                    <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-64 rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-100 max-h-64 overflow-y-auto" x-cloak>
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['service_type' => 'all'])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
+                            Semua Layanan
+                        </a>
+                        <div class="my-1 border-t border-slate-50"></div>
+                        <p class="px-4 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Tipe Layanan</p>
+                        @foreach(['WASH_ONLY', 'DRY_ONLY', 'WASH_DRY', 'IRONING', 'COMPLETE'] as $st)
                         <a href="{{ route('transactions.index', array_merge(request()->all(), ['service_type' => $st])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
-                            {{ $st == 'all' ? 'Semua Layanan' : str_replace('_', ' ', $st) }}
+                            {{ $serviceMap[$st] ?? str_replace('_', ' ', $st) }}
+                        </a>
+                        @endforeach
+                        <div class="my-1 border-t border-slate-50"></div>
+                        <p class="px-4 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Paket Layanan</p>
+                        @foreach($servicePackages as $pkg)
+                        <a href="{{ route('transactions.index', array_merge(request()->all(), ['service_type' => $pkg->id])) }}" class="block rounded-lg px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600">
+                            {{ $pkg->nama_paket }}
                         </a>
                         @endforeach
                     </div>
@@ -353,6 +365,24 @@
                                         <circle cx="12" cy="12" r="3"></circle>
                                     </svg>
                                 </a>
+
+                                @if($trx->status === 'READY' && $trx->transaction_type === 'DROP_OFF' && $trx->member && $trx->member->no_hp)
+                                    @php
+                                        $waMessage = "Halo *" . ($trx->member->nama ?? 'Pelanggan') . "*,\n\n";
+                                        $waMessage .= "Cucian Anda dengan No. Transaksi *" . $trx->transaction_number . "* sudah *Selesai & Siap Diambil* di *" . $trx->outlet->nama_outlet . "*.\n\n";
+                                        $waMessage .= "💰 *Total Tagihan: Rp " . number_format($trx->total_amount, 0, ',', '.') . "*\n\n";
+                                        $waMessage .= "Silakan datang ke outlet untuk pengambilan. Terima kasih! 🙏✨";
+                                        
+                                        $cleanPhone = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $trx->member->no_hp));
+                                        $waUrl = "https://wa.me/" . $cleanPhone . "?text=" . urlencode($waMessage);
+                                    @endphp
+                                    <a href="{{ $waUrl }}" target="_blank" class="rounded-lg p-2 text-emerald-400 transition hover:bg-white hover:text-emerald-600 hover:shadow-sm" title="Kirim Pengingat WA">
+                                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3z"></path>
+                                        </svg>
+                                    </a>
+                                @endif
+
                                 <button @click="openEditModal({{ json_encode($trx) }})" class="rounded-lg p-2 text-slate-300 transition hover:bg-white hover:text-primary-600 hover:shadow-sm">
                                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Member;
 use App\Models\Outlet;
+use App\Models\ServicePackage;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,9 +44,16 @@ class TransactionController extends Controller
             $query->where('transaction_type', $request->transaction_type);
         }
 
-        // Filter by Service Type
+        // Filter by Service Type / Package
         if ($request->has('service_type') && $request->service_type !== 'all') {
-            $query->where('service_type', $request->service_type);
+            $serviceType = $request->service_type;
+            if (\Illuminate\Support\Str::isUuid($serviceType)) {
+                $query->whereHas('servicePackages', function($q) use ($serviceType) {
+                    $q->where('service_packages.id', $serviceType);
+                });
+            } else {
+                $query->where('service_type', $serviceType);
+            }
         }
 
         // Filter by Payment Method
@@ -89,11 +97,12 @@ class TransactionController extends Controller
         $outlets = $request->user()->isSuperAdmin()
             ? Outlet::all()
             : Outlet::query()->whereIn('id', $request->user()->accessibleOutletIds())->get();
+        $servicePackages = $this->tenantContextService->scopeByUser(ServicePackage::query(), $request->user())->get();
         $cashiers = User::query()
             ->when(! $request->user()->isSuperAdmin(), fn ($builder) => $builder->where('tenant_id', $request->user()->tenant_id))
             ->get();
 
-        return view('pages.transactions.index', compact('transactions', 'stats', 'members', 'outlets', 'cashiers'));
+        return view('pages.transactions.index', compact('transactions', 'stats', 'members', 'outlets', 'cashiers', 'servicePackages'));
     }
 
     public function store(Request $request)
