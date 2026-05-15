@@ -720,7 +720,7 @@
                 <a href="#fitur">Fitur</a>
                 <a href="#harga">Harga</a>
                 <a href="#testimoni">Testimoni</a>
-                <a href="#blog">Blog</a>
+                <a href="#kontak">Kontak</a>
             </nav>
             <a href="{{ route('register.owner') }}" class="btn btn-primary">Coba Gratis</a>
         </div>
@@ -1034,15 +1034,51 @@
             </div>
         </section>
 
-        <section class="section">
+        </section>
+
+        <section id="kontak" class="section">
             <div class="container">
-                <div class="cta-banner reveal">
-                    <div>
-                        <h2>Siap tingkatkan bisnis laundry kamu?</h2>
-                        <p>Coba WashKita gratis selama 14 hari, tanpa kartu kredit.</p>
+                <div class="reveal">
+                    <span class="eyebrow">Hubungi Kami</span>
+                    <h2 class="section-title">Ada Pertanyaan? Kami Siap Membantu</h2>
+                    <p class="section-copy">Punya pertanyaan seputar fitur, paket, atau butuh bantuan teknis? Jangan ragu untuk menghubungi tim support kami melalui saluran di bawah ini.</p>
+                </div>
+
+                <div class="card-grid reveal" style="margin-top: 48px;">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(34, 197, 94, 0.12); color: #15803d;">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                        </div>
+                        <h3>WhatsApp / Phone</h3>
+                        <p>Konsultasi langsung melalui WhatsApp atau telepon untuk respon yang lebih cepat.</p>
+                        <a href="https://wa.me/6285262827436" target="_blank" class="btn btn-secondary" style="margin-top: 20px; width: 100%;">0852-6282-7436</a>
                     </div>
-                    <div>
-                        <a href="{{ route('register.owner') }}" class="btn btn-primary">Daftar Sekarang</a>
+
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(0, 180, 216, 0.12); color: var(--primary);">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Email Support</h3>
+                        <p>Kirimkan pertanyaan atau laporan kendala Anda melalui email resmi kami.</p>
+                        <a href="mailto:contact.washkita@gmail.com" class="btn btn-secondary" style="margin-top: 20px; width: 100%;">contact.washkita@gmail.com</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: rgba(236, 72, 153, 0.12); color: #db2777;">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg>
+                        </div>
+                        <h3>Instagram</h3>
+                        <p>Ikuti kami untuk update fitur terbaru, tips bisnis laundry, dan promo menarik lainnya.</p>
+                        <a href="https://www.instagram.com/wash.kita" target="_blank" class="btn btn-secondary" style="margin-top: 20px; width: 100%;">@wash.kita</a>
                     </div>
                 </div>
             </div>
@@ -1078,13 +1114,13 @@
                     <div class="footer-column">
                         <h4>Support</h4>
                         <a href="{{ route('login') }}">Pusat Bantuan</a>
-                        <a href="{{ route('login') }}">Hubungi Kami</a>
+                        <a href="#kontak">Hubungi Kami</a>
                         <a href="{{ route('login') }}">Status Sistem</a>
                     </div>
 
                     <div class="footer-column">
                         <h4>Social Media</h4>
-                        <a href="#">Instagram</a>
+                        <a href="https://www.instagram.com/wash.kita" target="_blank">Instagram</a>
                         <a href="#">LinkedIn</a>
                         <a href="#">YouTube</a>
                     </div>
