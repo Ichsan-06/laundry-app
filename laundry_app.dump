@@ -1,0 +1,995 @@
+-- MySQL dump 10.13  Distrib 8.0.27, for macos11 (arm64)
+--
+-- Host: 127.0.0.1    Database: laundry_app
+-- ------------------------------------------------------
+-- Server version	9.5.0
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
+SET @@SESSION.SQL_LOG_BIN= 0;
+
+--
+-- GTID state at the beginning of the backup 
+--
+
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '82426f86-da28-11f0-9860-c47603ac55a6:1-8249';
+
+--
+-- Table structure for table `addon_options`
+--
+
+DROP TABLE IF EXISTS `addon_options`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `addon_options` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `outlet_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deskripsi` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `harga` decimal(12,2) NOT NULL,
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `addon_options_outlet_id_foreign` (`outlet_id`),
+  CONSTRAINT `addon_options_outlet_id_foreign` FOREIGN KEY (`outlet_id`) REFERENCES `outlets` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `addon_options`
+--
+
+LOCK TABLES `addon_options` WRITE;
+/*!40000 ALTER TABLE `addon_options` DISABLE KEYS */;
+INSERT INTO `addon_options` VALUES ('019e1f7f-a748-700f-973c-df375db13b0f','019e1b63-6158-70be-a805-574a3f23a1c7','Plastic Bag','Plastik',3000.00,1,'2026-05-12 21:02:00','2026-05-12 21:02:00'),('019e1f80-0bc4-710c-9692-701392d5c852','019e1b63-6158-70be-a805-574a3f23a1c7','Pewangi','Pewangi',5000.00,1,'2026-05-12 21:02:25','2026-05-12 21:02:25');
+/*!40000 ALTER TABLE `addon_options` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cache`
+--
+
+DROP TABLE IF EXISTS `cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cache` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_expiration_index` (`expiration`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cache`
+--
+
+LOCK TABLES `cache` WRITE;
+/*!40000 ALTER TABLE `cache` DISABLE KEYS */;
+INSERT INTO `cache` VALUES ('laravel-cache-spatie.permission.cache','a:3:{s:5:\"alias\";a:5:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";s:1:\"j\";s:9:\"tenant_id\";}s:11:\"permissions\";a:48:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"dashboard.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:6:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:14:\"cashier.access\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:2;i:1;i:3;i:2;i:4;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"transactions.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:5:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:6;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:19:\"transactions.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:6;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:19:\"transactions.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:4;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:19:\"transactions.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:14:\"customers.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:16:\"customers.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;}}i:8;a:4:{s:1:\"a\";i:9;s:1:\"b\";s:16:\"customers.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:4;}}i:9;a:4:{s:1:\"a\";i:10;s:1:\"b\";s:16:\"customers.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:10;a:4:{s:1:\"a\";i:11;s:1:\"b\";s:13:\"machines.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:2;i:1;i:5;}}i:11;a:4:{s:1:\"a\";i:12;s:1:\"b\";s:15:\"machines.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:2;}}i:12;a:4:{s:1:\"a\";i:13;s:1:\"b\";s:15:\"machines.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:2;}}i:13;a:4:{s:1:\"a\";i:14;s:1:\"b\";s:15:\"machines.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:2;}}i:14;a:4:{s:1:\"a\";i:15;s:1:\"b\";s:13:\"services.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:5;i:3;i:6;}}i:15;a:4:{s:1:\"a\";i:16;s:1:\"b\";s:15:\"services.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:16;a:4:{s:1:\"a\";i:17;s:1:\"b\";s:15:\"services.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:17;a:4:{s:1:\"a\";i:18;s:1:\"b\";s:15:\"services.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:18;a:4:{s:1:\"a\";i:19;s:1:\"b\";s:11:\"addons.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:2;i:1;i:5;}}i:19;a:4:{s:1:\"a\";i:20;s:1:\"b\";s:13:\"addons.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:2;}}i:20;a:4:{s:1:\"a\";i:21;s:1:\"b\";s:13:\"addons.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:2;}}i:21;a:4:{s:1:\"a\";i:22;s:1:\"b\";s:13:\"addons.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:2;}}i:22;a:4:{s:1:\"a\";i:23;s:1:\"b\";s:12:\"reports.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:4;}}i:23;a:4:{s:1:\"a\";i:24;s:1:\"b\";s:14:\"reports.export\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:24;a:4:{s:1:\"a\";i:25;s:1:\"b\";s:15:\"settings.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:6;}}i:25;a:4:{s:1:\"a\";i:26;s:1:\"b\";s:10:\"roles.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:6;}}i:26;a:4:{s:1:\"a\";i:27;s:1:\"b\";s:12:\"roles.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:27;a:4:{s:1:\"a\";i:28;s:1:\"b\";s:12:\"roles.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:28;a:4:{s:1:\"a\";i:29;s:1:\"b\";s:12:\"roles.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:29;a:4:{s:1:\"a\";i:30;s:1:\"b\";s:16:\"permissions.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:30;a:4:{s:1:\"a\";i:31;s:1:\"b\";s:18:\"permissions.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:31;a:4:{s:1:\"a\";i:32;s:1:\"b\";s:18:\"permissions.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:32;a:4:{s:1:\"a\";i:33;s:1:\"b\";s:18:\"permissions.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:33;a:4:{s:1:\"a\";i:34;s:1:\"b\";s:12:\"users.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:34;a:4:{s:1:\"a\";i:35;s:1:\"b\";s:10:\"staff.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:6;}}i:35;a:4:{s:1:\"a\";i:36;s:1:\"b\";s:12:\"staff.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:36;a:4:{s:1:\"a\";i:37;s:1:\"b\";s:12:\"staff.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:37;a:4:{s:1:\"a\";i:38;s:1:\"b\";s:12:\"staff.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:38;a:4:{s:1:\"a\";i:39;s:1:\"b\";s:12:\"outlets.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:6;}}i:39;a:4:{s:1:\"a\";i:40;s:1:\"b\";s:14:\"outlets.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:40;a:4:{s:1:\"a\";i:41;s:1:\"b\";s:14:\"outlets.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:41;a:4:{s:1:\"a\";i:42;s:1:\"b\";s:14:\"outlets.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:42;a:4:{s:1:\"a\";i:43;s:1:\"b\";s:12:\"billing.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:2;}}i:43;a:4:{s:1:\"a\";i:44;s:1:\"b\";s:14:\"billing.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:44;a:4:{s:1:\"a\";i:45;s:1:\"b\";s:12:\"plans.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:45;a:4:{s:1:\"a\";i:46;s:1:\"b\";s:14:\"tenants.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:46;a:4:{s:1:\"a\";i:47;s:1:\"b\";s:12:\"promo.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:47;a:4:{s:1:\"a\";i:48;s:1:\"b\";s:19:\"subscription.manage\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}}s:5:\"roles\";a:6:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"j\";N;s:1:\"b\";s:11:\"Super Admin\";s:1:\"c\";s:3:\"web\";}i:1;a:4:{s:1:\"a\";i:2;s:1:\"j\";N;s:1:\"b\";s:5:\"Owner\";s:1:\"c\";s:3:\"web\";}i:2;a:4:{s:1:\"a\";i:3;s:1:\"j\";N;s:1:\"b\";s:5:\"Kasir\";s:1:\"c\";s:3:\"web\";}i:3;a:4:{s:1:\"a\";i:4;s:1:\"j\";N;s:1:\"b\";s:7:\"Manager\";s:1:\"c\";s:3:\"web\";}i:4;a:4:{s:1:\"a\";i:5;s:1:\"j\";N;s:1:\"b\";s:8:\"Operator\";s:1:\"c\";s:3:\"web\";}i:5;a:4:{s:1:\"a\";i:6;s:1:\"j\";s:36:\"019e1b63-614d-7383-b164-7fefc7aa53ef\";s:1:\"b\";s:3:\"SPV\";s:1:\"c\";s:3:\"web\";}}}',1778850347);
+/*!40000 ALTER TABLE `cache` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cache_locks`
+--
+
+DROP TABLE IF EXISTS `cache_locks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`),
+  KEY `cache_locks_expiration_index` (`expiration`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cache_locks`
+--
+
+LOCK TABLES `cache_locks` WRITE;
+/*!40000 ALTER TABLE `cache_locks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cache_locks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `failed_jobs`
+--
+
+LOCK TABLES `failed_jobs` WRITE;
+/*!40000 ALTER TABLE `failed_jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `failed_jobs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `job_batches`
+--
+
+DROP TABLE IF EXISTS `job_batches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `job_batches` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total_jobs` int NOT NULL,
+  `pending_jobs` int NOT NULL,
+  `failed_jobs` int NOT NULL,
+  `failed_job_ids` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` mediumtext COLLATE utf8mb4_unicode_ci,
+  `cancelled_at` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `finished_at` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `job_batches`
+--
+
+LOCK TABLES `job_batches` WRITE;
+/*!40000 ALTER TABLE `job_batches` DISABLE KEYS */;
+/*!40000 ALTER TABLE `job_batches` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `jobs`
+--
+
+DROP TABLE IF EXISTS `jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempts` tinyint unsigned NOT NULL,
+  `reserved_at` int unsigned DEFAULT NULL,
+  `available_at` int unsigned NOT NULL,
+  `created_at` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `jobs`
+--
+
+LOCK TABLES `jobs` WRITE;
+/*!40000 ALTER TABLE `jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `jobs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `machine_durations`
+--
+
+DROP TABLE IF EXISTS `machine_durations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `machine_durations` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `machine_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration_type` enum('WASH','DRY','RINSE','STEAM','COMPLETE') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'WASH',
+  `duration_minutes` int NOT NULL DEFAULT '0',
+  `price` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `machine_durations_machine_id_foreign` (`machine_id`),
+  CONSTRAINT `machine_durations_machine_id_foreign` FOREIGN KEY (`machine_id`) REFERENCES `machines` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `machine_durations`
+--
+
+LOCK TABLES `machine_durations` WRITE;
+/*!40000 ALTER TABLE `machine_durations` DISABLE KEYS */;
+INSERT INTO `machine_durations` VALUES ('019e1b62-d57d-7387-8f70-dc3e79f252bf','019e1b62-d577-7134-8e62-5e6bc35dad90','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57f-73ed-9248-d171338b5887','019e1b62-d577-7134-8e62-5e6bc35dad90','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57f-73ed-9248-d171342d2614','019e1b62-d577-7134-8e62-5e6bc35dad90','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d580-7127-a96d-fc06e9af1004','019e1b62-d578-714b-9e11-aaa722344d8c','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d580-7127-a96d-fc06e9f80b9d','019e1b62-d578-714b-9e11-aaa722344d8c','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d581-71e2-90b9-813932b3ce3b','019e1b62-d578-714b-9e11-aaa722344d8c','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d581-71e2-90b9-8139330b21a7','019e1b62-d578-714b-9e11-aaa722928eb7','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d581-71e2-90b9-813933f7e085','019e1b62-d578-714b-9e11-aaa722928eb7','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d581-71e2-90b9-813934726eca','019e1b62-d578-714b-9e11-aaa722928eb7','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d582-70bb-bb57-3e62ecc49c9b','019e1b62-d579-703a-9121-901c7d4c3540','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d582-70bb-bb57-3e62ed732091','019e1b62-d579-703a-9121-901c7d4c3540','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d582-70bb-bb57-3e62ed967f6a','019e1b62-d579-703a-9121-901c7d4c3540','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d582-70bb-bb57-3e62ee93fffe','019e1b62-d579-703a-9121-901c7dfdf787','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d583-7350-a88e-ee1f9c27861a','019e1b62-d579-703a-9121-901c7dfdf787','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d583-7350-a88e-ee1f9cbc2617','019e1b62-d579-703a-9121-901c7dfdf787','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d583-7350-a88e-ee1f9d440a76','019e1b62-d579-703a-9121-901c7e7aa403','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d583-7350-a88e-ee1f9df3acdd','019e1b62-d579-703a-9121-901c7e7aa403','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d584-704e-a80e-bcbd79823af5','019e1b62-d579-703a-9121-901c7e7aa403','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d584-704e-a80e-bcbd79ccf82a','019e1b62-d57a-722f-b5b0-41128c9f2175','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d584-704e-a80e-bcbd7a1e4ab9','019e1b62-d57a-722f-b5b0-41128c9f2175','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d585-711d-914f-7f3fed7e486f','019e1b62-d57a-722f-b5b0-41128c9f2175','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d585-711d-914f-7f3fee308783','019e1b62-d57a-722f-b5b0-41128d3cd3c9','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d585-711d-914f-7f3feee9fcf8','019e1b62-d57a-722f-b5b0-41128d3cd3c9','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d585-711d-914f-7f3fef6d45da','019e1b62-d57a-722f-b5b0-41128d3cd3c9','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d586-72f3-959b-4567d7b03d3c','019e1b62-d57b-7005-bb4b-9780fd604be5','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d586-72f3-959b-4567d894115c','019e1b62-d57b-7005-bb4b-9780fd604be5','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d587-7376-802e-b3632cecb72e','019e1b62-d57b-7005-bb4b-9780fd604be5','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d587-7376-802e-b3632d7e9c45','019e1b62-d57b-7005-bb4b-9780fd9f3274','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d587-7376-802e-b3632dd3afd7','019e1b62-d57b-7005-bb4b-9780fd9f3274','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d588-73e4-9eb8-2706ed778216','019e1b62-d57b-7005-bb4b-9780fd9f3274','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d588-73e4-9eb8-2706edd1120f','019e1b62-d57b-7005-bb4b-9780fdb77ecf','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d589-7184-afa1-8835285c7666','019e1b62-d57b-7005-bb4b-9780fdb77ecf','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d589-7184-afa1-8835286376ab','019e1b62-d57b-7005-bb4b-9780fdb77ecf','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d589-7184-afa1-883528cddcc2','019e1b62-d57c-72b5-976a-3cd649fbe597','WASH',30,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d58a-7226-b28c-a242d94f7172','019e1b62-d57c-72b5-976a-3cd649fbe597','DRY',45,25000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d58a-7226-b28c-a242d9bf0d4d','019e1b62-d57c-72b5-976a-3cd649fbe597','COMPLETE',90,50000.00,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b72-6400-73bd-a1e2-7ec5f8374818','019e1b72-63f7-720f-9168-530ff8905138','WASH',30,25000.00,1,'2026-05-12 02:09:02','2026-05-12 22:10:47'),('019e1b72-6404-710a-8c1f-f739b4acc226','019e1b72-63f7-720f-9168-530ff8905138','DRY',30,25000.00,1,'2026-05-12 02:09:02','2026-05-12 22:10:47'),('019e1b72-6406-7230-93f8-44ad39e16c84','019e1b72-63f7-720f-9168-530ff8905138','COMPLETE',60,25000.00,1,'2026-05-12 02:09:02','2026-05-12 22:10:47'),('019e1c65-20a0-72ce-8a32-42696c8756ee','019e1c65-2096-70f3-89c7-c4a1ffc6cc51','WASH',30,25000.00,1,'2026-05-12 06:34:10','2026-05-12 06:34:10'),('019e1c65-20a2-7126-a7fe-c3d31abd3640','019e1c65-2096-70f3-89c7-c4a1ffc6cc51','DRY',45,25000.00,1,'2026-05-12 06:34:10','2026-05-12 06:34:10'),('019e1c65-20a4-732b-b306-c54bc8eb919b','019e1c65-2096-70f3-89c7-c4a1ffc6cc51','COMPLETE',90,50000.00,1,'2026-05-12 06:34:10','2026-05-12 06:34:10'),('019e1fbe-6c6c-7325-b5e7-9cd746b2910c','019e1fbe-6c66-70d1-9254-8e9aad5a0219','WASH',30,25000.00,1,'2026-05-12 22:10:33','2026-05-12 22:10:33'),('019e1fbe-6c6e-70b1-a335-0532e2958e11','019e1fbe-6c66-70d1-9254-8e9aad5a0219','DRY',45,25000.00,1,'2026-05-12 22:10:33','2026-05-12 22:10:33'),('019e1fbe-6c6f-7288-ad34-a27d9c81b310','019e1fbe-6c66-70d1-9254-8e9aad5a0219','COMPLETE',90,50000.00,1,'2026-05-12 22:10:33','2026-05-12 22:10:33'),('019e1fbe-d077-7342-9326-eda5c1e0b278','019e1fbe-d074-7056-bf34-933def05f7ed','WASH',30,25000.00,1,'2026-05-12 22:10:59','2026-05-12 22:10:59'),('019e1fbe-d079-70a3-8ca6-c15c9fb5e329','019e1fbe-d074-7056-bf34-933def05f7ed','DRY',45,25000.00,1,'2026-05-12 22:10:59','2026-05-12 22:10:59'),('019e1fbe-d07b-70d5-aa48-01eda03ba103','019e1fbe-d074-7056-bf34-933def05f7ed','COMPLETE',90,50000.00,1,'2026-05-12 22:10:59','2026-05-12 22:10:59'),('019e1fbe-f64e-73b7-9f40-8baaf1d8e512','019e1fbe-f647-720b-ae96-6032e350dac4','WASH',30,25000.00,1,'2026-05-12 22:11:09','2026-05-12 22:11:09'),('019e1fbe-f656-70e5-8e78-30691f0f932e','019e1fbe-f647-720b-ae96-6032e350dac4','DRY',45,25000.00,1,'2026-05-12 22:11:09','2026-05-12 22:11:09'),('019e1fbe-f663-707b-9a86-bdaced028b32','019e1fbe-f647-720b-ae96-6032e350dac4','COMPLETE',90,50000.00,1,'2026-05-12 22:11:09','2026-05-12 22:11:09'),('019e1fbf-12c4-7258-9a8e-b89b39788799','019e1fbf-12c1-70b9-8c91-1571f92d728f','WASH',30,25000.00,1,'2026-05-12 22:11:16','2026-05-12 22:11:16'),('019e1fbf-12c6-7269-a586-6aaee085f51f','019e1fbf-12c1-70b9-8c91-1571f92d728f','DRY',45,25000.00,1,'2026-05-12 22:11:16','2026-05-12 22:11:16'),('019e1fbf-12c7-7162-b6e9-479039b0f279','019e1fbf-12c1-70b9-8c91-1571f92d728f','COMPLETE',90,50000.00,1,'2026-05-12 22:11:16','2026-05-12 22:11:16'),('019e1fbf-345a-721d-ae7f-6f394086de8c','019e1fbf-3457-702e-bc5e-9acfa33a7cf4','WASH',30,25000.00,1,'2026-05-12 22:11:25','2026-05-12 22:11:25'),('019e1fbf-345c-71c0-b271-6b0fc92d9bcd','019e1fbf-3457-702e-bc5e-9acfa33a7cf4','DRY',45,25000.00,1,'2026-05-12 22:11:25','2026-05-12 22:11:25'),('019e1fbf-345d-72dc-92f5-eb6e343c63c6','019e1fbf-3457-702e-bc5e-9acfa33a7cf4','COMPLETE',90,50000.00,1,'2026-05-12 22:11:25','2026-05-12 22:11:25'),('019e1fbf-5715-73e4-805e-c69f0a5a951c','019e1fbf-5711-7240-aa72-db6fcf26805f','WASH',30,25000.00,1,'2026-05-12 22:11:33','2026-05-12 22:11:33'),('019e1fbf-5718-70fe-a6c1-88c14e09355c','019e1fbf-5711-7240-aa72-db6fcf26805f','DRY',45,25000.00,1,'2026-05-12 22:11:33','2026-05-12 22:11:33'),('019e1fbf-571a-7319-822a-d7dbe1df225c','019e1fbf-5711-7240-aa72-db6fcf26805f','COMPLETE',90,50000.00,1,'2026-05-12 22:11:33','2026-05-12 22:11:33');
+/*!40000 ALTER TABLE `machine_durations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `machines`
+--
+
+DROP TABLE IF EXISTS `machines`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `machines` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `outlet_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `machine_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `machine_type` enum('WASHER','DRYER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'WASHER',
+  `capacity_kg` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `status` enum('AVAILABLE','IN_USE','MAINTENANCE','FAULTY') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'AVAILABLE',
+  `brand` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_serviced_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `machines_machine_code_unique` (`machine_code`),
+  KEY `machines_outlet_id_foreign` (`outlet_id`),
+  CONSTRAINT `machines_outlet_id_foreign` FOREIGN KEY (`outlet_id`) REFERENCES `outlets` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `machines`
+--
+
+LOCK TABLES `machines` WRITE;
+/*!40000 ALTER TABLE `machines` DISABLE KEYS */;
+INSERT INTO `machines` VALUES ('019e1b62-d577-7134-8e62-5e6bc35dad90','019e1b62-d168-70f8-b4f5-1d68cac254e5','DR-582','DRYER',10.00,'MAINTENANCE','Electrolux','2026-01-07 10:16:42','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d578-714b-9e11-aaa722344d8c','019e1b62-d168-70f8-b4f5-1d68cac254e5','DR-676','DRYER',7.00,'FAULTY','Electrolux','2025-12-24 17:07:27','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d578-714b-9e11-aaa722928eb7','019e1b62-d168-70f8-b4f5-1d68cac254e5','DR-975','WASHER',12.00,'FAULTY','LG','2025-12-28 00:14:20','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d579-703a-9121-901c7d4c3540','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-116','DRYER',12.00,'MAINTENANCE','Electrolux','2026-03-21 23:24:48','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d579-703a-9121-901c7dfdf787','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-672','DRYER',10.00,'IN_USE','Whirlpool','2026-04-27 00:17:19','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d579-703a-9121-901c7e7aa403','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-152','DRYER',7.00,'AVAILABLE','LG','2026-03-20 15:45:00','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57a-722f-b5b0-41128c9f2175','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-318','DRYER',7.00,'FAULTY','LG','2026-01-01 20:09:22','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57a-722f-b5b0-41128d3cd3c9','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-685','DRYER',10.00,'IN_USE','Electrolux','2026-04-01 07:17:07','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57b-7005-bb4b-9780fd604be5','019e1b62-d168-70f8-b4f5-1d68cac254e5','DR-151','DRYER',10.00,'MAINTENANCE','LG','2026-03-14 11:07:24','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57b-7005-bb4b-9780fd9f3274','019e1b62-d168-70f8-b4f5-1d68cac254e5','DR-763','WASHER',12.00,'MAINTENANCE','Whirlpool','2026-05-03 20:54:19','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57b-7005-bb4b-9780fdb77ecf','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-382','DRYER',10.00,'FAULTY','Whirlpool','2026-01-27 17:47:55','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d57c-72b5-976a-3cd649fbe597','019e1b62-d168-70f8-b4f5-1d68cac254e5','WS-235','WASHER',7.00,'MAINTENANCE','Electrolux','2025-12-18 17:13:46','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b72-63f7-720f-9168-530ff8905138','019e1b63-6158-70be-a805-574a3f23a1c7','W-02','WASHER',77.00,'AVAILABLE','In doloremque quam e',NULL,'2026-05-12 02:09:02','2026-05-15 00:58:02'),('019e1c65-2096-70f3-89c7-c4a1ffc6cc51','019e1b63-6158-70be-a805-574a3f23a1c7','W-01','DRYER',10.00,'AVAILABLE','Samsung',NULL,'2026-05-12 06:34:10','2026-05-15 00:58:02'),('019e1fbe-6c66-70d1-9254-8e9aad5a0219','019e1b63-6158-70be-a805-574a3f23a1c7','W-3','WASHER',8.00,'AVAILABLE','Samsung',NULL,'2026-05-12 22:10:33','2026-05-15 00:56:44'),('019e1fbe-d074-7056-bf34-933def05f7ed','019e1b63-6158-70be-a805-574a3f23a1c7','W-04','WASHER',8.00,'AVAILABLE','Samsung',NULL,'2026-05-12 22:10:59','2026-05-12 22:10:59'),('019e1fbe-f647-720b-ae96-6032e350dac4','019e1b63-6158-70be-a805-574a3f23a1c7','D-01','DRYER',8.00,'AVAILABLE','Samsung',NULL,'2026-05-12 22:11:09','2026-05-15 00:56:48'),('019e1fbf-12c1-70b9-8c91-1571f92d728f','019e1b63-6158-70be-a805-574a3f23a1c7','D-2','DRYER',8.00,'AVAILABLE','Samsung',NULL,'2026-05-12 22:11:16','2026-05-12 22:11:16'),('019e1fbf-3457-702e-bc5e-9acfa33a7cf4','019e1b63-6158-70be-a805-574a3f23a1c7','D-3','DRYER',8.00,'AVAILABLE','Samsung',NULL,'2026-05-12 22:11:25','2026-05-12 22:11:25'),('019e1fbf-5711-7240-aa72-db6fcf26805f','019e1b63-6158-70be-a805-574a3f23a1c7','D-04','DRYER',8.00,'AVAILABLE','Samsung',NULL,'2026-05-12 22:11:33','2026-05-12 22:11:33');
+/*!40000 ALTER TABLE `machines` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `members`
+--
+
+DROP TABLE IF EXISTS `members`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `members` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `outlet_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_member` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `no_hp` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `saldo` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `status` enum('ACTIVE','INACTIVE','LOW_BALANCE','PREMIUM') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `tanggal_daftar` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `members_id_member_unique` (`id_member`),
+  KEY `members_outlet_id_foreign` (`outlet_id`),
+  CONSTRAINT `members_outlet_id_foreign` FOREIGN KEY (`outlet_id`) REFERENCES `outlets` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `members`
+--
+
+LOCK TABLES `members` WRITE;
+/*!40000 ALTER TABLE `members` DISABLE KEYS */;
+INSERT INTO `members` VALUES ('019e1b62-d49c-7083-b07a-114743a94775','019e1b62-d168-70f8-b4f5-1d68cac254e5','MEM-001','John Doe','081234567890','john@example.com',500.00,'PREMIUM','2026-05-12 01:52:02','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d49f-7338-bb64-011bfa6fd0ea','019e1b62-d168-70f8-b4f5-1d68cac254e5','MEM-002','Jane Smith','081298765432','jane@example.com',50.00,'LOW_BALANCE','2026-05-12 01:52:02','2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1c63-c2ed-7092-8789-21dedca1e0d0','019e1b63-6158-70be-a805-574a3f23a1c7','MEM-B00141','ichsanm@','085262827436','01ichsanm@gmail.com',0.00,'ACTIVE','2026-05-12 06:32:40','2026-05-12 06:32:40','2026-05-12 06:32:40'),('019e1f8c-5c06-71fe-9976-b122a621b9f8','019e1b63-6158-70be-a805-574a3f23a1c7','MBR-B56A','Ichsan','085262827436',NULL,0.00,'ACTIVE','2026-05-12 21:15:52','2026-05-12 21:15:52','2026-05-14 06:26:33'),('019e26d7-56e9-736c-97a7-90f3e971d3f0','019e26d6-49a1-711c-b591-17b867893fac','MEM-5CEAB2','Ichsan','085262824732','014ichsanm@gmail.com',0.00,'ACTIVE','2026-05-14 07:15:07','2026-05-14 07:15:07','2026-05-14 07:15:07');
+/*!40000 ALTER TABLE `members` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `migrations`
+--
+
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'0001_01_01_000001_create_cache_table',1),(2,'0001_01_01_000002_create_jobs_table',1),(3,'2026_05_04_031940_create_outlets_table',1),(4,'2026_05_04_031941_create_users_table',1),(5,'2026_05_04_031942_create_members_table',1),(6,'2026_05_04_032425_create_sessions_table',1),(7,'2026_05_04_032634_create_transactions_table',1),(8,'2026_05_04_075249_create_machines_table',1),(9,'2026_05_04_081037_create_machine_durations_table',1),(10,'2026_05_04_081037_create_self_service_details_table',1),(11,'2026_05_05_032158_create_addon_options_table',1),(12,'2026_05_05_034451_create_service_packages_table',1),(13,'2026_05_05_071605_add_drop_off_fields_to_transactions_table',1),(14,'2026_05_05_071717_create_drop_off_details_and_items_tables',1),(15,'2026_05_06_014436_add_weight_and_note_to_transaction_services_table',1),(16,'2026_05_06_020111_add_discount_and_tax_to_transactions_table',1),(17,'2026_05_06_020958_add_ready_status_to_transactions_table',1),(18,'2026_05_12_012022_create_permission_tables',1),(19,'2026_05_12_020000_add_wijayapay_columns_to_transactions_table',1),(20,'2026_05_12_030000_create_tenants_table',1),(21,'2026_05_12_030100_add_tenant_fields_to_outlets_and_users',1),(22,'2026_05_12_030200_create_subscription_plans_tables',1),(23,'2026_05_12_030300_add_tenant_scope_to_roles_table',1),(24,'2026_05_12_101500_add_wijayapay_fields_to_outlets_table',2),(25,'2026_05_13_090000_add_price_to_subscription_plans_table',3),(26,'2026_05_13_090100_create_plan_purchase_histories_table',3),(27,'2026_05_13_110000_add_qris_display_columns_to_transactions_table',4);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `model_has_permissions`
+--
+
+DROP TABLE IF EXISTS `model_has_permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `model_has_permissions` (
+  `permission_id` bigint unsigned NOT NULL,
+  `model_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `model_uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`permission_id`,`model_uuid`,`model_type`),
+  KEY `model_has_permissions_model_id_model_type_index` (`model_uuid`,`model_type`),
+  CONSTRAINT `model_has_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `model_has_permissions`
+--
+
+LOCK TABLES `model_has_permissions` WRITE;
+/*!40000 ALTER TABLE `model_has_permissions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `model_has_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `model_has_roles`
+--
+
+DROP TABLE IF EXISTS `model_has_roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `model_has_roles` (
+  `role_id` bigint unsigned NOT NULL,
+  `model_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `model_uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`role_id`,`model_uuid`,`model_type`),
+  KEY `model_has_roles_model_id_model_type_index` (`model_uuid`,`model_type`),
+  CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `model_has_roles`
+--
+
+LOCK TABLES `model_has_roles` WRITE;
+/*!40000 ALTER TABLE `model_has_roles` DISABLE KEYS */;
+INSERT INTO `model_has_roles` VALUES (2,'App\\Models\\User','019e1b62-d28b-7379-81c3-50e17be06d90'),(1,'App\\Models\\User','019e1b62-d393-73ae-b530-b69fd149bbd4'),(3,'App\\Models\\User','019e1b62-d491-72c2-8eb0-0aa1e742addb'),(2,'App\\Models\\User','019e1b63-6257-72e3-946a-d7eafa08fd58'),(3,'App\\Models\\User','019e1b67-ba88-72e8-8cd7-393dabb2a084'),(3,'App\\Models\\User','019e1b79-6243-7258-99a3-33f419dff288'),(6,'App\\Models\\User','019e1b7b-53f6-73ec-be04-4cc9fa50ae95'),(2,'App\\Models\\User','019e26e3-93ae-7357-a82c-c37c2dea20f1');
+/*!40000 ALTER TABLE `model_has_roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `outlets`
+--
+
+DROP TABLE IF EXISTS `outlets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `outlets` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tenant_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nama_outlet` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alamat` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telepon` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `kota` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `wijayapay_merchant_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `wijayapay_api_key` text COLLATE utf8mb4_unicode_ci,
+  `wijayapay_create_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `wijayapay_status_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `wijayapay_callback_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `outlets_tenant_id_foreign` (`tenant_id`),
+  CONSTRAINT `outlets_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `outlets`
+--
+
+LOCK TABLES `outlets` WRITE;
+/*!40000 ALTER TABLE `outlets` DISABLE KEYS */;
+INSERT INTO `outlets` VALUES ('019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d167-72f2-9078-e71148310c75','Laundry Express Utama','Jl. Merdeka No. 123','021-1234567','Jakarta',1,NULL,NULL,NULL,NULL,NULL,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-614d-7383-b164-7fefc7aa53ef','Medan Laundry','medan','085262827436','Medan',1,'WP6975ae5bee603','8a68990902bc4536f7fb8b5891','https://wijayapay.com/api/transaction/create','https://wijayapay.com/api/get-status',NULL,'2026-05-12 01:52:38','2026-05-12 21:12:47'),('019e26d6-49a1-711c-b591-17b867893fac','019e1b63-614d-7383-b164-7fefc7aa53ef','JAKARTA LAUNDRY','Medan','085262824736','JAKARTA',1,'Molestiae consequatu','Ut ipsam aperiam mol','https://www.belityr.tv','https://www.dativotuxes.us',NULL,'2026-05-14 07:13:58','2026-05-14 07:13:58'),('019e26e3-92ae-72b6-978f-067a7b9ec8e2','019e26e3-92a8-7352-9197-1fcdea8af025','Putri Outlet','JAKARTA','085262827436','JAKARTA',1,NULL,NULL,NULL,NULL,NULL,'2026-05-14 07:28:28','2026-05-14 07:28:28');
+/*!40000 ALTER TABLE `outlets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `permissions`
+--
+
+DROP TABLE IF EXISTS `permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `permissions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `guard_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `permissions_name_guard_name_unique` (`name`,`guard_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `permissions`
+--
+
+LOCK TABLES `permissions` WRITE;
+/*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
+INSERT INTO `permissions` VALUES (1,'dashboard.view','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(2,'cashier.access','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(3,'transactions.view','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(4,'transactions.create','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(5,'transactions.update','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(6,'transactions.delete','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(7,'customers.view','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(8,'customers.create','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(9,'customers.update','web','2026-05-12 01:52:00','2026-05-12 01:52:00'),(10,'customers.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(11,'machines.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(12,'machines.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(13,'machines.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(14,'machines.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(15,'services.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(16,'services.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(17,'services.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(18,'services.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(19,'addons.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(20,'addons.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(21,'addons.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(22,'addons.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(23,'reports.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(24,'reports.export','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(25,'settings.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(26,'roles.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(27,'roles.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(28,'roles.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(29,'roles.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(30,'permissions.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(31,'permissions.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(32,'permissions.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(33,'permissions.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(34,'users.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(35,'staff.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(36,'staff.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(37,'staff.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(38,'staff.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(39,'outlets.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(40,'outlets.create','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(41,'outlets.update','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(42,'outlets.delete','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(43,'billing.view','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(44,'billing.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(45,'plans.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(46,'tenants.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(47,'promo.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(48,'subscription.manage','web','2026-05-12 01:52:01','2026-05-12 01:52:01');
+/*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `plan_purchase_histories`
+--
+
+DROP TABLE IF EXISTS `plan_purchase_histories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `plan_purchase_histories` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tenant_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subscription_plan_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activated_subscription_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `plan_name_snapshot` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` bigint unsigned NOT NULL,
+  `payment_fee` bigint unsigned NOT NULL DEFAULT '0',
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `payment_method` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'QRIS',
+  `payment_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ref_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `trx_reference` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `qr_image` text COLLATE utf8mb4_unicode_ci,
+  `tutorial_pembayaran` text COLLATE utf8mb4_unicode_ci,
+  `payment_expires_at` timestamp NULL DEFAULT NULL,
+  `paid_at` timestamp NULL DEFAULT NULL,
+  `last_payload` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `plan_purchase_histories_ref_id_unique` (`ref_id`),
+  KEY `plan_purchase_histories_tenant_id_foreign` (`tenant_id`),
+  KEY `plan_purchase_histories_subscription_plan_id_foreign` (`subscription_plan_id`),
+  KEY `plan_purchase_histories_activated_subscription_id_foreign` (`activated_subscription_id`),
+  CONSTRAINT `plan_purchase_histories_activated_subscription_id_foreign` FOREIGN KEY (`activated_subscription_id`) REFERENCES `tenant_subscriptions` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `plan_purchase_histories_subscription_plan_id_foreign` FOREIGN KEY (`subscription_plan_id`) REFERENCES `subscription_plans` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `plan_purchase_histories_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `plan_purchase_histories`
+--
+
+LOCK TABLES `plan_purchase_histories` WRITE;
+/*!40000 ALTER TABLE `plan_purchase_histories` DISABLE KEYS */;
+INSERT INTO `plan_purchase_histories` VALUES ('019e1f74-debb-7293-b941-6ccf27200240','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b62-d146-73cb-9151-5d58688d3d94',NULL,'Enterprise Plan',80000,664,'pending','QRIS','QRIS','BILL-C70669B4F91840C59D7803C0048DB68D','WP260513105014464','https://wijayapay.com/qris/1778644214_2561.png','Buka aplikasi yang mendukung pembayaran dengan QRIS\r\nPilih fitur QRIS / Bayar\r\nPindai kode QR yang diberikan oleh Merchant\r\nPastikan tagihan yang ditagihkan sesuai\r\nKlik tombol Konfirmasi\r\nMasukkan PIN untuk menyelesaikan pembayaran\r\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran','2026-05-13 04:50:14',NULL,'{\"data\": {\"ref_id\": \"BILL-C70669B4F91840C59D7803C0048DB68D\", \"expired\": \"2026-05-13 11:50:14\", \"qr_image\": \"https://wijayapay.com/qris/1778644214_2561.png\", \"qr_string\": \"00020101021226640017ID.CO.DANAMON.WWW0118936000110000307977021010317974020303UBE51440014ID.CO.QRIS.WWW0215ID20254627467070303UBE6277011617786444387531420517WP26051310501446407092992147769919000200010942384276453033605405800006006BEKASI520465335910Wijaya Pay5802ID61051713563044613\", \"total_fee\": 664, \"total_bayar\": 80000, \"callback_url\": \"http://localhost:8001/callback/wijayapay/billing\", \"payment_name\": \"QRIS\", \"trx_reference\": \"WP260513105014464\", \"payment_method\": \"QRIS\", \"total_diterima\": 79336, \"tutorial_pembayaran\": \"Buka aplikasi yang mendukung pembayaran dengan QRIS\\r\\nPilih fitur QRIS / Bayar\\r\\nPindai kode QR yang diberikan oleh Merchant\\r\\nPastikan tagihan yang ditagihkan sesuai\\r\\nKlik tombol Konfirmasi\\r\\nMasukkan PIN untuk menyelesaikan pembayaran\\r\\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran\"}, \"status_pembayaran\": \"pending\"}','2026-05-12 20:50:13','2026-05-12 20:50:29'),('019e26d2-1494-73f7-8d6a-e3216c53bb10','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b62-d126-7139-acfc-44bc0c62268c','019e26d5-0bac-70fa-b6a4-88b8cc14c660','Pro Plan',55000,135,'paid','QRIS','QRIS','TRK-1769333424-Z4r5U','WPTRX414200','https://wijayapay.com/qris/6975e2b0c7ab9.png','Buka aplikasi yang mendukung pembayaran dengan QRIS\r\nPilih fitur QRIS / Bayar\r\nPindai kode QR yang diberikan oleh Merchant\r\nPastikan tagihan yang ditagihkan sesuai\r\nKlik tombol Konfirmasi\r\nMasukkan PIN untuk menyelesaikan pembayaran\r\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran','2026-01-25 10:30:24','2026-05-14 07:12:36','{\"data\": {\"ref_id\": \"TRK-1769333424-Z4r5U\", \"expired\": \"2026-01-25 17:30:24\", \"qr_image\": \"https://wijayapay.com/qris/6975e2b0c7ab9.png\", \"qr_string\": \"00020101021226640017ID.CO.DANAMON.WWW0118936000110000307977021010317974020303UBE51440014ID.CO.QRIS.WWW0215ID20254627467070303UBE6271011617693340232335510511WPTRX4142000709221267991991900020001094144408635303360540451356006BEKASI520465335910Wijaya Pay5802ID6105171356304FA99\", \"total_fee\": 135, \"total_bayar\": 5135, \"payment_name\": \"QRIS\", \"trx_reference\": \"WPTRX414200\", \"payment_method\": \"QRIS\", \"total_diterima\": 5000, \"tutorial_pembayaran\": \"Buka aplikasi yang mendukung pembayaran dengan QRIS\\r\\nPilih fitur QRIS / Bayar\\r\\nPindai kode QR yang diberikan oleh Merchant\\r\\nPastikan tagihan yang ditagihkan sesuai\\r\\nKlik tombol Konfirmasi\\r\\nMasukkan PIN untuk menyelesaikan pembayaran\\r\\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran\"}, \"status_pembayaran\": \"paid\"}','2026-05-14 07:09:22','2026-05-14 07:12:36');
+/*!40000 ALTER TABLE `plan_purchase_histories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `role_has_permissions`
+--
+
+DROP TABLE IF EXISTS `role_has_permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `role_has_permissions` (
+  `permission_id` bigint unsigned NOT NULL,
+  `role_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`permission_id`,`role_id`),
+  KEY `role_has_permissions_role_id_foreign` (`role_id`),
+  CONSTRAINT `role_has_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `role_has_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `role_has_permissions`
+--
+
+LOCK TABLES `role_has_permissions` WRITE;
+/*!40000 ALTER TABLE `role_has_permissions` DISABLE KEYS */;
+INSERT INTO `role_has_permissions` VALUES (1,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(15,1),(16,1),(17,1),(18,1),(23,1),(24,1),(25,1),(26,1),(27,1),(28,1),(29,1),(30,1),(31,1),(32,1),(33,1),(34,1),(35,1),(36,1),(37,1),(38,1),(39,1),(40,1),(41,1),(42,1),(43,1),(44,1),(45,1),(46,1),(47,1),(48,1),(1,2),(2,2),(3,2),(5,2),(6,2),(7,2),(8,2),(9,2),(10,2),(11,2),(12,2),(13,2),(14,2),(15,2),(16,2),(17,2),(18,2),(19,2),(20,2),(21,2),(22,2),(23,2),(24,2),(25,2),(26,2),(27,2),(28,2),(29,2),(35,2),(36,2),(37,2),(38,2),(39,2),(40,2),(41,2),(42,2),(43,2),(1,3),(2,3),(3,3),(4,3),(7,3),(8,3),(1,4),(2,4),(3,4),(4,4),(5,4),(7,4),(8,4),(9,4),(23,4),(1,5),(11,5),(15,5),(19,5),(1,6),(3,6),(4,6),(15,6),(25,6),(26,6),(35,6),(39,6);
+/*!40000 ALTER TABLE `role_has_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `roles`
+--
+
+DROP TABLE IF EXISTS `roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `roles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `guard_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `roles_tenant_id_name_index` (`tenant_id`,`name`),
+  CONSTRAINT `roles_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `roles`
+--
+
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,NULL,'Super Admin','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(2,NULL,'Owner','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(3,NULL,'Kasir','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(4,NULL,'Manager','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(5,NULL,'Operator','web','2026-05-12 01:52:01','2026-05-12 01:52:01'),(6,'019e1b63-614d-7383-b164-7fefc7aa53ef','SPV','web','2026-05-12 02:18:08','2026-05-12 02:18:08');
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `self_service_details`
+--
+
+DROP TABLE IF EXISTS `self_service_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `self_service_details` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `transaction_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `machine_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `machine_duration_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration_minutes` int NOT NULL DEFAULT '0',
+  `price` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `start_time` timestamp NULL DEFAULT NULL,
+  `end_time` timestamp NULL DEFAULT NULL,
+  `machine_status` enum('RUNNING','COMPLETED','STOPPED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STOPPED',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `self_service_details_transaction_id_foreign` (`transaction_id`),
+  KEY `self_service_details_machine_id_foreign` (`machine_id`),
+  KEY `self_service_details_machine_duration_id_foreign` (`machine_duration_id`),
+  CONSTRAINT `self_service_details_machine_duration_id_foreign` FOREIGN KEY (`machine_duration_id`) REFERENCES `machine_durations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `self_service_details_machine_id_foreign` FOREIGN KEY (`machine_id`) REFERENCES `machines` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `self_service_details_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `self_service_details`
+--
+
+LOCK TABLES `self_service_details` WRITE;
+/*!40000 ALTER TABLE `self_service_details` DISABLE KEYS */;
+INSERT INTO `self_service_details` VALUES ('019e26ad-429c-7358-97c9-f33cb6a81e2a','019e26ad-4291-73f3-811c-7205fb4e0152','019e1b72-63f7-720f-9168-530ff8905138','019e1b72-6400-73bd-a1e2-7ec5f8374818',30,25000.00,'2026-05-14 06:29:09','2026-05-14 06:59:09','RUNNING','2026-05-14 06:29:09','2026-05-14 06:29:09'),('019e26ad-42a3-7224-9415-c8938616b6ea','019e26ad-4291-73f3-811c-7205fb4e0152','019e1fbe-f647-720b-ae96-6032e350dac4','019e1fbe-f656-70e5-8e78-30691f0f932e',45,25000.00,'2026-05-14 06:29:09','2026-05-14 07:14:09','RUNNING','2026-05-14 06:29:09','2026-05-14 06:29:09'),('019e26ae-6479-7238-bac9-39b894449129','019e26ae-6470-71f8-9077-f7a382a93af4','019e1c65-2096-70f3-89c7-c4a1ffc6cc51','019e1c65-20a2-7126-a7fe-c3d31abd3640',45,25000.00,NULL,NULL,'STOPPED','2026-05-14 06:30:23','2026-05-14 06:30:23'),('019e26ae-647d-73f1-960a-3e89f80732d9','019e26ae-6470-71f8-9077-f7a382a93af4','019e1fbe-6c66-70d1-9254-8e9aad5a0219','019e1fbe-6c6c-7325-b5e7-9cd746b2910c',30,25000.00,NULL,NULL,'STOPPED','2026-05-14 06:30:23','2026-05-14 06:30:23'),('019e2a63-ecb6-71f8-a964-162e379294a7','019e2a63-ecaa-7225-b567-2f359c1442d4','019e1c65-2096-70f3-89c7-c4a1ffc6cc51','019e1c65-20a2-7126-a7fe-c3d31abd3640',45,25000.00,'2026-05-14 23:47:32','2026-05-15 00:32:32','RUNNING','2026-05-14 23:47:32','2026-05-14 23:47:32'),('019e2a63-ecbc-72d6-844b-76ed369816e9','019e2a63-ecaa-7225-b567-2f359c1442d4','019e1fbe-6c66-70d1-9254-8e9aad5a0219','019e1fbe-6c6c-7325-b5e7-9cd746b2910c',30,25000.00,'2026-05-14 23:47:32','2026-05-15 00:17:32','RUNNING','2026-05-14 23:47:32','2026-05-14 23:47:32'),('019e2aa4-3fff-7146-bd9f-7e3b03c57442','019e2aa4-3ff4-73cd-931c-576d0ceb0b6c','019e1b72-63f7-720f-9168-530ff8905138','019e1b72-6400-73bd-a1e2-7ec5f8374818',30,25000.00,'2026-05-15 00:57:47','2026-05-15 01:27:47','STOPPED','2026-05-15 00:57:47','2026-05-15 00:58:02'),('019e2aa4-4006-7054-a8fe-d8fd23a793a4','019e2aa4-3ff4-73cd-931c-576d0ceb0b6c','019e1c65-2096-70f3-89c7-c4a1ffc6cc51','019e1c65-20a2-7126-a7fe-c3d31abd3640',45,25000.00,'2026-05-15 00:57:47','2026-05-15 01:42:47','STOPPED','2026-05-15 00:57:47','2026-05-15 00:58:02');
+/*!40000 ALTER TABLE `self_service_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `service_packages`
+--
+
+DROP TABLE IF EXISTS `service_packages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `service_packages` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `outlet_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama_paket` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deskripsi` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `harga_per_kg` decimal(12,2) NOT NULL,
+  `berat_minimal` decimal(8,2) NOT NULL DEFAULT '1.00',
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `service_packages_outlet_id_foreign` (`outlet_id`),
+  CONSTRAINT `service_packages_outlet_id_foreign` FOREIGN KEY (`outlet_id`) REFERENCES `outlets` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `service_packages`
+--
+
+LOCK TABLES `service_packages` WRITE;
+/*!40000 ALTER TABLE `service_packages` DISABLE KEYS */;
+INSERT INTO `service_packages` VALUES ('019e1f7f-068c-7303-9dd3-b9871735b557','019e1b63-6158-70be-a805-574a3f23a1c7','Cuci Komplit','Cuci + Setrika + Kering',8000.00,3.00,1,'2026-05-12 21:01:18','2026-05-12 21:01:18'),('019e1f7f-5872-7001-a02e-4a5084ea8596','019e1b63-6158-70be-a805-574a3f23a1c7','Cuci Kering','Cuci Kering saja',3000.00,1.00,1,'2026-05-12 21:01:39','2026-05-12 21:01:39');
+/*!40000 ALTER TABLE `service_packages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('UIQMzHot6rrXkIeDZKNY2cO6OC2EZK6mikGoQO7N',NULL,'127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiaHN3VEhzR0k1RldvVm8yMTJka0NOVGkyQzRSOGp2dnhzQVllYlNBSiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7czo0OiJob21lIjt9fQ==',1778832168),('wnWLMKB8pLd6fOIIe29mBu8G51msnOqux7Hgeek7',NULL,'127.0.0.1','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiM3NIcVRoQ09wQUlxZndIaXMzc3dsWXVqSmd5ZkJyMTRCeUllenRZciI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly83MDhhLTE4MC0yNTItMTY0LTU4Lm5ncm9rLWZyZWUuYXBwIjtzOjU6InJvdXRlIjtzOjQ6ImhvbWUiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19',1778829309);
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subscription_plan_permissions`
+--
+
+DROP TABLE IF EXISTS `subscription_plan_permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `subscription_plan_permissions` (
+  `subscription_plan_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `permission_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `plan_permission_unique` (`subscription_plan_id`,`permission_id`),
+  KEY `subscription_plan_permissions_permission_id_foreign` (`permission_id`),
+  CONSTRAINT `subscription_plan_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `subscription_plan_permissions_subscription_plan_id_foreign` FOREIGN KEY (`subscription_plan_id`) REFERENCES `subscription_plans` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subscription_plan_permissions`
+--
+
+LOCK TABLES `subscription_plan_permissions` WRITE;
+/*!40000 ALTER TABLE `subscription_plan_permissions` DISABLE KEYS */;
+INSERT INTO `subscription_plan_permissions` VALUES ('019e1b62-d0a4-7306-b943-393fa9fb6955',1,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',2,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',3,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',4,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',5,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',7,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',8,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',9,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',11,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',15,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',19,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',23,'2026-05-14 06:46:28','2026-05-14 06:46:28'),('019e1b62-d0a4-7306-b943-393fa9fb6955',24,'2026-05-14 06:46:28','2026-05-14 06:46:28'),('019e1b62-d0a4-7306-b943-393fa9fb6955',25,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',26,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',35,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',39,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',41,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d0a4-7306-b943-393fa9fb6955',43,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',1,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',2,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',3,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',4,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',5,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',7,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',8,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',9,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',23,'2026-05-14 06:46:28','2026-05-14 06:46:28'),('019e1b62-d112-73a5-9e79-500256f6cfdf',24,'2026-05-14 06:46:28','2026-05-14 06:46:28'),('019e1b62-d112-73a5-9e79-500256f6cfdf',25,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',26,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',27,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',28,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',35,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',36,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',37,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',39,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',41,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf',43,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',1,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',2,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',3,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',4,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',5,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',6,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',7,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',8,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',9,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',10,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',11,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',12,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',13,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',15,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',16,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',17,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',19,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',20,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',21,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',23,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',24,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',25,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',26,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',27,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',28,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',35,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',36,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',37,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',38,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',39,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',40,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',41,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',43,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c',47,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',1,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',2,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',3,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',4,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',5,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',6,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',7,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',8,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',9,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',10,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',11,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',12,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',13,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',14,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',15,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',16,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',17,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',18,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',19,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',20,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',21,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',22,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',23,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',24,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',25,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',26,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',27,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',28,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',29,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',30,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',31,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',32,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',33,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',34,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',35,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',36,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',37,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',38,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',39,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',40,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',41,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',42,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',43,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',44,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',45,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',46,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',47,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94',48,'2026-05-12 01:52:01','2026-05-12 01:52:01');
+/*!40000 ALTER TABLE `subscription_plan_permissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subscription_plans`
+--
+
+DROP TABLE IF EXISTS `subscription_plans`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `subscription_plans` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `max_outlets` int unsigned DEFAULT NULL,
+  `max_staff` int unsigned DEFAULT NULL,
+  `is_custom_permission` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `price_monthly` bigint unsigned NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `subscription_plans_slug_unique` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subscription_plans`
+--
+
+LOCK TABLES `subscription_plans` WRITE;
+/*!40000 ALTER TABLE `subscription_plans` DISABLE KEYS */;
+INSERT INTO `subscription_plans` VALUES ('019e1b62-d0a4-7306-b943-393fa9fb6955','Trial','trial',1,3,0,1,'Trial',0,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d112-73a5-9e79-500256f6cfdf','Basic Plan','basic',1,3,0,1,'Basic Plan',30000,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d126-7139-acfc-44bc0c62268c','Pro Plan','pro',3,10,0,1,'Pro Plan',55000,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d146-73cb-9151-5d58688d3d94','Enterprise Plan','enterprise',NULL,NULL,1,1,'Enterprise Plan',80000,'2026-05-12 01:52:01','2026-05-12 01:52:01');
+/*!40000 ALTER TABLE `subscription_plans` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tenant_subscriptions`
+--
+
+DROP TABLE IF EXISTS `tenant_subscriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tenant_subscriptions` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tenant_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subscription_plan_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'trial',
+  `starts_at` timestamp NULL DEFAULT NULL,
+  `ends_at` timestamp NULL DEFAULT NULL,
+  `trial_ends_at` timestamp NULL DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `is_trial` tinyint(1) NOT NULL DEFAULT '0',
+  `grace_dashboard_only` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tenant_subscriptions_tenant_id_foreign` (`tenant_id`),
+  KEY `tenant_subscriptions_subscription_plan_id_foreign` (`subscription_plan_id`),
+  CONSTRAINT `tenant_subscriptions_subscription_plan_id_foreign` FOREIGN KEY (`subscription_plan_id`) REFERENCES `subscription_plans` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tenant_subscriptions_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tenant_subscriptions`
+--
+
+LOCK TABLES `tenant_subscriptions` WRITE;
+/*!40000 ALTER TABLE `tenant_subscriptions` DISABLE KEYS */;
+INSERT INTO `tenant_subscriptions` VALUES ('019e1b62-d49a-73d1-bc03-83f2cacb4020','019e1b62-d167-72f2-9078-e71148310c75','019e1b62-d0a4-7306-b943-393fa9fb6955','active','2026-03-12 01:52:02',NULL,'2026-06-01 01:52:38',NULL,1,1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b63-6269-70a4-a4f4-535dc7806c18','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b62-d0a4-7306-b943-393fa9fb6955','expired','2026-03-12 01:52:38',NULL,'2026-06-01 01:52:38','2026-05-14 07:12:36',1,0,'2026-05-12 01:52:38','2026-05-14 07:12:36'),('019e26d5-0bac-70fa-b6a4-88b8cc14c660','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b62-d126-7139-acfc-44bc0c62268c','active','2026-05-14 07:12:36','2026-06-13 07:12:36',NULL,NULL,0,0,'2026-05-14 07:12:36','2026-05-14 07:12:36'),('019e26e3-93c5-7138-a8fb-725bba3dfc23','019e26e3-92a8-7352-9197-1fcdea8af025','019e1b62-d0a4-7306-b943-393fa9fb6955','trial','2026-05-14 07:28:29',NULL,'2026-05-28 07:28:29',NULL,1,1,'2026-05-14 07:28:29','2026-05-14 07:28:29');
+/*!40000 ALTER TABLE `tenant_subscriptions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tenants`
+--
+
+DROP TABLE IF EXISTS `tenants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tenants` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `owner_user_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tenants_slug_unique` (`slug`),
+  KEY `tenants_owner_user_id_foreign` (`owner_user_id`),
+  CONSTRAINT `tenants_owner_user_id_foreign` FOREIGN KEY (`owner_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tenants`
+--
+
+LOCK TABLES `tenants` WRITE;
+/*!40000 ALTER TABLE `tenants` DISABLE KEYS */;
+INSERT INTO `tenants` VALUES ('019e1b62-d167-72f2-9078-e71148310c75','Laundry Express Utama','laundry-express-utama','active','019e1b62-d28b-7379-81c3-50e17be06d90','2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b63-614d-7383-b164-7fefc7aa53ef','Rashad Dean','rashad-dean','active','019e1b63-6257-72e3-946a-d7eafa08fd58','2026-05-12 01:52:38','2026-05-12 01:52:38'),('019e26e3-92a8-7352-9197-1fcdea8af025','PUTRI','putri','active','019e26e3-93ae-7357-a82c-c37c2dea20f1','2026-05-14 07:28:28','2026-05-14 07:28:29'),('c067e351-9934-4167-a78f-d2b6d6ac9fa5','Default Laundry Tenant','default-laundry-tenant','active',NULL,'2026-05-12 01:52:00','2026-05-12 01:52:00');
+/*!40000 ALTER TABLE `tenants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_addons`
+--
+
+DROP TABLE IF EXISTS `transaction_addons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transaction_addons` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `transaction_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `addon_option_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `price` decimal(15,2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `transaction_addons_transaction_id_foreign` (`transaction_id`),
+  KEY `transaction_addons_addon_option_id_foreign` (`addon_option_id`),
+  CONSTRAINT `transaction_addons_addon_option_id_foreign` FOREIGN KEY (`addon_option_id`) REFERENCES `addon_options` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `transaction_addons_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_addons`
+--
+
+LOCK TABLES `transaction_addons` WRITE;
+/*!40000 ALTER TABLE `transaction_addons` DISABLE KEYS */;
+INSERT INTO `transaction_addons` VALUES ('0b4517c3-0e16-4805-b632-956d25809f57','019e2a63-ecaa-7225-b567-2f359c1442d4','019e1f7f-a748-700f-973c-df375db13b0f',3000.00,'2026-05-14 23:47:32','2026-05-14 23:47:32'),('351148f7-dc27-4311-932f-a0499bfb5db0','019e1f80-bff3-73e6-8b85-e49b4fff9678','019e1f80-0bc4-710c-9692-701392d5c852',5000.00,'2026-05-12 21:03:12','2026-05-12 21:03:12'),('3817919c-58ec-4452-8338-08bd6453d189','019e26ac-8f75-72dd-96e9-d36db82199fb','019e1f80-0bc4-710c-9692-701392d5c852',5000.00,'2026-05-14 06:28:23','2026-05-14 06:28:23'),('4b184a46-7ef0-4967-a5dd-146250ed72e9','019e2aa4-3ff4-73cd-931c-576d0ceb0b6c','019e1f7f-a748-700f-973c-df375db13b0f',3000.00,'2026-05-15 00:57:47','2026-05-15 00:57:47'),('a7b1be20-4217-4a28-8f80-ab07668274b6','019e1f80-bff3-73e6-8b85-e49b4fff9678','019e1f7f-a748-700f-973c-df375db13b0f',3000.00,'2026-05-12 21:03:12','2026-05-12 21:03:12'),('e76a70e4-299d-4e75-a4c8-bee63da1c29a','019e26a1-0837-7001-b413-90b6c04fb581','019e1f7f-a748-700f-973c-df375db13b0f',3000.00,'2026-05-14 06:15:48','2026-05-14 06:15:48');
+/*!40000 ALTER TABLE `transaction_addons` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_items`
+--
+
+DROP TABLE IF EXISTS `transaction_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transaction_items` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `transaction_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama_item` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `qty` int NOT NULL DEFAULT '1',
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `transaction_items_transaction_id_foreign` (`transaction_id`),
+  CONSTRAINT `transaction_items_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_items`
+--
+
+LOCK TABLES `transaction_items` WRITE;
+/*!40000 ALTER TABLE `transaction_items` DISABLE KEYS */;
+INSERT INTO `transaction_items` VALUES ('019e1f80-c016-702b-b3d6-e6b348e6a5f6','019e1f80-bff3-73e6-8b85-e49b4fff9678','Kemeja ',1,'','2026-05-12 21:03:12','2026-05-12 21:03:12'),('019e1f87-cb87-7073-8627-c21bc0da3071','019e1f87-cb71-725d-8447-4b0e988f3690','Kemeja',1,'','2026-05-12 21:10:53','2026-05-12 21:10:53'),('019e2007-799a-7048-b960-2533c235c12c','019e2007-796c-714b-b13e-5bf959d6ebc9','Kemeja',1,'','2026-05-12 23:30:21','2026-05-12 23:30:21'),('019e200c-0de4-70aa-928b-72a1d8a042cd','019e200c-0dc9-70fd-82ae-bbc6c0d20791','Kemeja',1,'','2026-05-12 23:35:21','2026-05-12 23:35:21'),('019e26a1-0844-7280-ac64-bb2be10a35bb','019e26a1-0837-7001-b413-90b6c04fb581','Kemeja',1,'','2026-05-14 06:15:48','2026-05-14 06:15:48'),('019e26ac-8f84-734d-9c3f-08cc3aabecea','019e26ac-8f75-72dd-96e9-d36db82199fb','Kemja',1,'','2026-05-14 06:28:23','2026-05-14 06:28:23');
+/*!40000 ALTER TABLE `transaction_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_services`
+--
+
+DROP TABLE IF EXISTS `transaction_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transaction_services` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `transaction_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `service_package_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `weight` decimal(8,2) NOT NULL,
+  `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price` decimal(15,2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `transaction_services_transaction_id_foreign` (`transaction_id`),
+  KEY `transaction_services_service_package_id_foreign` (`service_package_id`),
+  CONSTRAINT `transaction_services_service_package_id_foreign` FOREIGN KEY (`service_package_id`) REFERENCES `service_packages` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `transaction_services_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_services`
+--
+
+LOCK TABLES `transaction_services` WRITE;
+/*!40000 ALTER TABLE `transaction_services` DISABLE KEYS */;
+INSERT INTO `transaction_services` VALUES ('239cae81-2f63-4ba9-8143-593ba75a6bcc','019e200c-0dc9-70fd-82ae-bbc6c0d20791','019e1f7f-068c-7303-9dd3-b9871735b557',20.00,'',8000.00,'2026-05-12 23:35:21','2026-05-12 23:35:21'),('35f1b135-3066-43dd-aa6f-c4239fa29557','019e2007-796c-714b-b13e-5bf959d6ebc9','019e1f7f-068c-7303-9dd3-b9871735b557',1.00,'10',8000.00,'2026-05-12 23:30:21','2026-05-12 23:30:21'),('a0548931-064a-4752-a50a-ef4fb30f96fa','019e26a1-0837-7001-b413-90b6c04fb581','019e1f7f-068c-7303-9dd3-b9871735b557',8.00,'',8000.00,'2026-05-14 06:15:48','2026-05-14 06:15:48'),('b44ba721-d7a2-49e5-86b8-57f60e4e7408','019e1f80-bff3-73e6-8b85-e49b4fff9678','019e1f7f-068c-7303-9dd3-b9871735b557',1.00,'Noda',8000.00,'2026-05-12 21:03:12','2026-05-12 21:03:12'),('bd50b39b-f8d3-4d02-8d88-ad7daa72f35a','019e1f87-cb71-725d-8447-4b0e988f3690','019e1f7f-068c-7303-9dd3-b9871735b557',10.00,'',8000.00,'2026-05-12 21:10:53','2026-05-12 21:10:53'),('e627e2a8-2f07-4ffa-bc91-047817c1866c','019e26ac-8f75-72dd-96e9-d36db82199fb','019e1f7f-5872-7001-a02e-4a5084ea8596',30.00,'',3000.00,'2026-05-14 06:28:23','2026-05-14 06:28:23');
+/*!40000 ALTER TABLE `transaction_services` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transactions`
+--
+
+DROP TABLE IF EXISTS `transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transactions` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `outlet_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cashier_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `member_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `transaction_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `transaction_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SELF_SERVICE',
+  `service_type` enum('WASH_ONLY','DRY_ONLY','WASH_DRY','IRONING','COMPLETE') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'COMPLETE',
+  `weight` decimal(8,2) DEFAULT NULL,
+  `estimated_finish` timestamp NULL DEFAULT NULL,
+  `status` enum('PENDING','IN_PROGRESS','READY','COMPLETED','CANCELLED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `subtotal` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `member_discount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `discount_percent` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `discount_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `tax_percent` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `tax_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `total_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `payment_method` enum('CASH','TRANSFER','E_WALLET','QRIS') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CASH',
+  `payment_status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'unpaid',
+  `trx_reference` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `qris_qr_image` text COLLATE utf8mb4_unicode_ci,
+  `qris_tutorial_pembayaran` text COLLATE utf8mb4_unicode_ci,
+  `ref_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `payment_fee` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `payment_expires_at` timestamp NULL DEFAULT NULL,
+  `paid_at` timestamp NULL DEFAULT NULL,
+  `amount_received` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `change_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `transactions_transaction_number_unique` (`transaction_number`),
+  UNIQUE KEY `transactions_ref_id_unique` (`ref_id`),
+  KEY `transactions_outlet_id_foreign` (`outlet_id`),
+  KEY `transactions_cashier_id_foreign` (`cashier_id`),
+  KEY `transactions_member_id_foreign` (`member_id`),
+  CONSTRAINT `transactions_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `transactions_member_id_foreign` FOREIGN KEY (`member_id`) REFERENCES `members` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `transactions_outlet_id_foreign` FOREIGN KEY (`outlet_id`) REFERENCES `outlets` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transactions`
+--
+
+LOCK TABLES `transactions` WRITE;
+/*!40000 ALTER TABLE `transactions` DISABLE KEYS */;
+INSERT INTO `transactions` VALUES ('019e1b62-d52e-730e-9571-458d582f6ffa','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-GQ230','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',99.72,9.97,0.00,0.00,0.00,0.00,89.75,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,0.25,'Et tempore est maiores id voluptas.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d52f-7007-b58c-06ca57b6fc24','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-LB238','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',64.71,0.00,0.00,0.00,0.00,0.00,64.71,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,5.29,'Quod dolorem nemo nam incidunt aut.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d52f-7007-b58c-06ca57e4e710','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YJ755','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',135.42,13.54,0.00,0.00,0.00,0.00,121.88,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,8.12,'Voluptatum at hic eaque excepturi reprehenderit facilis.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d530-730e-b762-f60acdfd4009','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-HD979','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',88.39,0.00,0.00,0.00,0.00,0.00,88.39,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,1.61,'Ut rem officia nihil aut excepturi numquam aliquid.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d530-730e-b762-f60acdfff4ed','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-KJ448','SELF_SERVICE','IRONING',NULL,NULL,'COMPLETED',173.18,0.00,0.00,0.00,0.00,0.00,173.18,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,180.00,6.82,'Corrupti velit asperiores blanditiis.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d531-734f-b32d-e67de559231c','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-EB423','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',134.29,0.00,0.00,0.00,0.00,0.00,134.29,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,5.71,'Eum consequatur blanditiis commodi in.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d531-734f-b32d-e67de5ee4b91','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-SJ348','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',95.08,9.51,0.00,0.00,0.00,0.00,85.57,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,4.43,'Fuga atque voluptatem est rerum eum eius.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d531-734f-b32d-e67de688b823','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-EL510','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',134.31,13.43,0.00,0.00,0.00,0.00,120.88,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,9.12,'Voluptas ut provident molestiae eum est quia.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d532-7089-921d-5539be33e8c8','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-MR775','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',65.70,0.00,0.00,0.00,0.00,0.00,65.70,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,4.30,'Dolores illum molestias doloribus dolores rerum omnis eveniet assumenda.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d532-7089-921d-5539bebcba1a','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-VO613','SELF_SERVICE','IRONING',NULL,NULL,'COMPLETED',156.61,15.66,0.00,0.00,0.00,0.00,140.95,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,150.00,9.05,'Id commodi ut harum nesciunt.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d532-7089-921d-5539bf2b57bd','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-FX037','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',101.67,10.17,0.00,0.00,0.00,0.00,91.50,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,8.50,'Ullam libero rerum voluptate libero aut.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d533-7006-a139-81e460e67219','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YS042','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',123.04,0.00,0.00,0.00,0.00,0.00,123.04,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,6.96,'Est sed exercitationem itaque reiciendis quis quos velit.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d533-7006-a139-81e461849edc','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-LB001','SELF_SERVICE','IRONING',NULL,NULL,'COMPLETED',151.44,15.14,0.00,0.00,0.00,0.00,136.30,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,3.70,'Autem aut explicabo ducimus dolores sapiente aliquam.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d533-7006-a139-81e462142af5','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-BJ084','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',62.90,0.00,0.00,0.00,0.00,0.00,62.90,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,7.10,'Aliquid officiis quis adipisci amet accusantium minus.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d534-739d-8d4c-53d911765344','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YF781','SELF_SERVICE','WASH_ONLY',NULL,NULL,'COMPLETED',64.20,0.00,0.00,0.00,0.00,0.00,64.20,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,5.80,'Necessitatibus ut enim sequi odit qui voluptatem.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d534-739d-8d4c-53d911e85255','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-DN242','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',156.59,0.00,0.00,0.00,0.00,0.00,156.59,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,3.41,'Alias fuga modi ea eos doloremque ut itaque.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d534-739d-8d4c-53d912002d18','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-MM925','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',187.48,18.75,0.00,0.00,0.00,0.00,168.73,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,1.27,'Dolore omnis itaque voluptas quam sit velit repellat magnam.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d535-70fe-8996-97b09b5596dd','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-IU006','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',37.47,0.00,0.00,0.00,0.00,0.00,37.47,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,2.53,'Sed ratione sint culpa quae.','2026-05-01 05:28:29','2026-05-12 01:52:02'),('019e1b62-d535-70fe-8996-97b09bbe8e74','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YS634','SELF_SERVICE','WASH_ONLY',NULL,NULL,'COMPLETED',131.28,0.00,0.00,0.00,0.00,0.00,131.28,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,8.72,'Atque dicta in aliquam.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d535-70fe-8996-97b09bef8a49','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-RO312','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',112.00,11.20,0.00,0.00,0.00,0.00,100.80,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,9.20,'Sequi sed dolore fugiat et in quia.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d536-7012-9a73-ffb5c3b8e655','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-VS384','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',90.52,9.05,0.00,0.00,0.00,0.00,81.47,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,8.53,'Ut aliquam ea corrupti dolorem.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d536-7012-9a73-ffb5c41ee125','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-HN008','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',61.57,0.00,0.00,0.00,0.00,0.00,61.57,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,8.43,'Vel neque vel minima qui et.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d536-7012-9a73-ffb5c499adbd','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-MS993','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',182.11,0.00,0.00,0.00,0.00,0.00,182.11,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,190.00,7.89,'Qui et mollitia fugit ut.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d537-7377-99d9-f4ac80e5fa95','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-FC876','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',178.79,17.88,0.00,0.00,0.00,0.00,160.91,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,9.09,'Voluptatibus deleniti distinctio accusamus quae hic sint consequuntur.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d537-7377-99d9-f4ac81b28128','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-WZ564','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',36.26,3.63,0.00,0.00,0.00,0.00,32.63,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,7.37,'Provident labore ipsam eligendi non.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d537-7377-99d9-f4ac82442982','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-WA403','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',169.90,0.00,0.00,0.00,0.00,0.00,169.90,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,0.10,'Ratione velit aut nobis consectetur rem mollitia alias.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d538-7041-a157-59036af94acc','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-QO947','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',91.10,0.00,0.00,0.00,0.00,0.00,91.10,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,8.90,'Ut et amet rerum ut.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d538-7041-a157-59036bb4ac70','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-CJ842','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',78.65,0.00,0.00,0.00,0.00,0.00,78.65,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,1.35,'Soluta sed distinctio modi eligendi est voluptatem.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d539-7213-a6bd-487e97628eed','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-GA767','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',91.64,9.16,0.00,0.00,0.00,0.00,82.48,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,7.52,'Porro consectetur quia atque iusto ab soluta fugiat earum.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d539-7213-a6bd-487e984092b1','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-NI888','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',25.35,0.00,0.00,0.00,0.00,0.00,25.35,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,4.65,'Occaecati animi rerum porro odit debitis.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d539-7213-a6bd-487e98eef551','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-QX704','SELF_SERVICE','WASH_ONLY',NULL,NULL,'COMPLETED',40.26,0.00,0.00,0.00,0.00,0.00,40.26,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,9.74,'Quam commodi odit ut et.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53a-72e1-b204-4757806b49d0','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-IO417','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',105.58,0.00,0.00,0.00,0.00,0.00,105.58,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,4.42,'Ea iusto magnam natus fuga vero.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53a-72e1-b204-475780b4b93a','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-KM998','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',80.02,0.00,0.00,0.00,0.00,0.00,80.02,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,9.98,'Voluptatem molestiae aut aut culpa voluptas dolor dicta necessitatibus.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53b-72ed-87c9-79afc2f0b66e','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-LO408','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',21.97,2.20,0.00,0.00,0.00,0.00,19.77,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,20.00,0.23,'Eaque quidem voluptatibus dolore pariatur autem omnis qui quibusdam.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53b-72ed-87c9-79afc31dbe03','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-UP063','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',59.53,5.95,0.00,0.00,0.00,0.00,53.58,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,6.42,'Quod non exercitationem eum incidunt.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53c-70ba-8438-76cd3bc4d5e6','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-BN699','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',95.79,9.58,0.00,0.00,0.00,0.00,86.21,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,3.79,'Nam consequatur sed adipisci sit sed ut minus.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53c-70ba-8438-76cd3c2e9327','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-NX141','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',35.67,3.57,0.00,0.00,0.00,0.00,32.10,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,7.90,'Voluptates minus incidunt adipisci nulla.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53d-7264-80a3-77ce8197e0d2','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-TL810','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',33.35,3.34,0.00,0.00,0.00,0.00,30.02,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,9.99,'Quo id maxime harum at.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53d-7264-80a3-77ce823ad4a6','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-UX233','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',98.15,9.82,0.00,0.00,0.00,0.00,88.34,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,1.67,'Incidunt repudiandae ut et magnam et.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53d-7264-80a3-77ce82d5399d','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YZ309','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',22.37,0.00,0.00,0.00,0.00,0.00,22.37,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,7.63,'Quos dolorem et in.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53e-73e3-af37-648d2e4ae127','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-LF034','SELF_SERVICE','IRONING',NULL,NULL,'PENDING',27.52,2.75,0.00,0.00,0.00,0.00,24.77,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,5.23,'In corporis voluptates accusantium ut nobis molestias hic.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53e-73e3-af37-648d2e5fada1','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-FY612','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',136.41,0.00,0.00,0.00,0.00,0.00,136.41,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,3.59,'Rerum voluptatum et occaecati harum exercitationem nulla vitae.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53e-73e3-af37-648d2ed39894','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-WL799','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',47.93,4.79,0.00,0.00,0.00,0.00,43.14,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,6.86,'Totam et unde praesentium reiciendis unde sunt culpa eos.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53f-7053-a249-b8deec3ce87e','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-UC048','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',170.55,0.00,0.00,0.00,0.00,0.00,170.55,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,180.00,9.45,'In aut quas sunt ipsa et molestiae hic et.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53f-7053-a249-b8deed1474d9','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-TN683','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',170.10,17.01,0.00,0.00,0.00,0.00,153.09,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,6.91,'Ducimus aliquid laboriosam quas voluptates ut consectetur id.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d53f-7053-a249-b8deed804aea','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-EG819','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',57.65,5.77,0.00,0.00,0.00,0.00,51.89,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,8.12,'Ut officia labore voluptatem.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d540-7220-ae82-e3d68ba86265','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-HR351','SELF_SERVICE','DRY_ONLY',NULL,NULL,'PENDING',116.50,0.00,0.00,0.00,0.00,0.00,116.50,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,3.50,'Amet non explicabo fugit sit ut enim.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d540-7220-ae82-e3d68c6bf254','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-RY776','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',156.38,0.00,0.00,0.00,0.00,0.00,156.38,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,3.62,'Dolorem incidunt voluptas quia itaque voluptates quo.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d540-7220-ae82-e3d68d12edcb','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-PP374','SELF_SERVICE','COMPLETE',NULL,NULL,'PENDING',21.89,0.00,0.00,0.00,0.00,0.00,21.89,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,8.11,'Vitae culpa non sed.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d541-713f-8a7b-08e2a3447cf6','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-RX160','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',170.78,17.08,0.00,0.00,0.00,0.00,153.70,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,6.30,'Deleniti possimus temporibus autem explicabo magnam et.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d542-70ed-94f2-5a737c06dd8f','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-QI745','SELF_SERVICE','DRY_ONLY',NULL,NULL,'PENDING',115.84,11.58,0.00,0.00,0.00,0.00,104.26,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,5.74,'Quos sunt sequi exercitationem ut et.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d542-70ed-94f2-5a737c136f49','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-JC347','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',85.62,8.56,0.00,0.00,0.00,0.00,77.06,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,2.94,'Saepe quisquam voluptate ut fuga.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d542-70ed-94f2-5a737ca745fd','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-OY274','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',101.31,10.13,0.00,0.00,0.00,0.00,91.18,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,8.82,'Quod esse tempore magnam.','2026-05-02 05:28:29','2026-05-12 01:52:02'),('019e1b62-d543-7060-9e6f-b8b9ae5d56cf','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-GO064','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',142.10,14.21,0.00,0.00,0.00,0.00,127.89,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,2.11,'Voluptatem alias beatae voluptatem quo.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d543-7060-9e6f-b8b9af062c08','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-CW017','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',118.80,0.00,0.00,0.00,0.00,0.00,118.80,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,1.20,'Ab fugiat vel delectus aliquid.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d545-73ad-ac85-160747a70743','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-ZI907','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',53.63,5.36,0.00,0.00,0.00,0.00,48.27,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,1.73,'Consequatur ratione commodi sed pariatur et possimus.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d545-73ad-ac85-1607488a68c5','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-XZ614','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',49.80,0.00,0.00,0.00,0.00,0.00,49.80,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,0.20,'Ad ut aperiam fuga veritatis dolorem.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d545-73ad-ac85-16074967cbe1','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-VS201','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',132.01,0.00,0.00,0.00,0.00,0.00,132.01,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,7.99,'Quo dignissimos ullam voluptas optio.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d546-7087-9173-2721f13baa14','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-GO665','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',33.54,3.35,0.00,0.00,0.00,0.00,30.19,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,9.81,'Minus animi ut porro.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d546-7087-9173-2721f1b8152b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-TT438','SELF_SERVICE','WASH_ONLY',NULL,NULL,'IN_PROGRESS',26.68,0.00,0.00,0.00,0.00,0.00,26.68,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,3.32,'Quos officia voluptas libero et.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d546-7087-9173-2721f2691221','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-IM912','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',116.70,11.67,0.00,0.00,0.00,0.00,105.03,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,4.97,'Vero et temporibus excepturi cumque et.','2026-05-03 05:28:29','2026-05-12 01:52:02'),('019e1b62-d547-7266-b2f2-12f9b06811f2','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-FT237','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',49.97,0.00,0.00,0.00,0.00,0.00,49.97,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,0.03,'Sit non deleniti quae ipsa corporis aspernatur eum.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d547-7266-b2f2-12f9b0b4b5bc','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-CS124','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',126.97,0.00,0.00,0.00,0.00,0.00,126.97,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,3.03,'Aliquam ex voluptatem vero assumenda.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d547-7266-b2f2-12f9b1b00d36','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-WX619','SELF_SERVICE','WASH_ONLY',NULL,NULL,'IN_PROGRESS',115.87,0.00,0.00,0.00,0.00,0.00,115.87,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,4.13,'Illum consequatur dolorem et sit.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d548-70fb-9fe0-1fe2eb995f6a','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-LM705','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',83.75,8.38,0.00,0.00,0.00,0.00,75.38,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,4.63,'In consequatur corporis voluptate veniam quam.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d548-70fb-9fe0-1fe2ebf56279','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-IO288','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',94.56,0.00,0.00,0.00,0.00,0.00,94.56,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,5.44,'Iste iure dolor ipsum expedita voluptatum est itaque.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d548-70fb-9fe0-1fe2eca8bfaf','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-KP178','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',138.48,13.85,0.00,0.00,0.00,0.00,124.63,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,5.37,'Pariatur non qui dolorem.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d549-72f5-adcd-4c924de349aa','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-DJ833','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',43.82,0.00,0.00,0.00,0.00,0.00,43.82,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,6.18,'Aliquid amet illo unde.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d549-72f5-adcd-4c924ed76445','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-BZ950','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',57.04,5.70,0.00,0.00,0.00,0.00,51.34,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,8.66,'Ea sed quis sequi in.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54a-71d7-be82-7a686dd55306','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-VL229','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',42.71,0.00,0.00,0.00,0.00,0.00,42.71,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,7.29,'Voluptas laborum assumenda dolorum vel unde.','2026-05-04 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54a-71d7-be82-7a686e91c9e8','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-GW797','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',148.44,14.84,0.00,0.00,0.00,0.00,133.60,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,6.40,'Est voluptate aut fugit aliquid.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54a-71d7-be82-7a686f425cca','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-JT722','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',69.88,6.99,0.00,0.00,0.00,0.00,62.89,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,7.11,'Quo et fugiat quibusdam et.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54b-738f-8673-cc7437962cc7','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-RG866','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',175.96,0.00,0.00,0.00,0.00,0.00,175.96,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,180.00,4.04,'Magnam officiis maiores fuga non enim dicta.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54b-738f-8673-cc7437f4ef32','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-FA647','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',185.64,18.56,0.00,0.00,0.00,0.00,167.08,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,2.92,'Et cum aliquid corrupti qui voluptatem deserunt non.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54b-738f-8673-cc743802ef51','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-LT795','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',134.16,13.42,0.00,0.00,0.00,0.00,120.74,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,9.26,'Sequi aspernatur velit incidunt mollitia.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54c-730a-98c8-c7279ea0d773','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-SS119','SELF_SERVICE','IRONING',NULL,NULL,'PENDING',107.54,0.00,0.00,0.00,0.00,0.00,107.54,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,2.46,'Delectus sit voluptatum impedit explicabo ut blanditiis.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54d-73f4-8ee7-cbea7f288165','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-NL212','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',126.85,12.69,0.00,0.00,0.00,0.00,114.17,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,5.84,'Recusandae voluptas eligendi labore et totam rerum.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54d-73f4-8ee7-cbea7f58ff3c','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-VV892','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',103.42,0.00,0.00,0.00,0.00,0.00,103.42,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,6.58,'Ea est rerum dicta.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54e-7167-a6b3-1583e4a5949b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-SU199','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',150.61,15.06,0.00,0.00,0.00,0.00,135.55,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,4.45,'Qui eaque fugiat voluptatem eum.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54e-7167-a6b3-1583e599bce7','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-CF557','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',158.19,0.00,0.00,0.00,0.00,0.00,158.19,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,1.81,'Voluptate ut nobis quia exercitationem nesciunt.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d54f-7144-9eef-8429d97f9186','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-NU306','SELF_SERVICE','DRY_ONLY',NULL,NULL,'PENDING',125.27,0.00,0.00,0.00,0.00,0.00,125.27,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,4.73,'Voluptatem eaque aut consequatur explicabo rem.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d559-734a-8902-d2b78065c86b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-WO517','SELF_SERVICE','WASH_ONLY',NULL,NULL,'COMPLETED',155.46,0.00,0.00,0.00,0.00,0.00,155.46,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,4.54,'Explicabo dolores ex ut voluptatem nisi expedita non corporis.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d559-734a-8902-d2b780f7a1e0','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YB328','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',26.37,2.64,0.00,0.00,0.00,0.00,23.73,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,6.27,'Dolorem consequuntur et quae cupiditate quae.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d559-734a-8902-d2b781eae773','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-AL107','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',141.77,0.00,0.00,0.00,0.00,0.00,141.77,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,150.00,8.23,'Voluptas quis enim aperiam nostrum rerum nesciunt.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55a-71d3-9845-6ef3d0dacb44','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-AU491','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',171.49,17.15,0.00,0.00,0.00,0.00,154.34,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,5.66,'Perspiciatis dolores ullam quis maiores nisi adipisci eveniet illum.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55a-71d3-9845-6ef3d100b0af','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-RF283','SELF_SERVICE','IRONING',NULL,NULL,'PENDING',185.74,0.00,0.00,0.00,0.00,0.00,185.74,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,190.00,4.26,'Et est adipisci placeat quis corrupti.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55a-71d3-9845-6ef3d1654a4b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-LN789','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',36.11,3.61,0.00,0.00,0.00,0.00,32.50,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,7.50,'Amet quis nostrum dolore non.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55b-71a0-80b7-9ef6b98b44a5','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-AA996','SELF_SERVICE','IRONING',NULL,NULL,'COMPLETED',46.73,0.00,0.00,0.00,0.00,0.00,46.73,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,3.27,'Iure ut ut et.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55b-71a0-80b7-9ef6b9eb89e7','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-DO197','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',74.55,7.46,0.00,0.00,0.00,0.00,67.10,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,2.91,'Aspernatur voluptates optio laborum est perspiciatis sunt.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55b-71a0-80b7-9ef6ba65f422','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-FU835','SELF_SERVICE','WASH_ONLY',NULL,NULL,'IN_PROGRESS',40.41,4.04,0.00,0.00,0.00,0.00,36.37,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,3.63,'Magni et hic esse sit.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55c-721c-81aa-4e1f83fb7455','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-EY688','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',26.48,0.00,0.00,0.00,0.00,0.00,26.48,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,3.52,'Et aliquam ducimus aliquid.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55c-721c-81aa-4e1f84981698','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-VZ939','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',53.95,5.40,0.00,0.00,0.00,0.00,48.56,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,1.45,'Et id esse cupiditate atque ut voluptate sit veniam.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55c-721c-81aa-4e1f84e736c4','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-HY770','SELF_SERVICE','WASH_ONLY',NULL,NULL,'PENDING',114.94,11.49,0.00,0.00,0.00,0.00,103.45,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,6.55,'Necessitatibus sed adipisci vel ea tenetur rerum.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55d-7377-b5d1-1f05dbd3bea4','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-NZ396','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',195.54,19.55,0.00,0.00,0.00,0.00,175.99,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,180.00,4.01,'Illum fugiat animi dolorum expedita libero.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55d-7377-b5d1-1f05dc851457','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-OF728','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',131.49,13.15,0.00,0.00,0.00,0.00,118.34,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,1.66,'Amet commodi pariatur laborum vel eveniet officia.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55d-7377-b5d1-1f05dd71bb90','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-JU402','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',77.55,7.76,0.00,0.00,0.00,0.00,69.80,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,0.21,'Recusandae autem aliquid maxime ad aspernatur voluptas dicta.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55e-7203-9b04-1a488038352c','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-GP192','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',95.74,0.00,0.00,0.00,0.00,0.00,95.74,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,4.26,'Autem labore eos eaque veritatis officia quam.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55e-7203-9b04-1a488114772d','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-RT908','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',48.39,0.00,0.00,0.00,0.00,0.00,48.39,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,1.61,'Corrupti consequuntur accusantium tempora ullam et eum et.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55e-7203-9b04-1a488139562d','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-RK876','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',43.82,0.00,0.00,0.00,0.00,0.00,43.82,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,6.18,'Voluptatem aut numquam libero fugit aut.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55f-701b-8b5f-9976a0501778','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-TX966','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',21.72,2.17,0.00,0.00,0.00,0.00,19.55,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,20.00,0.45,'Praesentium animi quibusdam laudantium dolores voluptatibus qui.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55f-701b-8b5f-9976a0ce7427','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-IW610','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',140.91,0.00,0.00,0.00,0.00,0.00,140.91,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,150.00,9.09,'Accusantium non earum cupiditate modi itaque aliquam laudantium ut.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d55f-701b-8b5f-9976a1428f14','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-GA595','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',120.59,0.00,0.00,0.00,0.00,0.00,120.59,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,9.41,'Occaecati exercitationem quas et ut sunt sunt.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d560-7300-bc83-985abbb77d79','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-FE731','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',199.55,0.00,0.00,0.00,0.00,0.00,199.55,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,200.00,0.45,'Dolorem sunt minus animi in culpa rerum.','2026-05-05 05:28:29','2026-05-12 01:52:02'),('019e1b62-d560-7300-bc83-985abc77bf3e','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-BC441','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',95.68,0.00,0.00,0.00,0.00,0.00,95.68,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,4.32,'Pariatur quam nemo porro atque.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d560-7300-bc83-985abd005b68','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-WY757','SELF_SERVICE','COMPLETE',NULL,NULL,'PENDING',45.09,4.51,0.00,0.00,0.00,0.00,40.58,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,9.42,'Et ut excepturi dolore sint modi voluptatum sit voluptatem.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d561-7229-86f7-ba278ef3480b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-KN570','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',147.14,0.00,0.00,0.00,0.00,0.00,147.14,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,150.00,2.86,'Non officia sed qui qui delectus nulla beatae.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d561-7229-86f7-ba278fe47c52','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-FQ554','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',115.55,11.56,0.00,0.00,0.00,0.00,104.00,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,6.01,'Quia commodi consequatur optio iusto.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d562-73fb-a8e0-dc3b6f1cafee','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-QG434','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',50.11,0.00,0.00,0.00,0.00,0.00,50.11,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,9.89,'Molestiae illo vero molestiae.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d562-73fb-a8e0-dc3b6fc871a7','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-HA069','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',189.15,0.00,0.00,0.00,0.00,0.00,189.15,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,190.00,0.85,'Sit officia animi enim commodi alias deserunt ad.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d562-73fb-a8e0-dc3b7020b298','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-SU931','SELF_SERVICE','COMPLETE',NULL,NULL,'PENDING',187.39,18.74,0.00,0.00,0.00,0.00,168.65,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,1.35,'Necessitatibus veniam accusamus repudiandae.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d563-738f-816b-75d69864da50','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-DT742','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',84.91,0.00,0.00,0.00,0.00,0.00,84.91,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,5.09,'Ut exercitationem beatae blanditiis pariatur placeat hic reiciendis.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d563-738f-816b-75d69916942b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-ON135','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',21.30,2.13,0.00,0.00,0.00,0.00,19.17,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,20.00,0.83,'Architecto aspernatur qui omnis et.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d563-738f-816b-75d699b81326','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-CN362','SELF_SERVICE','DRY_ONLY',NULL,NULL,'PENDING',140.68,14.07,0.00,0.00,0.00,0.00,126.61,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,3.39,'At ducimus nihil expedita optio mollitia.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d564-7183-949c-56814a059f34','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-IL238','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',75.44,7.54,0.00,0.00,0.00,0.00,67.90,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,2.10,'Iure quaerat eos quos dolorum.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d564-7183-949c-56814ad82ee5','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-NN972','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',95.63,0.00,0.00,0.00,0.00,0.00,95.63,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,4.37,'Veritatis quas in assumenda.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d564-7183-949c-56814bbe6939','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-ME736','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',152.40,15.24,0.00,0.00,0.00,0.00,137.16,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,2.84,'Et excepturi eum facilis et.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d565-72f2-9449-059b8db5a9c4','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-JG184','SELF_SERVICE','WASH_ONLY',NULL,NULL,'IN_PROGRESS',148.00,14.80,0.00,0.00,0.00,0.00,133.20,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,6.80,'Rerum totam ut eum aut.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d565-72f2-9449-059b8e928830','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-RN165','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',119.07,0.00,0.00,0.00,0.00,0.00,119.07,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,0.93,'Ut voluptates vero voluptatem voluptatem minima reiciendis.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d565-72f2-9449-059b8f569d36','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-BU928','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',188.32,18.83,0.00,0.00,0.00,0.00,169.49,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,0.51,'Officia natus atque possimus consectetur amet.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d566-71f0-8218-3575f756d665','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-QW966','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',26.94,0.00,0.00,0.00,0.00,0.00,26.94,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,3.06,'Ut ut totam facere fuga assumenda non.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d566-71f0-8218-3575f7b59d11','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-KS621','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',29.51,2.95,0.00,0.00,0.00,0.00,26.56,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,30.00,3.44,'Illo ipsa pariatur voluptas voluptas non excepturi necessitatibus.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d566-71f0-8218-3575f8894465','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-VY904','SELF_SERVICE','DRY_ONLY',NULL,NULL,'PENDING',184.65,18.47,0.00,0.00,0.00,0.00,166.19,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,3.82,'Voluptatem veniam nihil dicta eum voluptate aliquam architecto.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d567-7311-9afb-5c724f833e44','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-VN637','SELF_SERVICE','WASH_ONLY',NULL,NULL,'COMPLETED',53.45,5.35,0.00,0.00,0.00,0.00,48.11,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,1.90,'Ea assumenda quia quos delectus hic.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d567-7311-9afb-5c724f8778af','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-AN707','SELF_SERVICE','IRONING',NULL,NULL,'COMPLETED',69.84,6.98,0.00,0.00,0.00,0.00,62.86,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,7.14,'Soluta est culpa voluptas.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d568-7239-b60e-d2b783fa436e','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-VD534','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',87.27,8.73,0.00,0.00,0.00,0.00,78.54,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,1.46,'Nam quibusdam vero voluptas nesciunt aut velit.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d568-7239-b60e-d2b784ada48b','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-LR120','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',78.91,7.89,0.00,0.00,0.00,0.00,71.02,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,8.98,'Voluptatum dolorem a quo et voluptas sit.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d568-7239-b60e-d2b7854242f7','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-DZ360','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',52.40,0.00,0.00,0.00,0.00,0.00,52.40,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,7.60,'Aut autem quam fuga maxime eum.','2026-05-06 05:28:29','2026-05-12 01:52:02'),('019e1b62-d569-730b-a268-7866332af223','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-TB217','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',107.11,0.00,0.00,0.00,0.00,0.00,107.11,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,2.89,'Ea repellat et aliquam pariatur perferendis reprehenderit.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d569-730b-a268-7866342403d7','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YR875','SELF_SERVICE','COMPLETE',NULL,NULL,'PENDING',149.18,0.00,0.00,0.00,0.00,0.00,149.18,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,150.00,0.82,'Non iste consequatur voluptates occaecati neque.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d569-730b-a268-786634337f37','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-CA740','SELF_SERVICE','WASH_ONLY',NULL,NULL,'IN_PROGRESS',43.30,4.33,0.00,0.00,0.00,0.00,38.97,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,1.03,'Rem pariatur distinctio tempore asperiores sed molestiae aliquid aut.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56a-7037-934c-031366fe4c6d','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-BL305','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',125.98,12.60,0.00,0.00,0.00,0.00,113.38,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,6.62,'Deleniti et vero deserunt enim adipisci.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56a-7037-934c-031367f371e0','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-ZE200','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',111.78,0.00,0.00,0.00,0.00,0.00,111.78,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,8.22,'Qui vero est modi reiciendis pariatur non voluptatum libero.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56a-7037-934c-031368d3dcb9','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-AX905','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',76.85,0.00,0.00,0.00,0.00,0.00,76.85,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,3.15,'Quia consequuntur corrupti eaque voluptatem modi molestiae.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56b-716e-add9-712bdaecd004','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-PY055','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',87.66,8.77,0.00,0.00,0.00,0.00,78.89,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,1.11,'Fuga qui qui qui.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56b-716e-add9-712bdbc80bcb','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-PG616','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',110.73,11.07,0.00,0.00,0.00,0.00,99.66,'TRANSFER','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,100.00,0.34,'Omnis aut ut quos.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56b-716e-add9-712bdcb406f0','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-DX567','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',101.26,0.00,0.00,0.00,0.00,0.00,101.26,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,8.74,'Animi odio enim a adipisci aut quia.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56c-722d-8cf3-fb0e61e5cf9c','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-WW444','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',67.46,0.00,0.00,0.00,0.00,0.00,67.46,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,2.54,'Et quo ut est et sint sint.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56c-722d-8cf3-fb0e624f6127','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-GC217','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',35.61,3.56,0.00,0.00,0.00,0.00,32.05,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,7.95,'Fugiat dolorem ut eligendi quis quis ipsam officiis dignissimos.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56c-722d-8cf3-fb0e630445e9','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-ZC210','SELF_SERVICE','WASH_ONLY',NULL,NULL,'COMPLETED',61.28,6.13,0.00,0.00,0.00,0.00,55.15,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,4.85,'Inventore nemo dicta vel praesentium in soluta.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56d-7333-8524-0f5227fa4711','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-QN339','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',153.17,0.00,0.00,0.00,0.00,0.00,153.17,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,6.83,'Eius est non officia impedit.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56d-7333-8524-0f5228782cda','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-KX688','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',66.52,6.65,0.00,0.00,0.00,0.00,59.87,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,0.13,'Cum eum quisquam consequatur.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56d-7333-8524-0f52289183da','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-GO018','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',72.83,0.00,0.00,0.00,0.00,0.00,72.83,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,7.17,'Tenetur dolorem quo consequuntur ad vitae.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56e-7375-b809-9b4a14b3e857','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-XB431','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',64.57,0.00,0.00,0.00,0.00,0.00,64.57,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,5.43,'Expedita id et reprehenderit.','2026-05-07 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56e-7375-b809-9b4a156f8d23','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-CE779','SELF_SERVICE','DRY_ONLY',NULL,NULL,'COMPLETED',122.54,0.00,0.00,0.00,0.00,0.00,122.54,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,7.46,'Nostrum nisi molestiae earum aut.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56e-7375-b809-9b4a160ed54e','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-XO654','SELF_SERVICE','WASH_ONLY',NULL,NULL,'IN_PROGRESS',139.87,13.99,0.00,0.00,0.00,0.00,125.88,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,4.12,'Voluptatem laboriosam voluptatibus minus eius sint nihil maiores.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56f-7335-ae39-c42d7cc580eb','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-EF961','SELF_SERVICE','DRY_ONLY',NULL,NULL,'PENDING',71.70,7.17,0.00,0.00,0.00,0.00,64.53,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,70.00,5.47,'Soluta magnam qui qui et earum qui deserunt ut.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d56f-7335-ae39-c42d7d973ff5','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-UI908','SELF_SERVICE','DRY_ONLY',NULL,NULL,'CANCELLED',86.89,8.69,0.00,0.00,0.00,0.00,78.20,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,80.00,1.80,'Qui ipsum ullam accusamus voluptate quia.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d570-72a2-9b0b-ef609915c10d','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-PO059','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',60.72,6.07,0.00,0.00,0.00,0.00,54.65,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,5.35,'Esse odit aliquid quis nihil.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d570-72a2-9b0b-ef6099f1743a','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-JQ795','SELF_SERVICE','WASH_DRY',NULL,NULL,'COMPLETED',103.53,0.00,0.00,0.00,0.00,0.00,103.53,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,6.47,'Natus ut aspernatur quia laboriosam.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d570-72a2-9b0b-ef609a68df7f','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-LS258','SELF_SERVICE','IRONING',NULL,NULL,'PENDING',51.70,0.00,0.00,0.00,0.00,0.00,51.70,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,8.30,'Id iure consequatur officia ipsum.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d571-72bd-9159-897217d35050','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-RZ634','SELF_SERVICE','WASH_DRY',NULL,NULL,'CANCELLED',177.91,17.79,0.00,0.00,0.00,0.00,160.12,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,9.88,'Sit tempora quis neque aspernatur nemo repudiandae autem.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d571-72bd-9159-897218260347','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-UA029','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',89.87,0.00,0.00,0.00,0.00,0.00,89.87,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,0.13,'Fugiat corporis quia reprehenderit excepturi qui.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d571-72bd-9159-89721867f2b4','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-HK021','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',99.09,9.91,0.00,0.00,0.00,0.00,89.18,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,90.00,0.82,'Quia quisquam ut deserunt consequuntur quibusdam.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d572-727f-8597-d4d95b6fa8f9','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-YD254','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',54.60,5.46,0.00,0.00,0.00,0.00,49.14,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,0.86,'Sapiente autem suscipit voluptas nesciunt.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d572-727f-8597-d4d95b759480','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-FJ513','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',153.36,15.34,0.00,0.00,0.00,0.00,138.02,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,1.98,'Beatae voluptatum tempora quasi doloremque quo atque ea.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1b62-d572-727f-8597-d4d95b8f585f','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-AO679','SELF_SERVICE','DRY_ONLY',NULL,NULL,'IN_PROGRESS',141.50,14.15,0.00,0.00,0.00,0.00,127.35,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,2.65,'Qui aut et adipisci nulla repudiandae sit omnis et.','2026-05-13 05:28:29','2026-05-12 01:52:02'),('019e1f80-bff3-73e6-8b85-e49b4fff9678','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-09EF25','DROP_OFF','COMPLETE',1.00,'2026-05-17 03:00:00','COMPLETED',32000.00,0.00,0.00,0.00,0.00,0.00,90.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRFR1FZF8HSWV2KWCKSH5YBK',0.00,NULL,'2026-05-12 21:03:11',10.00,0.00,'-','2026-05-13 05:28:29','2026-05-12 21:06:18'),('019e1f87-cb71-725d-8447-4b0e988f3690','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-B36A68','DROP_OFF','COMPLETE',10.00,'2026-05-18 03:00:00','IN_PROGRESS',80000.00,0.00,10.00,8000.00,11.00,80.00,90.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRFRFJV774DBKS7Z6BX5X0HK',0.00,NULL,'2026-05-12 21:10:53',90.00,80.00,NULL,'2026-05-13 05:28:29','2026-05-12 21:10:53'),('019e1fc1-1c16-728e-8cad-d075dfa471cd','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1f8c-5c06-71fe-9976-b122a621b9f8','TRX-KF158','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',104.22,0.00,0.00,0.00,0.00,0.00,104.22,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,110.00,5.78,'Magnam aliquid facilis officiis itaque recusandae.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c24-714e-9c70-6fd22c98b50b','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1f8c-5c06-71fe-9976-b122a621b9f8','TRX-AA722','SELF_SERVICE','WASH_DRY',NULL,NULL,'PENDING',48.23,0.00,0.00,0.00,0.00,0.00,48.23,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,1.77,'Non est eos veniam aliquid repellat.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c27-706f-a898-def5f9a72b83','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1c63-c2ed-7092-8789-21dedca1e0d0','TRX-YW364','SELF_SERVICE','IRONING',NULL,NULL,'IN_PROGRESS',156.41,0.00,0.00,0.00,0.00,0.00,156.41,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,160.00,3.59,'Adipisci sed est minima illo.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c29-7284-842c-a7f5f7fbf5f9','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1f8c-5c06-71fe-9976-b122a621b9f8','TRX-OY555','SELF_SERVICE','WASH_ONLY',NULL,NULL,'CANCELLED',183.12,18.31,0.00,0.00,0.00,0.00,164.81,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,170.00,5.19,'Qui odio tempora ipsam quia dolor.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c2c-7024-b4fb-1c876195a013','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1f8c-5c06-71fe-9976-b122a621b9f8','TRX-YO386','SELF_SERVICE','COMPLETE',NULL,NULL,'PENDING',36.11,0.00,0.00,0.00,0.00,0.00,36.11,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,40.00,3.89,'Molestiae vero labore iusto quos sed.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c30-724b-b174-e283d796a526','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1c63-c2ed-7092-8789-21dedca1e0d0','TRX-AX624','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',130.94,0.00,0.00,0.00,0.00,0.00,130.94,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,140.00,9.06,'Voluptas quisquam ratione saepe voluptatibus.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c31-7302-8dd9-610bf31c98fc','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-HE292','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',54.82,0.00,0.00,0.00,0.00,0.00,54.82,'QRIS','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,60.00,5.18,'Blanditiis voluptatem vero optio et accusamus accusamus.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c33-71b9-84a9-752f770ff37e','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49f-7338-bb64-011bfa6fd0ea','TRX-GV077','SELF_SERVICE','IRONING',NULL,NULL,'CANCELLED',42.00,0.00,0.00,0.00,0.00,0.00,42.00,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,50.00,8.00,'Quo id reiciendis odit.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c35-7359-9a14-7309d2d43e52','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d49c-7083-b07a-114743a94775','TRX-HZ180','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',139.68,13.97,0.00,0.00,0.00,0.00,125.71,'CASH','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,130.00,4.29,'Beatae et rerum dolorem est velit error.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e1fc1-1c37-71b5-aca5-e38e076fd45b','019e1b62-d168-70f8-b4f5-1d68cac254e5','019e1b62-d28b-7379-81c3-50e17be06d90','019e1c63-c2ed-7092-8789-21dedca1e0d0','TRX-CG267','SELF_SERVICE','WASH_DRY',NULL,NULL,'IN_PROGRESS',111.95,0.00,0.00,0.00,0.00,0.00,111.95,'E_WALLET','unpaid',NULL,NULL,NULL,NULL,0.00,NULL,NULL,120.00,8.05,'Qui velit quia voluptas vel corporis odit.','2026-05-13 05:28:29','2026-05-12 22:13:29'),('019e2007-796c-714b-b13e-5bf959d6ebc9','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-A488AF','DROP_OFF','COMPLETE',1.00,'2026-05-14 03:00:00','CANCELLED',24000.00,0.00,0.00,0.00,0.00,0.00,24000.00,'QRIS','failed','WP260513133021835','https://wijayapay.com/qris/1778653821_3826.png','Buka aplikasi yang mendukung pembayaran dengan QRIS\r\nPilih fitur QRIS / Bayar\r\nPindai kode QR yang diberikan oleh Merchant\r\nPastikan tagihan yang ditagihkan sesuai\r\nKlik tombol Konfirmasi\r\nMasukkan PIN untuk menyelesaikan pembayaran\r\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran','WP-01KRG0EYB1988HVPB80335MRAC',269.00,'2026-05-13 07:30:21',NULL,0.00,0.00,'Makanan','2026-05-12 23:30:21','2026-05-14 06:39:32'),('019e200c-0dc9-70fd-82ae-bbc6c0d20791','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-22A472','DROP_OFF','COMPLETE',20.00,'2026-05-14 03:00:00','CANCELLED',160000.00,0.00,0.00,0.00,0.00,0.00,160000.00,'QRIS','failed','WP260513133521906','https://wijayapay.com/qris/1778654121_1552.png','Buka aplikasi yang mendukung pembayaran dengan QRIS\r\nPilih fitur QRIS / Bayar\r\nPindai kode QR yang diberikan oleh Merchant\r\nPastikan tagihan yang ditagihkan sesuai\r\nKlik tombol Konfirmasi\r\nMasukkan PIN untuk menyelesaikan pembayaran\r\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran','WP-01KRG0R3E2TJ8YJG3SFKHGW4BJ',1228.00,'2026-05-13 07:35:21',NULL,0.00,0.00,NULL,'2026-05-12 23:35:21','2026-05-14 06:39:30'),('019e26a1-0837-7001-b413-90b6c04fb581','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58','019e1f8c-5c06-71fe-9976-b122a621b9f8','TRX-80EC7E','DROP_OFF','COMPLETE',8.00,'2026-05-18 03:00:00','READY',67000.00,0.00,0.00,0.00,0.00,0.00,67000.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRKA2219S9YK2NFK1098P3KW',0.00,NULL,'2026-05-14 06:15:48',100000.00,33000.00,'00','2026-05-14 06:15:48','2026-05-15 00:53:10'),('019e26ac-8f75-72dd-96e9-d36db82199fb','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-77B9A0','DROP_OFF','COMPLETE',30.00,'2026-05-17 03:00:00','COMPLETED',95000.00,0.00,10.00,9500.00,10.00,8550.00,94050.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRKAS3V6PYXC13R9NPPR7K4G',0.00,NULL,'2026-05-14 06:28:23',100000.00,5950.00,'CAS','2026-05-14 06:28:23','2026-05-14 07:32:34'),('019e26ad-4291-73f3-811c-7205fb4e0152','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-F5AFBF','SELF_SERVICE','COMPLETE',NULL,NULL,'IN_PROGRESS',50000.00,0.00,5.00,2500.00,10.00,4750.00,52250.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRKATGMEAXJDEMJ08QGAKRSY',0.00,NULL,'2026-05-14 06:29:09',80000.00,27750.00,NULL,'2026-05-14 06:29:09','2026-05-14 06:29:09'),('019e26ae-6470-71f8-9077-f7a382a93af4','019e1b63-6158-70be-a805-574a3f23a1c7','019e1b63-6257-72e3-946a-d7eafa08fd58',NULL,'TRX-C67A8B','SELF_SERVICE','COMPLETE',NULL,NULL,'CANCELLED',50000.00,0.00,0.00,0.00,0.00,0.00,50000.00,'QRIS','failed','WP260514203024347','https://wijayapay.com/qris/1778765424_5310.png','Buka aplikasi yang mendukung pembayaran dengan QRIS\r\nPilih fitur QRIS / Bayar\r\nPindai kode QR yang diberikan oleh Merchant\r\nPastikan tagihan yang ditagihkan sesuai\r\nKlik tombol Konfirmasi\r\nMasukkan PIN untuk menyelesaikan pembayaran\r\nSetelah pembayaran berhasil, kamu akan dialihkan ke Halaman Hasil Pembayaran','WP-01KRKAWS3EW62T4C1KCPJQVSCK',453.00,'2026-05-14 14:30:24',NULL,0.00,0.00,NULL,'2026-05-14 06:30:23','2026-05-14 06:39:19'),('019e2a63-ecaa-7225-b567-2f359c1442d4','019e26d6-49a1-711c-b591-17b867893fac','019e1b63-6257-72e3-946a-d7eafa08fd58','019e26d7-56e9-736c-97a7-90f3e971d3f0','TRX-A83E2C','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',53000.00,0.00,10.00,5300.00,0.00,0.00,47700.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRN67V5680K7C2XC9APTRJK2',0.00,NULL,'2026-05-14 23:47:32',100000.00,52300.00,NULL,'2026-05-14 23:47:32','2026-05-14 23:48:10'),('019e2aa4-3ff4-73cd-931c-576d0ceb0b6c','019e26d6-49a1-711c-b591-17b867893fac','019e1b63-6257-72e3-946a-d7eafa08fd58','019e1f8c-5c06-71fe-9976-b122a621b9f8','TRX-249F1C','SELF_SERVICE','COMPLETE',NULL,NULL,'COMPLETED',53000.00,0.00,0.00,0.00,0.00,0.00,53000.00,'CASH','paid',NULL,NULL,NULL,'WP-01KRNA8FZFJ1M1ZAJ17GJHS1VA',0.00,NULL,'2026-05-15 00:57:47',100000.00,47000.00,NULL,'2026-05-15 00:57:47','2026-05-15 00:58:02');
+/*!40000 ALTER TABLE `transactions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tenant_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `outlet_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('SUPER_ADMIN','ADMIN','KASIR') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'KASIR',
+  `user_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff',
+  `aktif` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`),
+  KEY `users_outlet_id_foreign` (`outlet_id`),
+  KEY `users_tenant_id_foreign` (`tenant_id`),
+  CONSTRAINT `users_outlet_id_foreign` FOREIGN KEY (`outlet_id`) REFERENCES `outlets` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `users_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES ('019e1b62-d28b-7379-81c3-50e17be06d90','019e1b62-d167-72f2-9078-e71148310c75',NULL,'Owner Laundry','admin@laundry.com','$2y$12$i1bV.s4AL/BoNEBqLL3cCuup/RdZpmddY1vluy9JBlLJanzIPdkh.','ADMIN','owner',1,'2026-05-12 01:52:01','2026-05-12 01:52:01'),('019e1b62-d393-73ae-b530-b69fd149bbd4',NULL,NULL,'Super Admin','superadmin@laundry.com','$2y$12$odEIHaBmWp9JswL12S.Y3Of9fD6jnIOCP97z72gO/xJixTUUy4QLG','SUPER_ADMIN','super_admin',1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b62-d491-72c2-8eb0-0aa1e742addb','019e1b62-d167-72f2-9078-e71148310c75','019e1b62-d168-70f8-b4f5-1d68cac254e5','Kasir User','user@laundry.com','$2y$12$vGVu65IaESysFGly8BGdAO9TZc13j./6BcCusGIshicl3apbgbIJO','KASIR','staff',1,'2026-05-12 01:52:02','2026-05-12 01:52:02'),('019e1b63-6257-72e3-946a-d7eafa08fd58','019e1b63-614d-7383-b164-7fefc7aa53ef',NULL,'Rhona Franklin','013ichsanm@gmail.com','$2y$12$x/XToVnKAT8a1ksJqCvhHeNiO7Gu4Ib0ZqwcHHXBylhcW.5AySAv6','ADMIN','owner',1,'2026-05-12 01:52:38','2026-05-12 01:52:38'),('019e1b67-ba88-72e8-8cd7-393dabb2a084','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b63-6158-70be-a805-574a3f23a1c7','Ichsna','014ichsanm@gmail.com','$2y$12$ZpKybcP4htr2P0MXb0JvTuKsOjxISylS58LbAdqGKgb8uS8JmTzc.','KASIR','staff',1,'2026-05-12 01:57:23','2026-05-12 01:57:23'),('019e1b79-6243-7258-99a3-33f419dff288','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b63-6158-70be-a805-574a3f23a1c7','Necessitatibus amet','cumalogar@mailinator.com','$2y$12$cIimWdrtxpPc6lv2V3Kewukwk726SPwPSQ5fwJlTXYmiA3QmZTIIi','KASIR','staff',1,'2026-05-12 02:16:40','2026-05-12 02:16:40'),('019e1b7b-53f6-73ec-be04-4cc9fa50ae95','019e1b63-614d-7383-b164-7fefc7aa53ef','019e1b63-6158-70be-a805-574a3f23a1c7','Veritatis possimus','ichsan@mail.com','$2y$12$bZ4ab6xF0bEbbPHV0g636uII9qaChOs6NSNYUSe2pGjtn661kX1Cu','KASIR','staff',1,'2026-05-12 02:18:47','2026-05-12 02:18:47'),('019e26e3-93ae-7357-a82c-c37c2dea20f1','019e26e3-92a8-7352-9197-1fcdea8af025',NULL,'Putri','putri@mail.com','$2y$12$sFXrvYyuFSCeFRn1FqYL/OksWMTGqmyfmB1.Xj6LISpI0tRrCk6ji','ADMIN','owner',1,'2026-05-14 07:28:29','2026-05-14 07:28:29');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'laundry_app'
+--
+SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-05-16 15:25:17
