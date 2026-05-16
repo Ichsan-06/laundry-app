@@ -19,7 +19,7 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
-        $subtotal = $this->faker->randomFloat(2, 20, 200);
+        $subtotal = rand(8000, 200000);
         $memberDiscount = $this->faker->boolean(50) ? ($subtotal * 0.1) : 0;
         $totalAmount = $subtotal - $memberDiscount;
         $amountReceived = ceil($totalAmount / 10) * 10;
