@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WashKita | Kelola Laundry Lebih Mudah, Lebih Cepat</title>
+    <title>WashKita - Aplikasi Manajemen Laundry Modern</title>
+    <meta name="description" content="WashKita adalah aplikasi manajemen laundry modern untuk membantu transaksi, pelanggan, laporan, dan operasional laundry lebih mudah.">
+    <meta name="keywords" content="aplikasi laundry, aplikasi manajemen laundry, aplikasi kasir laundry, software laundry, aplikasi laundry kiloan, aplikasi POS laundry, manajemen usaha laundry, aplikasi laundry online, aplikasi laundry berbasis web, aplikasi laundry terbaik, sistem laundry digital">
+    <link rel="canonical" href="https://washkita.com/aplikasi-manajemen-laundry" />
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
+    
+    <meta property="og:title" content="WashKita - Aplikasi Manajemen Laundry Modern">
+    <meta property="og:description" content="WashKita adalah aplikasi manajemen laundry modern untuk membantu transaksi, pelanggan, laporan, dan operasional laundry lebih mudah.">
+    <meta property="og:url" content="https://washkita.com/aplikasi-manajemen-laundry">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ asset('logo.png') }}">
+    <meta name="theme-color" content="#00B4D8">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -731,13 +743,13 @@
             <div class="container hero-grid">
                 <div class="reveal">
                     <!-- <span class="eyebrow">SaaS Laundry Modern</span> -->
-                    <h1>Atur Laundry jadi Lebih Mudah, Lebih Cepat</h1>
+                    <h1>Aplikasi Manajemen Laundry Modern untuk Bisnis Laundry</h1>
                     <p>WashKita membantu pemilik usaha laundry mencatat order, memantau status, dan mengelola keuangan — dari satu dashboard.</p>
                     <div class="hero-actions">
                         <a href="{{ route('register.owner') }}" class="btn btn-primary">Mulai Gratis 14 Hari</a>
                         <a href="#fitur" class="btn btn-secondary">Lihat Demo</a>
                     </div>
-                    <div class="hero-note">Tanpa kartu kredit. Siap dipakai untuk outlet tunggal maupun multi-cabang.</div>
+                    <div class="hero-note">Software laundry berbasis web tanpa kartu kredit. Cocok untuk UMKM laundry kiloan, satuan, maupun koin multi-cabang.</div>
                 </div>
 
                 <div class="mockup-shell reveal">
@@ -820,8 +832,8 @@
             <div class="container">
                 <div class="reveal">
                     <span class="eyebrow">Fitur Utama</span>
-                    <h2 class="section-title">Semua yang kamu butuhkan, dalam satu aplikasi</h2>
-                    <p class="section-copy">Dari meja kasir sampai laporan keuangan, semua alur kerja laundry tersusun rapi agar operasional lebih cepat dan keputusan bisnis lebih percaya diri.</p>
+                    <h2 class="section-title">Semua yang kamu butuhkan, dalam satu aplikasi manajemen laundry</h2>
+                    <p class="section-copy">Dari meja aplikasi kasir laundry sampai laporan keuangan, semua alur kerja tersusun rapi agar operasional lebih cepat dan keputusan bisnis lebih percaya diri dengan sistem laundry digital kami.</p>
                 </div>
 
                 <div class="card-grid">
@@ -919,7 +931,7 @@
                         <ul class="pricing-list">
                             <li><span class="check">✓</span>1 outlet aktif</li>
                             <li><span class="check">✓</span>Dashboard</li>
-                            <li><span class="check">✓</span>Kasir dan transaksi</li>
+                            <li><span class="check">✓</span>Aplikasi kasir laundry (POS)</li>
                             <li><span class="check">✓</span>Pelanggan dan staff</li>
                             <li><span class="check">✓</span>Pengaturan, role akses, dan outlet</li>
                         </ul>
@@ -933,7 +945,7 @@
                         <p>Pilihan ideal untuk laundry berkembang yang butuh fitur operasional lebih lengkap.</p>
                         <ul class="pricing-list">
                             <li><span class="check">✓</span>3 outlet aktif</li>
-                            <li><span class="check">✓</span>Dashboard, kasir, transaksi, pelanggan</li>
+                            <li><span class="check">✓</span>Aplikasi POS laundry lengkap (kasir, transaksi)</li>
                             <li><span class="check">✓</span>Mesin, layanan, dan add on</li>
                             <li><span class="check">✓</span>Laporan dan staff</li>
                             <li><span class="check">✓</span>Multi outlet</li>
@@ -993,7 +1005,7 @@
                 <div class="reveal">
                     <span class="eyebrow">Testimoni</span>
                     <h2 class="section-title">Pemilik laundry suka karena operasional jadi lebih tenang</h2>
-                    <p class="section-copy">WashKita membantu bisnis laundry di berbagai kota mengurangi kerja manual, mempercepat pelayanan, dan menjaga pelanggan tetap puas.</p>
+                    <p class="section-copy">WashKita adalah aplikasi laundry online yang membantu bisnis laundry di berbagai kota mengurangi kerja manual, mempercepat pelayanan, dan menjaga pelanggan tetap puas dengan aplikasi laundry terbaik di kelasnya.</p>
                 </div>
 
                 <div class="testimonial-grid">
@@ -1091,10 +1103,10 @@
                 <div class="footer-grid">
                     <div class="footer-brand">
                         <a href="#top" class="brand">
-                            <img src="{{ asset('logo.png') }}" alt="WashKita Logo" class="brand-mark">
+                            <img src="{{ asset('logo.png') }}" alt="WashKita - Aplikasi Manajemen Laundry" class="brand-mark">
                             WashKita
                         </a>
-                        <p>Aplikasi manajemen laundry untuk owner yang ingin operasional rapi, cepat, dan siap berkembang.</p>
+                        <p>Aplikasi manajemen usaha laundry untuk owner yang ingin operasional rapi, cepat, dan siap berkembang dengan aplikasi POS laundry modern.</p>
                     </div>
 
                     <div class="footer-column">
