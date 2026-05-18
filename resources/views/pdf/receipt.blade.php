@@ -186,7 +186,7 @@
                         <tr>
                             <td>
                                 <span class="item-name">{{ $pkg->nama_paket }}</span>
-                                <span class="item-meta">{{ max($pkg->pivot->weight, 1) }} Kg x Rp {{ number_format($pkg->pivot->price, 0, ',', '.') }}</span>
+                                <span class="item-meta">{{ max($pkg->pivot->weight, 1) }} {{ $pkg->satuanSingkat() }} x Rp {{ number_format($pkg->pivot->price, 0, ',', '.') }}</span>
                             </td>
                             <td class="text-right">Rp {{ number_format($pkg->pivot->price * max($pkg->pivot->weight, 1), 0, ',', '.') }}</td>
                         </tr>

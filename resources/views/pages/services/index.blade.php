@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Service Packages - Laundry Track')
+@section('title', 'Paket Layanan - Laundry Track')
 
 @section('header')
 <header class="sticky top-0 z-20 flex min-h-[84px] shrink-0 items-center justify-between gap-6 border-b border-slate-100 bg-white/95 px-4 py-4 backdrop-blur md:min-h-[108px] md:px-10">
@@ -14,7 +14,7 @@
             </div>
             <form action="{{ route('services.index') }}" method="GET">
                 <input type="text" name="search" value="{{ request('search') }}" 
-                    placeholder="Search services by package name..." 
+                    placeholder="Cari paket layanan..." 
                     class="block w-full rounded-xl border-none bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-primary-500/20">
             </form>
         </div>
@@ -24,18 +24,19 @@
 
 @section('content')
 <div class="mx-auto max-w-[1400px] space-y-8">
+    @php($opsiSatuan = \App\Models\ServicePackage::SATUAN_OPTIONS)
     {{-- Page Header --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Service Packages</h2>
-            <p class="mt-1 text-sm font-semibold text-slate-400">Manage your laundry service price lists.</p>
+            <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Paket Layanan</h2>
+            <p class="mt-1 text-sm font-semibold text-slate-400">Kelola daftar harga layanan laundry Anda.</p>
         </div>
         <div class="flex items-center gap-3">
             <a href="{{ route('services.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 transition hover:bg-primary-700">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M12 5v14M5 12h14"></path>
                 </svg>
-                Add Package
+                Tambah Paket
             </a>
         </div>
     </div>
@@ -46,13 +47,13 @@
             <div class="flex items-center gap-3">
                 <label class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Status</label>
                 <select name="status" class="rounded-xl border-none bg-slate-50 py-2.5 pl-4 pr-10 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20" onchange="this.form.submit()">
-                    <option value="">All Status</option>
-                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
                 </select>
             </div>
             @if(request()->hasAny(['status', 'search']))
-                <a href="{{ route('services.index') }}" class="text-xs font-bold text-rose-500 hover:underline">Clear Filters</a>
+                <a href="{{ route('services.index') }}" class="text-xs font-bold text-rose-500 hover:underline">Hapus Filter</a>
             @endif
         </form>
     </div>
@@ -63,11 +64,12 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="border-b border-slate-50 bg-slate-50/30">
-                        <th class="px-8 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Package Name</th>
-                        <th class="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Price / KG</th>
-                        <th class="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Min. Weight</th>
+                        <th class="px-8 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Nama Paket</th>
+                        <th class="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Harga</th>
+                        <th class="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Satuan</th>
+                        <th class="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Minimum</th>
                         <th class="px-6 py-5 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Status</th>
-                        <th class="px-8 py-5 text-right text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Actions</th>
+                        <th class="px-8 py-5 text-right text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -80,16 +82,19 @@
                             </div>
                         </td>
                         <td class="px-6 py-5">
-                            <p class="text-sm font-extrabold text-slate-900">Rp {{ number_format($service->harga_per_kg, 0, ',', '.') }}</p>
+                            <p class="text-sm font-extrabold text-slate-900">Rp {{ number_format($service->harga_per_kg, 0, ',', '.') }} / {{ $service->satuanSingkat() }}</p>
                         </td>
                         <td class="px-6 py-5">
-                            <p class="text-sm font-bold text-slate-600">{{ $service->berat_minimal }} KG</p>
+                            <p class="text-sm font-bold text-slate-600">{{ $opsiSatuan[$service->satuan ?? \App\Models\ServicePackage::SATUAN_PER_KG] ?? 'Per Kg' }}</p>
+                        </td>
+                        <td class="px-6 py-5">
+                            <p class="text-sm font-bold text-slate-600">{{ rtrim(rtrim(number_format($service->berat_minimal, 2, ',', '.'), '0'), ',') }} {{ $service->satuanSingkat() }}</p>
                         </td>
                         <td class="px-6 py-5">
                             <div class="flex items-center gap-2">
                                 <div class="h-2 w-2 rounded-full {{ $service->aktif ? 'bg-emerald-500' : 'bg-slate-300' }}"></div>
                                 <span class="text-xs font-bold {{ $service->aktif ? 'text-slate-700' : 'text-slate-400' }}">
-                                    {{ $service->aktif ? 'Active' : 'Inactive' }}
+                                    {{ $service->aktif ? 'Aktif' : 'Tidak Aktif' }}
                                 </span>
                             </div>
                         </td>
@@ -101,7 +106,7 @@
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                     </svg>
                                 </a>
-                                <form action="{{ route('services.destroy', $service->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this service package?')">
+                                <form action="{{ route('services.destroy', $service->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus paket layanan ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="rounded-xl bg-slate-50 p-2.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600">
@@ -118,7 +123,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-8 py-20 text-center text-slate-400 text-sm font-bold">No services found.</td>
+                        <td colspan="6" class="px-8 py-20 text-center text-slate-400 text-sm font-bold">Belum ada paket layanan yang sesuai dengan pencarian.</td>
                     </tr>
                     @endforelse
                 </tbody>

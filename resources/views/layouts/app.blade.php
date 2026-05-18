@@ -9,7 +9,7 @@
     $mainMenus = [
         ['label' => 'Dashboard', 'route' => 'dashboard', 'match' => 'dashboard*', 'permission' => 'dashboard.view'],
         ['label' => 'Kasir', 'route' => 'kasir.index', 'match' => 'kasir*', 'permission' => 'cashier.access'],
-        ['label' => 'Member', 'route' => 'members.index', 'match' => 'members*', 'permission' => 'customers.view'],
+        ['label' => 'Pelanggan', 'route' => 'members.index', 'match' => 'members*', 'permission' => 'customers.view'],
         ['label' => 'Transaksi', 'route' => 'transactions.index', 'match' => 'transactions*', 'permission' => 'transactions.view'],
         ['label' => 'Mesin', 'route' => 'machines.index', 'match' => 'machines*', 'permission' => 'machines.view'],
         ['label' => 'Layanan', 'route' => 'services.index', 'match' => 'services*', 'permission' => 'services.view'],
@@ -17,7 +17,7 @@
         ['label' => 'Outlet', 'route' => 'outlets.index', 'match' => 'outlets*', 'permission' => 'outlets.view'],
         ['label' => 'Laporan', 'route' => 'reports.index', 'match' => 'reports*', 'permission' => 'reports.view'],
         ['label' => 'Staff', 'route' => 'users.index', 'match' => 'users*', 'permission' => 'staff.view'],
-        ['label' => 'Billing', 'route' => 'billing.index', 'match' => 'billing*', 'permission' => 'billing.view'],
+        ['label' => 'Langganan', 'route' => 'billing.index', 'match' => 'billing*', 'permission' => 'billing.view'],
     ];
 
     $systemMenus = [
@@ -25,7 +25,7 @@
         ['label' => 'Permissions', 'route' => 'permissions.index', 'match' => 'permissions*', 'permission' => 'permissions.view'],
         ['label' => 'Plans', 'route' => 'subscription-plans.index', 'match' => 'subscription-plans*', 'permission' => 'plans.manage'],
         ['label' => 'Tenants', 'route' => 'tenants.index', 'match' => 'tenants*', 'permission' => 'tenants.manage'],
-        ['label' => 'Settings', 'route' => 'settings.index', 'match' => 'settings*', 'permission' => 'settings.manage'],
+        ['label' => 'Pengaturan', 'route' => 'settings.index', 'match' => 'settings*', 'permission' => 'settings.manage'],
     ];
 
     $outletName = $currentUser?->isOwner()

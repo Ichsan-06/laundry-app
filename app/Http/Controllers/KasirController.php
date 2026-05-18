@@ -292,6 +292,9 @@ class KasirController extends Controller
             'payment_expires_at' => $normalized['expired'] ?: $transaction->payment_expires_at,
             'paid_at' => $localStatus === 'paid' ? ($transaction->paid_at ?? now()) : $transaction->paid_at,
             'status' => $localStatus === 'paid' ? 'IN_PROGRESS' : ($localStatus === 'expired' ? 'CANCELLED' : $transaction->status),
+            'process_step' => $localStatus === 'paid' && $transaction->transaction_type === 'DROP_OFF'
+                ? ($transaction->process_step ?: 'RECEIVED')
+                : $transaction->process_step,
             'amount_received' => $localStatus === 'paid' ? ($transaction->total_amount + $transaction->payment_fee) : $transaction->amount_received,
             'change_amount' => 0,
         ]);
@@ -451,7 +454,7 @@ class KasirController extends Controller
 
                         if ($weight <= 0) {
                             throw ValidationException::withMessages([
-                                'checkout' => 'Berat cucian harus lebih dari 0.',
+                                'checkout' => 'Jumlah layanan untuk paket ' . $pkg->nama_paket . ' harus lebih dari 0 ' . $pkg->satuanSingkat() . '.',
                             ]);
                         }
 
@@ -542,6 +545,7 @@ class KasirController extends Controller
             'weight' => $validated['service_type'] === 'DROP_OFF' ? $prepared['total_weight'] : null,
             'estimated_finish' => $validated['service_type'] === 'DROP_OFF' && ! empty($validated['estimated_finish']) ? $validated['estimated_finish'] : null,
             'status' => 'PENDING',
+            'process_step' => $validated['service_type'] === 'DROP_OFF' ? 'RECEIVED' : null,
             'subtotal' => $prepared['subtotal'],
             'member_discount' => 0,
             'discount_percent' => $validated['discount_percent'] ?? 0,
@@ -570,6 +574,7 @@ class KasirController extends Controller
             'member_id' => $prepared['member']?->id,
             'weight' => $validated['service_type'] === 'DROP_OFF' ? $prepared['total_weight'] : null,
             'estimated_finish' => $validated['service_type'] === 'DROP_OFF' && ! empty($validated['estimated_finish']) ? $validated['estimated_finish'] : null,
+            'process_step' => $validated['service_type'] === 'DROP_OFF' ? ($transaction->process_step ?: 'RECEIVED') : null,
             'subtotal' => $prepared['subtotal'],
             'discount_percent' => $validated['discount_percent'] ?? 0,
             'discount_amount' => $validated['discount_amount'] ?? 0,

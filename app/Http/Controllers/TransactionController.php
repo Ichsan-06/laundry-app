@@ -7,9 +7,11 @@ use App\Models\Member;
 use App\Models\Outlet;
 use App\Models\ServicePackage;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\TenantContextService;
+use Illuminate\Http\RedirectResponse;
 
 class TransactionController extends Controller
 {
@@ -66,6 +68,23 @@ class TransactionController extends Controller
             $query->where('outlet_id', $request->outlet_id);
         }
 
+        if ($request->filled('date_range')) {
+            $today = Carbon::today();
+
+            match ($request->date_range) {
+                'today' => $query->whereDate('created_at', $today),
+                'yesterday' => $query->whereDate('created_at', $today->copy()->subDay()),
+                'last_7_days' => $query->whereDate('created_at', '>=', $today->copy()->subDays(6)),
+                'last_30_days' => $query->whereDate('created_at', '>=', $today->copy()->subDays(29)),
+                'this_month' => $query->whereBetween('created_at', [
+                    $today->copy()->startOfMonth()->startOfDay(),
+                    $today->copy()->endOfMonth()->endOfDay(),
+                ]),
+                'custom' => $this->applyCustomDateRange($query, $request),
+                default => null,
+            };
+        }
+
         // Sorting
         $sort = $request->get('sort', 'latest');
         if ($sort === 'oldest') {
@@ -103,6 +122,17 @@ class TransactionController extends Controller
             ->get();
 
         return view('pages.transactions.index', compact('transactions', 'stats', 'members', 'outlets', 'cashiers', 'servicePackages'));
+    }
+
+    private function applyCustomDateRange($query, Request $request): void
+    {
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', Carbon::parse($request->start_date)->toDateString());
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', Carbon::parse($request->end_date)->toDateString());
+        }
     }
 
     public function store(Request $request)
@@ -147,6 +177,16 @@ class TransactionController extends Controller
 
         DB::transaction(function () use ($transaction, $validated) {
             $oldStatus = $transaction->status;
+
+            if ($transaction->isDropOff()) {
+                $validated['process_step'] = match ($validated['status']) {
+                    'READY' => 'READY',
+                    'COMPLETED' => 'PICKED_UP',
+                    'IN_PROGRESS', 'PENDING' => $transaction->process_step ?: 'RECEIVED',
+                    default => $transaction->process_step,
+                };
+            }
+
             $transaction->update($validated);
 
             // Handle machine availability for self service
@@ -171,6 +211,53 @@ class TransactionController extends Controller
         });
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui.');
+    }
+
+    public function advanceProcess(Request $request, Transaction $transaction): RedirectResponse
+    {
+        $this->authorize('update', $transaction);
+
+        abort_unless($transaction->isDropOff(), 404);
+
+        $validated = $request->validate([
+            'step' => 'required|in:' . implode(',', Transaction::DROP_OFF_PROCESS_STEPS),
+            'notify' => 'nullable|boolean',
+        ]);
+
+        $nextStep = $transaction->nextProcessStep();
+
+        if ($validated['step'] !== $nextStep) {
+            return redirect()
+                ->route('transactions.show', $transaction)
+                ->with('error', 'Urutan status laundry tidak valid.');
+        }
+
+        [$status, $successMessage] = match ($validated['step']) {
+            'READY' => ['READY', 'Transaksi ditandai selesai dan siap diambil.'],
+            'PICKED_UP' => ['COMPLETED', 'Transaksi ditandai sudah diambil pelanggan.'],
+            default => ['IN_PROGRESS', 'Status proses laundry berhasil diperbarui.'],
+        };
+
+        $transaction->update([
+            'process_step' => $validated['step'],
+            'status' => $status,
+        ]);
+
+        if ((bool) ($validated['notify'] ?? false) && $validated['step'] === 'READY') {
+            $waUrl = $transaction->fresh()->whatsappReadyUrl();
+
+            if ($waUrl) {
+                return redirect()->away($waUrl);
+            }
+
+            return redirect()
+                ->route('transactions.show', $transaction)
+                ->with('error', 'Nomor WhatsApp pelanggan belum tersedia.');
+        }
+
+        return redirect()
+            ->route('transactions.show', $transaction)
+            ->with('success', $successMessage);
     }
 
     public function show($id)

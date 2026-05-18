@@ -79,6 +79,10 @@ Route::middleware(['auth', 'active.user'])->group(function () {
             ->except(['create', 'edit'])
             ->middleware(['rbac:permission,transactions.view,transactions.create,transactions.update,transactions.delete', 'plan.permission:transactions.view,transactions.create,transactions.update,transactions.delete']);
 
+        Route::patch('/transactions/{transaction}/advance-process', [TransactionController::class, 'advanceProcess'])
+            ->middleware(['rbac:permission,transactions.update', 'plan.permission:transactions.update'])
+            ->name('transactions.advance-process');
+
         Route::resource('machines', MachineController::class)
             ->except('show')
             ->middleware(['rbac:permission,machines.view,machines.create,machines.update,machines.delete', 'plan.permission:machines.view,machines.create,machines.update,machines.delete']);

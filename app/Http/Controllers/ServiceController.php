@@ -46,6 +46,7 @@ class ServiceController extends Controller
             'deskripsi' => 'nullable|string',
             'harga_per_kg' => 'required|numeric|min:0',
             'berat_minimal' => 'required|numeric|min:0',
+            'satuan' => 'required|in:' . implode(',', array_keys(ServicePackage::SATUAN_OPTIONS)),
             'aktif' => 'boolean',
         ]);
 
@@ -59,10 +60,11 @@ class ServiceController extends Controller
             'deskripsi' => $validated['deskripsi'],
             'harga_per_kg' => $validated['harga_per_kg'],
             'berat_minimal' => $validated['berat_minimal'],
+            'satuan' => $validated['satuan'],
             'aktif' => $request->has('aktif'),
         ]);
 
-        return redirect()->route('services.index')->with('success', 'Service package created successfully.');
+        return redirect()->route('services.index')->with('success', 'Paket layanan berhasil ditambahkan.');
     }
 
     public function edit(ServicePackage $service)
@@ -80,6 +82,7 @@ class ServiceController extends Controller
             'deskripsi' => 'nullable|string',
             'harga_per_kg' => 'required|numeric|min:0',
             'berat_minimal' => 'required|numeric|min:0',
+            'satuan' => 'required|in:' . implode(',', array_keys(ServicePackage::SATUAN_OPTIONS)),
             'aktif' => 'boolean',
         ]);
 
@@ -88,16 +91,17 @@ class ServiceController extends Controller
             'deskripsi' => $validated['deskripsi'],
             'harga_per_kg' => $validated['harga_per_kg'],
             'berat_minimal' => $validated['berat_minimal'],
+            'satuan' => $validated['satuan'],
             'aktif' => $request->has('aktif'),
         ]);
 
-        return redirect()->route('services.index')->with('success', 'Service package updated successfully.');
+        return redirect()->route('services.index')->with('success', 'Paket layanan berhasil diperbarui.');
     }
 
     public function destroy(ServicePackage $service)
     {
         abort_if(! in_array($service->outlet_id, auth()->user()->accessibleOutletIds(), true), 403);
         $service->delete();
-        return redirect()->route('services.index')->with('success', 'Service package deleted successfully.');
+        return redirect()->route('services.index')->with('success', 'Paket layanan berhasil dihapus.');
     }
 }

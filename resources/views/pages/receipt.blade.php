@@ -57,7 +57,7 @@
             {{-- Drop Off --}}
             @foreach($transaction->servicePackages as $pkg)
             <div class="item-row">
-                <span>{{ $pkg->nama_paket }} ({{ $pkg->pivot->weight }}kg)</span>
+                <span>{{ $pkg->nama_paket }} ({{ $pkg->pivot->weight }} {{ $pkg->satuanSingkat() }})</span>
                 <span>Rp {{ number_format($pkg->pivot->price * $pkg->pivot->weight, 0, ',', '.') }}</span>
             </div>
             @if($pkg->pivot->note)

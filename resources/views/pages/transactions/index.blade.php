@@ -19,6 +19,10 @@
                 @if(request('service_type')) <input type="hidden" name="service_type" value="{{ request('service_type') }}"> @endif
                 @if(request('payment_method')) <input type="hidden" name="payment_method" value="{{ request('payment_method') }}"> @endif
                 @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
+                @if(request('outlet_id')) <input type="hidden" name="outlet_id" value="{{ request('outlet_id') }}"> @endif
+                @if(request('date_range')) <input type="hidden" name="date_range" value="{{ request('date_range') }}"> @endif
+                @if(request('start_date')) <input type="hidden" name="start_date" value="{{ request('start_date') }}"> @endif
+                @if(request('end_date')) <input type="hidden" name="end_date" value="{{ request('end_date') }}"> @endif
                 
                 <input type="text" name="search" value="{{ request('search') }}" 
                     placeholder="Cari berdasarkan ID, Nama Member..." 
@@ -80,6 +84,30 @@
         'READY' => 'Siap Diambil',
         'COMPLETED' => 'Selesai',
         'CANCELLED' => 'Dibatalkan',
+    ];
+    $dropOffProcessMap = [
+        'RECEIVED' => 'Diterima',
+        'WASHED' => 'Dicuci',
+        'DRIED' => 'Dikeringkan',
+        'IRONED' => 'Disetrika',
+        'READY' => 'Selesai',
+        'PICKED_UP' => 'Diambil',
+    ];
+    $dropOffNextStepMap = [
+        'WASHED' => 'Dicuci',
+        'DRIED' => 'Kering',
+        'IRONED' => 'Setrika',
+        'READY' => 'Selesai',
+        'PICKED_UP' => 'Diambil',
+    ];
+    $dateRangeLabels = [
+        'all' => 'Semua Waktu',
+        'today' => 'Hari Ini',
+        'yesterday' => 'Kemarin',
+        'last_7_days' => '7 Hari Terakhir',
+        'last_30_days' => '30 Hari Terakhir',
+        'this_month' => 'Bulan Ini',
+        'custom' => 'Custom Tanggal',
     ];
 @endphp
     @if(session('success'))
@@ -223,6 +251,66 @@
                     </div>
                 </div>
 
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-white hover:shadow-sm">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {{ $dateRangeLabels[request('date_range', 'all')] ?? 'Semua Waktu' }}
+                        <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m6 9 6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <div x-show="open" @click.away="open = false" class="absolute left-0 mt-2 z-30 w-72 overflow-hidden rounded-[24px] bg-white p-2 shadow-xl ring-1 ring-slate-100" x-cloak>
+                        @foreach(['all', 'today', 'yesterday', 'last_7_days', 'last_30_days', 'this_month', 'custom'] as $range)
+                            @php
+                                $isActiveRange = request('date_range', 'all') === $range || ($range === 'all' && ! request('date_range'));
+                            @endphp
+                            @if($range !== 'custom')
+                                <a href="{{ route('transactions.index', array_merge(request()->all(), ['date_range' => $range === 'all' ? null : $range, 'start_date' => null, 'end_date' => null])) }}"
+                                   class="{{ $isActiveRange ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50' }} flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition">
+                                    <span class="flex h-6 w-6 items-center justify-center">
+                                        @if($isActiveRange)
+                                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                <path d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        @endif
+                                    </span>
+                                    {{ $dateRangeLabels[$range] }}
+                                </a>
+                            @else
+                                <div class="mt-1 border-t border-slate-100 px-2 pt-3">
+                                    <p class="px-2 pb-2 text-[10px] font-extrabold uppercase tracking-[0.24em] text-slate-400">{{ $dateRangeLabels[$range] }}</p>
+                                    <form action="{{ route('transactions.index') }}" method="GET" class="space-y-3 rounded-2xl px-2 pb-2 pt-1">
+                                        @foreach(request()->except(['date_range', 'start_date', 'end_date', 'page']) as $key => $value)
+                                            @if(is_array($value))
+                                                @foreach($value as $item)
+                                                    <input type="hidden" name="{{ $key }}[]" value="{{ $item }}">
+                                                @endforeach
+                                            @elseif($value !== null && $value !== '')
+                                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                            @endif
+                                        @endforeach
+                                        <input type="hidden" name="date_range" value="custom">
+                                        <div>
+                                            <label class="mb-1 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Dari</label>
+                                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-700">
+                                        </div>
+                                        <div>
+                                            <label class="mb-1 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Sampai</label>
+                                            <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-700">
+                                        </div>
+                                        <button type="submit" class="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-extrabold text-white transition hover:bg-slate-800">
+                                            Terapkan Filter
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+
                 {{-- Filter: Service Type --}}
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-white hover:shadow-sm">
@@ -291,7 +379,7 @@
                     </div>
                 </div>
 
-                @if(request()->anyFilled(['status', 'transaction_type', 'service_type', 'payment_method', 'sort', 'search', 'outlet_id']))
+                @if(request()->anyFilled(['status', 'transaction_type', 'service_type', 'payment_method', 'sort', 'search', 'outlet_id', 'date_range', 'start_date', 'end_date']))
                 <a href="{{ route('transactions.index') }}" class="text-xs font-extrabold text-rose-500 hover:underline">Hapus Semua Filter</a>
                 @endif
             </div>
@@ -352,13 +440,35 @@
                                     'COMPLETED' => 'bg-emerald-50 text-emerald-600 ring-emerald-100',
                                     'CANCELLED' => 'bg-rose-50 text-rose-600 ring-rose-100',
                                 ];
+                                $displayStatus = $trx->transaction_type === 'DROP_OFF'
+                                    ? ($dropOffProcessMap[$trx->currentProcessStep()] ?? ($statusMap[$trx->status] ?? str_replace('_', ' ', $trx->status)))
+                                    : ($statusMap[$trx->status] ?? str_replace('_', ' ', $trx->status));
                             @endphp
                             <span class="inline-flex rounded-md px-2 py-1 text-[10px] font-extrabold tracking-widest ring-1 ring-inset {{ $statusClasses[$trx->status] ?? 'bg-slate-100 text-slate-500' }}">
-                                {{ $statusMap[$trx->status] ?? str_replace('_', ' ', $trx->status) }}
+                                {{ $displayStatus }}
                             </span>
                         </td>
                         <td class="px-8 py-5 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                @php
+                                    $nextProcessStep = $trx->transaction_type === 'DROP_OFF' ? $trx->nextProcessStep() : null;
+                                @endphp
+
+                                @if($trx->transaction_type === 'DROP_OFF' && $trx->status !== 'CANCELLED' && $nextProcessStep)
+                                    <form action="{{ route('transactions.advance-process', $trx->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="step" value="{{ $nextProcessStep }}">
+                                        <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-[11px] font-extrabold uppercase tracking-wide text-white transition hover:bg-slate-800" title="Lanjut ke {{ $dropOffProcessMap[$nextProcessStep] ?? $nextProcessStep }}">
+                                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                                                <path d="M5 12h14"></path>
+                                                <path d="m13 6 6 6-6 6"></path>
+                                            </svg>
+                                            {{ $dropOffNextStepMap[$nextProcessStep] ?? 'Next' }}
+                                        </button>
+                                    </form>
+                                @endif
+
                                 <a href="{{ route('transactions.show', $trx->id) }}" class="rounded-lg p-2 text-slate-300 transition hover:bg-white hover:text-indigo-600 hover:shadow-sm">
                                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

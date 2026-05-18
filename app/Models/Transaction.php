@@ -10,6 +10,15 @@ class Transaction extends Model
 {
     use HasFactory, HasUuids;
 
+    public const DROP_OFF_PROCESS_STEPS = [
+        'RECEIVED',
+        'WASHED',
+        'DRIED',
+        'IRONED',
+        'READY',
+        'PICKED_UP',
+    ];
+
     protected $fillable = [
         'outlet_id',
         'cashier_id',
@@ -24,6 +33,7 @@ class Transaction extends Model
         'tax_percent',
         'tax_amount',
         'status',
+        'process_step',
         'subtotal',
         'member_discount',
         'total_amount',
@@ -102,5 +112,69 @@ class Transaction extends Model
     public function items()
     {
         return $this->hasMany(TransactionItem::class);
+    }
+
+    public function isDropOff(): bool
+    {
+        return $this->transaction_type === 'DROP_OFF';
+    }
+
+    public function currentProcessStep(): ?string
+    {
+        if (! $this->isDropOff()) {
+            return null;
+        }
+
+        if ($this->process_step) {
+            return $this->process_step;
+        }
+
+        return match ($this->status) {
+            'READY' => 'READY',
+            'COMPLETED' => 'PICKED_UP',
+            default => 'RECEIVED',
+        };
+    }
+
+    public function nextProcessStep(): ?string
+    {
+        $currentStep = $this->currentProcessStep();
+
+        if (! $currentStep) {
+            return null;
+        }
+
+        $currentIndex = array_search($currentStep, self::DROP_OFF_PROCESS_STEPS, true);
+
+        if ($currentIndex === false || ! isset(self::DROP_OFF_PROCESS_STEPS[$currentIndex + 1])) {
+            return null;
+        }
+
+        return self::DROP_OFF_PROCESS_STEPS[$currentIndex + 1];
+    }
+
+    public function whatsappReadyMessage(): ?string
+    {
+        if (! $this->member || ! $this->member->no_hp) {
+            return null;
+        }
+
+        $memberName = $this->member->nama ?? 'Pelanggan';
+        $formattedTotal = number_format((float) $this->total_amount, 0, ',', '.');
+
+        return "Halo {$memberName}, laundry Anda dengan nota {$this->transaction_number} di {$this->outlet->nama_outlet} sudah selesai dan siap diambil. Total tagihan Anda adalah Rp {$formattedTotal}. Terima kasih!";
+    }
+
+    public function whatsappReadyUrl(): ?string
+    {
+        $message = $this->whatsappReadyMessage();
+
+        if (! $message) {
+            return null;
+        }
+
+        $cleanPhone = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', (string) $this->member->no_hp));
+
+        return 'https://wa.me/' . $cleanPhone . '?text=' . urlencode($message);
     }
 }

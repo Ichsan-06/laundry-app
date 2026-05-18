@@ -84,6 +84,44 @@
         return 'Rp ' + Math.max(0, Number(value || 0)).toLocaleString('id-ID');
     },
 
+    packageById(packageId) {
+        return this.allServices.find(service => service.id === packageId);
+    },
+
+    unitShort(unit) {
+        switch (unit) {
+            case 'per_pasang':
+                return 'pasang';
+            case 'per_pcs':
+                return 'pcs';
+            case 'per_meter':
+                return 'meter';
+            default:
+                return 'kg';
+        }
+    },
+
+    unitLabel(unit) {
+        switch (unit) {
+            case 'per_pasang':
+                return 'Pasang';
+            case 'per_pcs':
+                return 'Pcs';
+            case 'per_meter':
+                return 'Meter';
+            default:
+                return 'Kg';
+        }
+    },
+
+    quantityLabel(packageId) {
+        return 'Jumlah (' + this.unitLabel(this.packageById(packageId)?.satuan) + ')';
+    },
+
+    quantitySuffix(packageId) {
+        return this.unitLabel(this.packageById(packageId)?.satuan);
+    },
+
     showToast(type, message) {
         if (this.toast.timeout) {
             clearTimeout(this.toast.timeout);
@@ -387,9 +425,8 @@
                 return sum + parseFloat(machine.selected_duration?.price || 0);
             }, 0);
         } else {
-            // Services: weight * price_per_kg
             this.dropOff.details.forEach(d => {
-                const pkg = this.allServices.find(s => s.id === d.package_id);
+                const pkg = this.packageById(d.package_id);
                 if (pkg) {
                     const weight = Math.max(parseFloat(d.weight) || 0, parseFloat(pkg.berat_minimal) || 0);
                     total += weight * parseFloat(pkg.harga_per_kg);
@@ -460,7 +497,9 @@
 
             const invalidWeight = this.dropOff.details.find(detail => detail.package_id && (parseFloat(detail.weight) || 0) <= 0);
             if (invalidWeight) {
-                this.showAlert('error', 'Berat tidak valid', 'Berat cucian harus lebih dari 0 kg.');
+                const pkg = this.packageById(invalidWeight.package_id);
+                const unit = this.unitShort(pkg?.satuan);
+                this.showAlert('error', 'Jumlah tidak valid', 'Jumlah layanan harus lebih dari 0 ' + unit + '.');
                 return false;
             }
 
@@ -730,20 +769,23 @@
                                             <select x-model="detail.package_id" class="block w-full rounded-xl border-slate-100 bg-white py-2.5 px-4 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
                                                 <option value="">-- Pilih Paket --</option>
                                                 <template x-for="pkg in allServices" :key="pkg.id">
-                                                    <option :value="pkg.id" x-text="pkg.nama_paket + ' (Rp ' + parseFloat(pkg.harga_per_kg).toLocaleString('id-ID') + '/kg)'"></option>
+                                                    <option :value="pkg.id" x-text="pkg.nama_paket + ' (Rp ' + parseFloat(pkg.harga_per_kg).toLocaleString('id-ID') + '/' + unitShort(pkg.satuan) + ')'"></option>
                                                 </template>
                                             </select>
                                         </div>
 
-                                        {{-- Weight Input --}}
+                                        {{-- Quantity Input --}}
                                         <div class="sm:col-span-3 space-y-2">
-                                            <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Berat (Kg)</label>
+                                            <label class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400" x-text="quantityLabel(detail.package_id)"></label>
                                             <div class="relative">
                                                 <input type="number" min="0.1" step="0.1" x-model="detail.weight" class="block w-full rounded-xl border-slate-100 bg-white py-2.5 px-4 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-primary-500/20">
                                                 <div class="absolute inset-y-0 right-0 flex items-center pr-4">
-                                                    <span class="text-[10px] font-bold text-slate-400 uppercase">Kg</span>
+                                                    <span class="text-[10px] font-bold text-slate-400 uppercase" x-text="quantitySuffix(detail.package_id)"></span>
                                                 </div>
                                             </div>
+                                            <template x-if="detail.package_id">
+                                                <p class="text-[10px] font-bold text-slate-400" x-text="'Minimum ' + (packageById(detail.package_id)?.berat_minimal || 1) + ' ' + unitShort(packageById(detail.package_id)?.satuan)"></p>
+                                            </template>
                                         </div>
 
                                         {{-- Notes Input --}}
@@ -951,12 +993,12 @@
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <span class="text-xs font-bold text-slate-400">Paket</span>
-                                <div class="text-right">
-                                    <template x-for="d in dropOff.details" :key="d.package_id">
-                                        <p class="text-[11px] font-extrabold text-slate-900" x-text="(allServices.find(s => s.id === d.package_id)?.nama_paket || '-') + ' (' + d.weight + ' Kg)'"></p>
-                                    </template>
+                                    <div class="text-right">
+                                        <template x-for="d in dropOff.details" :key="d.package_id">
+                                        <p class="text-[11px] font-extrabold text-slate-900" x-text="(packageById(d.package_id)?.nama_paket || '-') + ' (' + d.weight + ' ' + unitShort(packageById(d.package_id)?.satuan) + ')'"></p>
+                                        </template>
+                                    </div>
                                 </div>
-                            </div>
                             {{-- Weight and Paket Summary combined above --}}
                         </div>
                     </template>
