@@ -7,8 +7,8 @@
 @section('header')
 <header class="sticky top-0 z-20 flex min-h-[84px] shrink-0 items-center justify-between gap-4 border-b border-slate-100 bg-white/95 px-4 py-4 backdrop-blur md:min-h-[108px] md:px-10">
     <div class="min-w-0">
-        <p class="text-[11px] font-extrabold uppercase tracking-widest text-primary-600">Overview</p>
-        <h1 class="truncate text-xl font-extrabold tracking-tight text-slate-900 md:text-2xl">Dashboard Overview</h1>
+        <p class="text-[11px] font-extrabold uppercase tracking-widest text-primary-600">Ringkasan</p>
+        <h1 class="truncate text-xl font-extrabold tracking-tight text-slate-900 md:text-2xl">Ringkasan Dashboard</h1>
     </div>
     <div class="flex items-center gap-4">
         <form action="{{ route('dashboard') }}" method="GET" class="flex items-center gap-2">
@@ -34,7 +34,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Export Report
+                Laporan Ekspor
             </button>
         </form>
     </div>
@@ -62,7 +62,7 @@
                 </span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Total Revenue</p>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Total Pendapatan</p>
                 <h3 class="mt-1 text-2xl font-extrabold text-slate-900">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
             </div>
         </div>
@@ -76,11 +76,11 @@
                         <circle cx="12" cy="14" r="3"></circle>
                     </svg>
                 </div>
-                <span class="text-xs font-bold text-slate-400">Capacity: {{ $machineCapacityPercent }}%</span>
+                <span class="text-xs font-bold text-slate-400">Kapasitas Mesin: {{ $machineCapacityPercent }}%</span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Active Machines</p>
-                <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ $activeMachinesCount }}/{{ $totalMachines }} <span class="text-sm font-bold text-slate-400">Units</span></h3>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Mesin Aktif</p>
+                <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ $activeMachinesCount }}/{{ $totalMachines }} <span class="text-sm font-bold text-slate-400">Unit</span></h3>
             </div>
         </div>
 
@@ -95,7 +95,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pending Orders</p>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pesanan Tertunda</p>
                 <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ $pendingOrders }}</h3>
             </div>
         </div>
@@ -118,8 +118,8 @@
                 </span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">New Members</p>
-                <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ $newMembersCount }} <span class="text-sm font-bold text-slate-400">today</span></h3>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pelanggan Baru</p>
+                <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ $newMembersCount }} <span class="text-sm font-bold text-slate-400">hari ini</span></h3>
             </div>
         </div>
     </div>
@@ -128,8 +128,8 @@
         <!-- Live Machines -->
         <div class="lg:col-span-4 rounded-3xl border border-slate-100 bg-white p-8 shadow-soft">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-lg font-extrabold text-slate-900">Live Machines</h3>
-                <a href="{{ route('machines.index') }}" class="text-sm font-bold text-primary-600 hover:underline">View All</a>
+                <h3 class="text-lg font-extrabold text-slate-900">Mesin Aktif</h3>
+                <a href="{{ route('machines.index') }}" class="text-sm font-bold text-primary-600 hover:underline">Lihat Semua</a>
             </div>
             <div class="space-y-4">
                 @foreach($liveMachines as $machine)
@@ -162,10 +162,10 @@
         <!-- Revenue Over Time -->
         <div class="lg:col-span-8 rounded-3xl border border-slate-100 bg-white p-8 shadow-soft">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-lg font-extrabold text-slate-900">Revenue Over Time</h3>
+                <h3 class="text-lg font-extrabold text-slate-900">Pendapatan</h3>
                 <div class="flex items-center gap-1 rounded-lg bg-slate-100 p-1">
-                    <button class="rounded-md bg-primary-600 px-3 py-1 text-[11px] font-bold text-white shadow-sm">Daily</button>
-                    <button class="rounded-md px-3 py-1 text-[11px] font-bold text-slate-500 hover:bg-slate-200">Weekly</button>
+                    <button class="rounded-md bg-primary-600 px-3 py-1 text-[11px] font-bold text-white shadow-sm">Harian</button>
+                    <button class="rounded-md px-3 py-1 text-[11px] font-bold text-slate-500 hover:bg-slate-200">Mingguan</button>
                 </div>
             </div>
             <div class="h-[280px] w-full">
@@ -178,18 +178,18 @@
         <!-- Recent Transactions -->
         <div class="lg:col-span-8 rounded-3xl border border-slate-100 bg-white shadow-soft overflow-hidden">
             <div class="p-8 border-b border-slate-50 flex items-center justify-between">
-                <h3 class="text-lg font-extrabold text-slate-900">Recent Transactions</h3>
-                <a href="{{ route('transactions.index') }}" class="text-sm font-bold text-primary-600 hover:underline">View All</a>
+                <h3 class="text-lg font-extrabold text-slate-900">Transaksi Terbaru</h3>
+                <a href="{{ route('transactions.index') }}" class="text-sm font-bold text-primary-600 hover:underline">Lihat Semua</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-slate-50/50">
-                            <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Order ID</th>
-                            <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Customer</th>
-                            <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Service</th>
+                            <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">ID Pesanan</th>
+                            <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pelanggan</th>
+                            <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Layanan</th>
                             <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Status</th>
-                            <th class="px-8 py-4 text-right text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Amount</th>
+                            <th class="px-8 py-4 text-right text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Jumlah</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
@@ -209,12 +209,12 @@
                                 @if($t['status'] === 'COMPLETED')
                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-extrabold text-emerald-600">
                                         <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                                        Completed
+                                        Selesai
                                     </span>
                                 @elseif($t['status'] === 'IN_PROGRESS')
                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1 text-[11px] font-extrabold text-primary-600">
                                         <span class="h-1.5 w-1.5 rounded-full bg-primary-500 animate-pulse"></span>
-                                        In Progress
+                                        Dalam Pengerjaan
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-extrabold text-amber-600">
@@ -234,7 +234,7 @@
         <!-- Quick Actions & Alerts -->
         <div class="lg:col-span-4 space-y-6">
             <div class="rounded-3xl border border-slate-100 bg-white p-8 shadow-soft">
-                <h3 class="text-lg font-extrabold text-slate-900 mb-6">Quick Actions</h3>
+                <h3 class="text-lg font-extrabold text-slate-900 mb-6">Aksi Cepat</h3>
                 <div class="space-y-4">
                     <a href="/kasir" class="flex items-center justify-between rounded-2xl bg-primary-600 p-5 text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700 active:scale-95">
                         <div class="flex items-center gap-4">
@@ -243,7 +243,7 @@
                                     <path d="M12 5v14M5 12h14"></path>
                                 </svg>
                             </div>
-                            <span class="font-extrabold">Create New Order</span>
+                            <span class="font-extrabold">Buat Pesanan Baru</span>
                         </div>
                         <svg class="h-5 w-5 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"></path>
@@ -258,7 +258,7 @@
                                     <circle cx="12" cy="7" r="4"></circle>
                                 </svg>
                             </div>
-                            <span class="font-extrabold">Add New Member</span>
+                            <span class="font-extrabold">Tambah Pelanggan</span>
                         </div>
                         <svg class="h-5 w-5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"></path>
@@ -272,29 +272,62 @@
                                     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
                                 </svg>
                             </div>
-                            <span class="font-extrabold">Machine Maintenance</span>
+                            <span class="font-extrabold">Perawatan Mesin</span>
                         </div>
                         <svg class="h-5 w-5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"></path>
                         </svg>
                     </button>
+
+                    <a href="{{ route('inventories.index') }}" class="flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 text-slate-700 transition hover:bg-slate-50 active:scale-95">
+                        <div class="flex items-center gap-4">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"></path>
+                                    <path d="m3.3 7 8.7 5 8.7-5"></path>
+                                    <path d="M12 12v9"></path>
+                                </svg>
+                            </div>
+                            <span class="font-extrabold">Buka Inventaris</span>
+                        </div>
+                        <svg class="h-5 w-5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
                 </div>
             </div>
 
-            <div class="rounded-3xl bg-rose-50 p-8">
-                <div class="flex items-center gap-4 text-rose-600">
+            <div class="rounded-3xl {{ $lowStockCount > 0 ? 'bg-rose-50' : 'bg-emerald-50' }} p-8">
+                <div class="flex items-center gap-4 {{ $lowStockCount > 0 ? 'text-rose-600' : 'text-emerald-600' }}">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                         <line x1="12" y1="9" x2="12" y2="13"></line>
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
-                    <h4 class="font-extrabold uppercase tracking-wider text-rose-700">Alert: 2 Pending Issues</h4>
+                    <h4 class="font-extrabold uppercase tracking-wider {{ $lowStockCount > 0 ? 'text-rose-700' : 'text-emerald-700' }}">
+                        Peringatan Stok ≤ {{ $lowStockCount }}
+                    </h4>
                 </div>
-                <p class="mt-4 text-sm font-semibold text-rose-600/80 leading-relaxed">
-                    Washer #12 and Dryer #05 require immediate attention from the maintenance team.
-                </p>
-                <a href="#" class="mt-6 flex items-center gap-2 text-sm font-extrabold text-rose-700 hover:underline">
-                    View Maintenance Log
+                @if($lowStockCount > 0)
+                    <div class="mt-4 space-y-3">
+                        @foreach($lowStockItems as $item)
+                            <div class="rounded-2xl bg-white/70 px-4 py-3">
+                                <p class="text-sm font-extrabold text-rose-700">{{ $item->nama_barang }}</p>
+                                <p class="mt-1 text-sm font-semibold text-rose-600/80">
+                                    Stok {{ $item->formattedQuantity() }} {{ $item->satuan }} di {{ $item->outlet?->nama_outlet ?? '-' }}
+                                    .
+                                    Batas alert {{ $item->formattedQuantity($item->alert_stok) }} {{ $item->satuan }}.
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="mt-4 text-sm font-semibold leading-relaxed text-emerald-700/80">
+                        Tidak ada stok yang menyentuh batas alert. Semua inventaris masih aman.
+                    </p>
+                @endif
+                <a href="{{ route('inventories.index', ['status' => 'low']) }}" class="mt-6 flex items-center gap-2 text-sm font-extrabold {{ $lowStockCount > 0 ? 'text-rose-700' : 'text-emerald-700' }} hover:underline">
+                    Lihat Inventaris
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>

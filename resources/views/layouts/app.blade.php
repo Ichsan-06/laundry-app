@@ -14,6 +14,8 @@
         ['label' => 'Mesin', 'route' => 'machines.index', 'match' => 'machines*', 'permission' => 'machines.view'],
         ['label' => 'Layanan', 'route' => 'services.index', 'match' => 'services*', 'permission' => 'services.view'],
         ['label' => 'Addon', 'route' => 'addons.index', 'match' => 'addons*', 'permission' => 'addons.view'],
+        ['label' => 'Inventaris', 'route' => 'inventories.index', 'match' => 'inventories*', 'permission' => 'inventories.view'],
+        ['label' => 'Pengeluaran', 'route' => 'outcomes.index', 'match' => 'outcomes*', 'permission' => 'outcomes.view'],
         ['label' => 'Outlet', 'route' => 'outlets.index', 'match' => 'outlets*', 'permission' => 'outlets.view'],
         ['label' => 'Laporan', 'route' => 'reports.index', 'match' => 'reports*', 'permission' => 'reports.view'],
         ['label' => 'Staff', 'route' => 'users.index', 'match' => 'users*', 'permission' => 'staff.view'],
@@ -209,5 +211,122 @@
             </main>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('headerNotifications', () => ({
+                open: false,
+                count: 0,
+                items: [],
+                init() {
+                    this.fetchNotifications();
+                    // Polling setiap 30 detik untuk real-time update
+                    setInterval(() => this.fetchNotifications(), 30000);
+                },
+                async fetchNotifications() {
+                    try {
+                        const res = await fetch('{{ route("api.notifications.due-transactions") }}');
+                        const data = await res.json();
+                        if (data.success) {
+                            this.count = data.count;
+                            this.items = data.items;
+                        }
+                    } catch (err) {
+                        console.error('Error fetching notifications:', err);
+                    }
+                }
+            }));
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Temukan elemen header
+            const header = document.querySelector('header');
+            if (!header) return;
+
+            // Cari kontainer aksi di bagian paling kanan header
+            let actionsContainer = null;
+            const firstChild = header.firstElementChild;
+            
+            // Jika header memiliki wrapper dalam (seperti layout default)
+            if (firstChild && firstChild.classList.contains('justify-between')) {
+                actionsContainer = firstChild.lastElementChild;
+            } else {
+                actionsContainer = header.lastElementChild;
+            }
+
+            if (actionsContainer) {
+                const bellContainer = document.createElement('div');
+                bellContainer.className = 'relative flex items-center';
+                bellContainer.id = 'global-notification-bell-root';
+                bellContainer.setAttribute('x-data', 'headerNotifications()');
+                
+                bellContainer.innerHTML = `
+                    <!-- Tombol Lonceng -->
+                    <button @click="open = !open" class="relative rounded-full p-2.5 text-slate-400 transition hover:bg-slate-100 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span x-show="count > 0" class="absolute top-1.5 right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-extrabold text-white ring-2 ring-white animate-pulse" x-text="count" style="display: none;"></span>
+                    </button>
+
+                    <!-- Dropdown Modal -->
+                    <div x-show="open" @click.outside="open = false" 
+                         x-transition:enter="transition ease-out duration-150" 
+                         x-transition:enter-start="opacity-0 scale-95" 
+                         x-transition:enter-end="opacity-100 scale-100" 
+                         x-transition:leave="transition ease-in duration-100" 
+                         x-transition:leave-start="opacity-100 scale-100" 
+                         x-transition:leave-end="opacity-0 scale-95" 
+                         class="absolute right-0 mt-2 w-80 rounded-3xl border border-slate-100 bg-white p-4 shadow-panel z-50 top-full" 
+                         style="display: none;">
+                        <div class="flex items-center justify-between border-b border-slate-50 pb-3 mb-3">
+                            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Notifikasi Estimasi</h3>
+                            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500" x-text="count + ' tertunda'"></span>
+                        </div>
+                        <div class="max-h-60 overflow-y-auto space-y-2 pr-1">
+                            <template x-for="item in items" :key="item.id">
+                                <a :href="item.url" class="block rounded-2xl p-3 transition" :class="item.is_overdue ? 'bg-rose-50/50 hover:bg-rose-50' : 'bg-amber-50/50 hover:bg-amber-50'">
+                                    <div class="flex items-start justify-between">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider" :class="item.is_overdue ? 'text-rose-700' : 'text-amber-700'" x-text="'#' + item.transaction_number"></span>
+                                        <span class="text-[10px] font-extrabold" :class="item.is_overdue ? 'text-rose-600' : 'text-amber-600'" x-text="item.time_left"></span>
+                                    </div>
+                                    <p class="mt-1 text-xs font-extrabold text-slate-800" x-text="item.member_name"></p>
+                                    <div class="mt-2 flex items-center justify-between text-[10px] font-semibold text-slate-400">
+                                        <span x-text="'Estimasi Selesai: ' + item.estimated_finish"></span>
+                                    </div>
+                                    <div class="mt-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right" x-text="item.outlet_name"></div>
+                                </a>
+                            </template>
+                            <div x-show="count === 0" class="py-8 text-center">
+                                <svg class="mx-auto h-8 w-8 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 8v4l3 3"></path>
+                                </svg>
+                                <p class="mt-2 text-xs font-bold text-slate-400">Semua pesanan aman tepat waktu</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Jika container aksi adalah card profil, masukkan bell sebagai saudara sebelum profil card tersebut
+                if (firstChild && firstChild.classList.contains('justify-between')) {
+                    actionsContainer.parentNode.insertBefore(bellContainer, actionsContainer);
+                } else {
+                    // Di custom header (dashboard), masukkan ke dalam kontainer aksi paling kanan
+                    actionsContainer.insertBefore(bellContainer, actionsContainer.firstChild);
+                }
+
+                // Compile Alpine tree
+                if (window.Alpine) {
+                    Alpine.initTree(bellContainer);
+                } else {
+                    document.addEventListener('alpine:init', () => {
+                        Alpine.initTree(bellContainer);
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html>

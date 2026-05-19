@@ -7,11 +7,11 @@
 @section('content')
 <div class="space-y-8">
     <!-- Filters & Actions -->
-    <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1 rounded-xl bg-white p-1 shadow-sm border border-slate-100">
-            <a href="{{ route('reports.index', ['filter' => 'monthly']) }}" class="rounded-lg {{ $filter === 'monthly' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-slate-500 hover:bg-slate-50' }} px-4 py-2 text-sm font-bold transition">Monthly</a>
-            <a href="{{ route('reports.index', ['filter' => 'weekly']) }}" class="rounded-lg {{ $filter === 'weekly' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-slate-500 hover:bg-slate-50' }} px-4 py-2 text-sm font-bold transition">Weekly</a>
-            <a href="{{ route('reports.index', ['filter' => 'daily']) }}" class="rounded-lg {{ $filter === 'daily' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-slate-500 hover:bg-slate-50' }} px-4 py-2 text-sm font-bold transition">Daily</a>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-1 rounded-xl bg-white p-1 shadow-sm border border-slate-100 w-fit">
+            <a href="{{ route('reports.index', ['filter' => 'monthly']) }}" class="rounded-lg {{ $filter === 'monthly' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-slate-500 hover:bg-slate-50' }} px-4 py-2 text-sm font-bold transition">Bulanan</a>
+            <a href="{{ route('reports.index', ['filter' => 'weekly']) }}" class="rounded-lg {{ $filter === 'weekly' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-slate-500 hover:bg-slate-50' }} px-4 py-2 text-sm font-bold transition">Mingguan</a>
+            <a href="{{ route('reports.index', ['filter' => 'daily']) }}" class="rounded-lg {{ $filter === 'daily' ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' : 'text-slate-500 hover:bg-slate-50' }} px-4 py-2 text-sm font-bold transition">Harian</a>
             <div class="mx-2 h-4 w-px bg-slate-200"></div>
             <button class="rounded-lg p-2 text-slate-500 hover:bg-slate-50">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -21,6 +21,25 @@
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
             </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="{{ route('reports.export-pdf', ['filter' => $filter]) }}" class="flex items-center gap-2 rounded-xl bg-rose-600 text-white shadow-md shadow-rose-600/10 px-4 py-2.5 text-sm font-bold transition hover:bg-rose-700 hover:scale-[1.02] active:scale-[0.98]">
+                <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export PDF
+            </a>
+            <a href="{{ route('reports.export-excel', ['filter' => $filter]) }}" class="flex items-center gap-2 rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-600/10 px-4 py-2.5 text-sm font-bold transition hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98]">
+                <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export Excel
+            </a>
         </div>
     </div>
 
@@ -43,7 +62,7 @@
                 </span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Total Revenue</p>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Total Pendapatan</p>
                 <h3 class="mt-1 text-2xl font-extrabold text-slate-900">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
             </div>
         </div>
@@ -68,7 +87,7 @@
                 </span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Transactions</p>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Transaksi</p>
                 <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ number_format($totalTransactions, 0, ',', '.') }}</h3>
             </div>
         </div>
@@ -89,7 +108,7 @@
                 </span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Avg. Efficiency</p>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Rata-rata Efisiensi</p>
                 <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ number_format($avgEfficiency, 1) }}%</h3>
             </div>
         </div>
@@ -112,7 +131,7 @@
                 </span>
             </div>
             <div class="mt-4">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">New Members</p>
+                <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Jumlah Pelanggan Baru</p>
                 <h3 class="mt-1 text-2xl font-extrabold text-slate-900">{{ number_format($newMembers, 0, ',', '.') }}</h3>
             </div>
         </div>
@@ -124,8 +143,8 @@
         <div class="lg:col-span-2 rounded-3xl border border-slate-100 bg-white p-8 shadow-soft">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h3 class="text-lg font-extrabold text-slate-900">Revenue Growth</h3>
-                    <p class="text-sm font-semibold text-slate-400">Daily earnings trajectory for the current month</p>
+                    <h3 class="text-lg font-extrabold text-slate-900">Pertumbuhan Pendapatan</h3>
+                    <p class="text-sm font-semibold text-slate-400">Tren pendapatan harian untuk bulan ini</p>
                 </div>
                 <button class="flex items-center gap-2 text-sm font-bold text-primary-600 hover:underline">
                     Download CSV
@@ -143,8 +162,8 @@
 
         <!-- Service Usage Breakdown -->
         <div class="rounded-3xl border border-slate-100 bg-white p-8 shadow-soft">
-            <h3 class="text-lg font-extrabold text-slate-900">Service Usage</h3>
-            <p class="text-sm font-semibold text-slate-400 mb-8">Breakdown of service preferences</p>
+            <h3 class="text-lg font-extrabold text-slate-900">Penggunaan Layanan</h3>
+            <p class="text-sm font-semibold text-slate-400 mb-8">Rincian preferensi layanan</p>
             
             <div class="space-y-6">
                 @foreach($serviceUsage as $usage)
@@ -172,13 +191,13 @@
     <div class="rounded-3xl border border-slate-100 bg-white shadow-soft overflow-hidden">
         <div class="p-8 border-b border-slate-50">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-extrabold text-slate-900">Machine Statistics</h3>
+                <h3 class="text-lg font-extrabold text-slate-900">Statistik Mesin</h3>
                 <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold text-slate-400">Sort by:</span>
+                    <span class="text-sm font-bold text-slate-400">Urutkan berdasarkan:</span>
                     <select class="bg-transparent text-sm font-extrabold text-slate-900 outline-none cursor-pointer">
-                        <option>Usage Frequency</option>
-                        <option>Revenue</option>
-                        <option>Efficiency</option>
+                        <option>Frekuensi Penggunaan</option>
+                        <option>Pendapatan</option>
+                        <option>Efisiensi</option>
                     </select>
                 </div>
             </div>
@@ -187,12 +206,12 @@
             <table class="w-full text-left">
                 <thead>
                     <tr class="bg-slate-50/50">
-                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Machine ID</th>
-                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Type</th>
-                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Cycles (Mo)</th>
-                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Avg. Duration</th>
+                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">ID Mesin</th>
+                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Tipe</th>
+                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Siklus (Mo)</th>
+                        <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Rata-rata Durasi</th>
                         <th class="px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Status</th>
-                        <th class="px-8 py-4 text-right text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Revenue</th>
+                        <th class="px-8 py-4 text-right text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pendapatan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -216,7 +235,7 @@
                             @if($stat['status'] == 'READY')
                                 <span class="rounded-lg bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold text-emerald-600">Optimal</span>
                             @else
-                                <span class="rounded-lg bg-amber-50 px-3 py-1.5 text-[11px] font-extrabold text-amber-600">Service Due</span>
+                                <span class="rounded-lg bg-amber-50 px-3 py-1.5 text-[11px] font-extrabold text-amber-600">Perlu Servis</span>
                             @endif
                         </td>
                         <td class="px-8 py-5 text-right font-extrabold text-slate-900">Rp {{ number_format($stat['revenue'], 0, ',', '.') }}</td>
@@ -227,7 +246,7 @@
         </div>
         <div class="p-8 bg-slate-50/30 flex justify-center">
             <button class="flex items-center gap-2 text-sm font-extrabold text-primary-600 hover:underline">
-                View Detailed Machine Analysis
+                Lihat Analisis Mesin
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
                 </svg>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\InventoryItem;
 use App\Models\Transaction;
 use App\Models\Machine;
 use App\Models\SelfServiceDetail;
@@ -27,6 +28,10 @@ class DashboardController extends Controller
         $transactions = $this->tenantContextService->scopeByUser(Transaction::query(), $user);
         $machines = $this->tenantContextService->scopeByUser(Machine::query(), $user);
         $members = $this->tenantContextService->scopeByUser(Member::query(), $user);
+        $inventoryItems = $this->tenantContextService->scopeByUser(
+            InventoryItem::query()->with('outlet'),
+            $user
+        );
 
         // 1. Summary Cards (Filtered by date)
         $totalRevenue = (clone $transactions)->where('status', 'COMPLETED')
@@ -42,6 +47,12 @@ class DashboardController extends Controller
             ->count();
 
         $newMembersCount = (clone $members)->whereBetween('created_at', [$startDate, $endDate])->count();
+        $lowStockItems = (clone $inventoryItems)
+            ->whereColumn('stok', '<=', 'alert_stok')
+            ->orderByRaw('stok - alert_stok asc')
+            ->take(5)
+            ->get();
+        $lowStockCount = $lowStockItems->count();
 
         // 2. Live Machines (Always current status)
         $liveMachines = (clone $machines)->get()->map(function($machine) {
@@ -108,6 +119,8 @@ class DashboardController extends Controller
             'machineCapacityPercent',
             'pendingOrders',
             'newMembersCount',
+            'lowStockItems',
+            'lowStockCount',
             'liveMachines',
             'chartLabels',
             'chartData',

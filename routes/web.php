@@ -7,9 +7,11 @@ use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BillingPaymentController;
 use App\Http\Controllers\BillingWijayaPayCallbackController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\MachineController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\OutcomeController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ReportController;
@@ -22,6 +24,7 @@ use App\Http\Controllers\TenantSubscriptionController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WijayaPayCallbackController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -91,9 +94,23 @@ Route::middleware(['auth', 'active.user'])->group(function () {
             ->except('show')
             ->middleware(['rbac:permission,addons.view,addons.create,addons.update,addons.delete', 'plan.permission:addons.view,addons.create,addons.update,addons.delete']);
 
+        Route::resource('inventories', InventoryController::class)
+            ->except(['show', 'create', 'edit'])
+            ->middleware(['rbac:permission,inventories.view,inventories.create,inventories.update,inventories.delete']);
+        Route::post('/inventories/{inventory}/restock', [InventoryController::class, 'restock'])
+            ->middleware(['rbac:permission,inventories.update'])
+            ->name('inventories.restock');
+        Route::post('/inventories/{inventory}/use', [InventoryController::class, 'use'])
+            ->middleware(['rbac:permission,inventories.update'])
+            ->name('inventories.use');
+
         Route::resource('services', ServiceController::class)
             ->except('show')
             ->middleware(['rbac:permission,services.view,services.create,services.update,services.delete', 'plan.permission:services.view,services.create,services.update,services.delete']);
+
+        Route::resource('outcomes', OutcomeController::class)
+            ->except(['show', 'create', 'edit'])
+            ->middleware(['rbac:permission,outcomes.view,outcomes.create,outcomes.update,outcomes.delete']);
 
         Route::resource('outlets', OutletController::class)
             ->except('show')
@@ -134,6 +151,17 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])
             ->middleware(['rbac:permission,reports.view', 'plan.permission:reports.view'])
             ->name('reports.index');
+
+        Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])
+            ->middleware(['rbac:permission,reports.view', 'plan.permission:reports.view'])
+            ->name('reports.export-pdf');
+
+        Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])
+            ->middleware(['rbac:permission,reports.view', 'plan.permission:reports.view'])
+            ->name('reports.export-excel');
+
+        Route::get('/api/notifications/due-transactions', [NotificationController::class, 'getDueTransactions'])
+            ->name('api.notifications.due-transactions');
     });
 });
 
