@@ -11,6 +11,7 @@
         ['label' => 'Kasir', 'route' => 'kasir.index', 'match' => 'kasir*', 'permission' => 'cashier.access'],
         ['label' => 'Pelanggan', 'route' => 'members.index', 'match' => 'members*', 'permission' => 'customers.view'],
         ['label' => 'Transaksi', 'route' => 'transactions.index', 'match' => 'transactions*', 'permission' => 'transactions.view'],
+        ['label' => 'Kalender', 'route' => 'calendar.index', 'match' => 'calendar*', 'permission' => 'calendar.view'],
         ['label' => 'Mesin', 'route' => 'machines.index', 'match' => 'machines*', 'permission' => 'machines.view'],
         ['label' => 'Layanan', 'route' => 'services.index', 'match' => 'services*', 'permission' => 'services.view'],
         ['label' => 'Addon', 'route' => 'addons.index', 'match' => 'addons*', 'permission' => 'addons.view'],

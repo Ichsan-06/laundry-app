@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MemberSeeder::class,
             TransactionSeeder::class,
-            MachineSeeder::class,
+            // MachineSeeder::class,
         ]);
     }
 }

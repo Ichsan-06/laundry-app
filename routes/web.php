@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\OwnerRegistrationController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BillingPaymentController;
 use App\Http\Controllers\BillingWijayaPayCallbackController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\KasirController;
@@ -85,6 +86,13 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::patch('/transactions/{transaction}/advance-process', [TransactionController::class, 'advanceProcess'])
             ->middleware(['rbac:permission,transactions.update', 'plan.permission:transactions.update'])
             ->name('transactions.advance-process');
+
+        Route::get('/calendar', [CalendarController::class, 'index'])
+            ->middleware(['rbac:permission,calendar.view', 'plan.permission:calendar.view'])
+            ->name('calendar.index');
+        Route::get('/calendar/show/{date}', [CalendarController::class, 'show'])
+            ->middleware(['rbac:permission,calendar.view', 'plan.permission:calendar.view'])
+            ->name('calendar.show');
 
         Route::resource('machines', MachineController::class)
             ->except('show')

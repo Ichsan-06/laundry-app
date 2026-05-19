@@ -20,6 +20,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'permissions' => [
                     'dashboard.view',
                     'transactions.view',
+                    'calendar.view',
                     'transactions.create',
                     'transactions.update',
                     'customers.view',
@@ -47,6 +48,7 @@ class SubscriptionPlanSeeder extends Seeder
                     'dashboard.view',
                     'cashier.access',
                     'transactions.view',
+                    'calendar.view',
                     'transactions.create',
                     'transactions.update',
                     'customers.view',
@@ -74,6 +76,7 @@ class SubscriptionPlanSeeder extends Seeder
                     'dashboard.view',
                     'cashier.access',
                     'transactions.view',
+                    'calendar.view',
                     'transactions.create',
                     'transactions.update',
                     'transactions.delete',
