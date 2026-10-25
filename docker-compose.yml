@@ -29,39 +29,9 @@ services:
     networks:
       - laundry-network
 
-  mysql:
-    image: mysql:8.0
-    container_name: laundry-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: laundry_db
-      MYSQL_ROOT_PASSWORD: roots
-      MYSQL_PASSWORD: roots
-      MYSQL_USER: roots
-    ports:
-      - "3308:3307"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - laundry-network
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: laundry-phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8085:80"
-    environment:
-      PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root
-    depends_on:
-      - mysql
-    networks:
-      - laundry-network
-
-volumes:
-  mysql_data:
-
 networks:
   laundry-network:
     driver: bridge
+    
+  shared-infra:
+    external: true
