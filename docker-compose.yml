@@ -6,8 +6,6 @@ services:
     container_name: laundry-app
     restart: unless-stopped
     working_dir: /var/www
-    depends_on:
-      - mysql
     networks:
       - laundry-network
     volumes:
@@ -32,6 +30,6 @@ services:
 networks:
   laundry-network:
     driver: bridge
-    
+
   shared-infra:
     external: true
