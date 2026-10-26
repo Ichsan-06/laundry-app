@@ -4,17 +4,14 @@ version: "3.8"
 services:
   app:
     build: .
-    image: laundry-app:latest
-    image_build:
-      context: .
-      dockerfile: Dockerfile
     container_name: laundry-app
     restart: unless-stopped
     working_dir: /var/www
     networks:
       - laundry-network
     volumes:
-      - /opt/laundry-app/.env:/var/www/.env:ro
+      - /opt/laundry-app/.env:/var/www/.env:rw
+      - /opt/laundry-app/.env.docker:/var/www/.env.docker:rw
     ports:
       - "8003:80"
 
