@@ -10,7 +10,7 @@ services:
     networks:
       - laundry-network
     volumes:
-      - ./.env.docker:/var/www/.env
+      - /opt/laundry-app/.env:/var/www/.env:ro
     ports:
       - "8003:80"
 
