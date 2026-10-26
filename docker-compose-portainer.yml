@@ -9,6 +9,7 @@ services:
     working_dir: /var/www
     networks:
       - laundry-network
+      - shared-infra
     volumes:
       - /opt/laundry-app/.env:/var/www/.env:rw
     ports:
