@@ -39,3 +39,5 @@ services:
 networks:
   laundry-network:
     driver: bridge
+  shared-infra:
+    external: true
